@@ -10,6 +10,10 @@ import type { TokenPairDto } from './dto/token.dto.js';
 
 export type Audience = 'member' | 'admin';
 
+/** 舊 refresh token 在輪替後仍可使用的寬限時間（處理並發刷新） */
+export const ROTATION_GRACE_MS = 30_000;
+const REUSED_MESSAGE = '偵測到登入權杖重複使用，已登出所有裝置';
+
 const AUDIENCE_BY_SUBJECT: Record<AuthSubject, Audience> = { MEMBER: 'member', ADMIN: 'admin' };
 
 export interface AccessTokenPayload {
@@ -27,7 +31,8 @@ export interface ClientInfo {
  * 權杖策略：
  * - Access token：短效 JWT（預設 15 分鐘），無狀態驗證，Web／Admin／App 一律放在 Authorization header。
  * - Refresh token：長效不透明亂碼，只在資料庫存 SHA-256 雜湊。每次刷新都輪替，
- *   舊 token 再被使用代表可能外洩，整個 family 立即作廢（refresh token rotation + reuse detection）。
+ *   舊 token 超過寬限期後再被使用代表可能外洩，整個 family 立即作廢
+ *   （refresh token rotation + reuse detection，寬限期處理同一裝置的並發刷新）。
  */
 @Injectable()
 export class TokenService {
@@ -58,30 +63,29 @@ export class TokenService {
       throw AppException.unauthorized(ErrorCode.TOKEN_INVALID, '登入已失效，請重新登入');
     }
 
-    if (session.revokedAt || session.rotatedAt) {
+    if (session.revokedAt) {
       await this.revokeFamily(session.familyId);
-      throw AppException.unauthorized(
-        ErrorCode.TOKEN_REUSED,
-        '偵測到登入權杖重複使用，已登出所有裝置',
-      );
+      throw AppException.unauthorized(ErrorCode.TOKEN_REUSED, REUSED_MESSAGE);
+    }
+
+    if (session.rotatedAt) {
+      // 寬限期內的重複使用視為同一裝置的並發刷新（例如頁面同時發出多個請求），不視為盜用
+      if (Date.now() - session.rotatedAt.getTime() <= ROTATION_GRACE_MS) {
+        return this.createSession(subjectType, session.subjectId, session.familyId, client);
+      }
+      await this.revokeFamily(session.familyId);
+      throw AppException.unauthorized(ErrorCode.TOKEN_REUSED, REUSED_MESSAGE);
     }
 
     if (session.expiresAt <= new Date()) {
       throw AppException.unauthorized(ErrorCode.TOKEN_INVALID, '登入已過期，請重新登入');
     }
 
-    // 條件式更新避免同一個 refresh token 被並發請求同時兌換
-    const { count } = await this.prisma.authSession.updateMany({
+    // 條件式更新；若同時有另一個請求剛完成輪替，同樣落在寬限期內，直接核發新權杖
+    await this.prisma.authSession.updateMany({
       where: { id: session.id, rotatedAt: null, revokedAt: null },
       data: { rotatedAt: new Date() },
     });
-    if (count === 0) {
-      await this.revokeFamily(session.familyId);
-      throw AppException.unauthorized(
-        ErrorCode.TOKEN_REUSED,
-        '偵測到登入權杖重複使用，已登出所有裝置',
-      );
-    }
 
     return this.createSession(subjectType, session.subjectId, session.familyId, client);
   }

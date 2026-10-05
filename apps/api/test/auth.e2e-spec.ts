@@ -70,6 +70,11 @@ describe('會員認證 (e2e)', () => {
     const second = rotated.body.refreshToken as string;
     expect(second).not.toBe(first);
 
+    // 模擬超過寬限期後才被拿來重複使用（例如 token 外洩）
+    await ctx.prisma.authSession.updateMany({
+      where: { rotatedAt: { not: null } },
+      data: { rotatedAt: new Date(Date.now() - 60_000) },
+    });
     const reuse = await ctx
       .http()
       .post('/v1/auth/refresh')
@@ -84,6 +89,23 @@ describe('會員認證 (e2e)', () => {
       .send({ refreshToken: second })
       .expect(401);
     expect(after.body.error.code).toBe('TOKEN_REUSED');
+  });
+
+  it('寬限期內同一個 refresh token 的並發刷新都會成功（不誤判為盜用）', async () => {
+    const { body } = await register().expect(201);
+    const results = await Promise.all(
+      Array.from({ length: 3 }, () =>
+        ctx.http().post('/v1/auth/refresh').send({ refreshToken: body.tokens.refreshToken }),
+      ),
+    );
+    expect(results.map((r) => r.status)).toEqual([200, 200, 200]);
+    for (const r of results) {
+      await ctx
+        .http()
+        .get('/v1/me')
+        .set('Authorization', `Bearer ${r.body.accessToken}`)
+        .expect(200);
+    }
   });
 
   it('沒有帶 token 或 token 無效時回傳 401', async () => {

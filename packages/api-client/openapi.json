@@ -1,0 +1,5304 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1/auth/register": {
+      "post": {
+        "operationId": "MemberAuth_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberAuthResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "會員註冊，成功後直接回傳登入權杖",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "MemberAuth_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberAuthResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "會員登入",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "MemberAuth_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPairDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "以 refresh token 換發新權杖（舊的 refresh token 會失效）",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "MemberAuth_logout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "登出：作廢此 refresh token 所屬的工作階段",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/admin/auth/login": {
+      "post": {
+        "operationId": "AdminAuth_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAuthResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "後台登入",
+        "tags": [
+          "Admin / Auth"
+        ]
+      }
+    },
+    "/v1/admin/auth/refresh": {
+      "post": {
+        "operationId": "AdminAuth_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPairDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin / Auth"
+        ]
+      }
+    },
+    "/v1/admin/auth/logout": {
+      "post": {
+        "operationId": "AdminAuth_logout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin / Auth"
+        ]
+      }
+    },
+    "/v1/admin/auth/me": {
+      "get": {
+        "operationId": "AdminAuth_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "目前登入的管理員與其權限",
+        "tags": [
+          "Admin / Auth"
+        ]
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "Me_profile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "目前登入的會員資料",
+        "tags": [
+          "Me"
+        ]
+      },
+      "patch": {
+        "operationId": "Me_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "tags": [
+          "Me"
+        ]
+      },
+      "delete": {
+        "operationId": "Me_deleteAccount",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "刪除帳號（個資去識別化，訂單紀錄保留）",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/v1/me/password": {
+      "post": {
+        "operationId": "Me_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "變更密碼（成功後所有裝置需重新登入）",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/v1/brands": {
+      "get": {
+        "operationId": "Catalog_listBrands",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BrandDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "品牌列表",
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/brands/{slug}": {
+      "get": {
+        "operationId": "Catalog_getBrand",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrandDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/categories": {
+      "get": {
+        "operationId": "Catalog_listCategories",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "分類樹",
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/scales": {
+      "get": {
+        "operationId": "Catalog_listScales",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScaleOptionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "上架商品使用中的比例（篩選選項）",
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/products": {
+      "get": {
+        "operationId": "Catalog_listProducts",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ]
+            }
+          },
+          {
+            "name": "saleType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SaleType"
+            }
+          },
+          {
+            "name": "availability",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "available",
+                "upcoming",
+                "preorder",
+                "sold_out"
+              ]
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "newest",
+              "type": "string",
+              "enum": [
+                "newest",
+                "price_asc",
+                "price_desc",
+                "release",
+                "featured"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "關鍵字（商品名稱、品牌、SKU）",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "brand",
+            "required": false,
+            "in": "query",
+            "description": "品牌 slug",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "分類 slug（含子分類）",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scale",
+            "required": false,
+            "in": "query",
+            "description": "比例，例如 1:64",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "商品列表：關鍵字搜尋、品牌／分類／比例／販售方式／狀態／價格篩選、排序、分頁",
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/products/{slug}": {
+      "get": {
+        "operationId": "Catalog_getProduct",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "商品詳情",
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/admin/products": {
+      "get": {
+        "operationId": "AdminProducts_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ProductStatus"
+            }
+          },
+          {
+            "name": "saleType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SaleType"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "名稱或 SKU",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "brandId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "lowStock",
+            "required": false,
+            "in": "query",
+            "description": "只顯示低庫存（≤5）",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Products"
+        ]
+      },
+      "post": {
+        "operationId": "AdminProducts_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Products"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}": {
+      "get": {
+        "operationId": "AdminProducts_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Products"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminProducts_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Products"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminProducts_archive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "下架封存",
+        "tags": [
+          "Admin / Products"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/stock": {
+      "post": {
+        "operationId": "AdminProducts_adjustStock",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdjustStockDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockLevelDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "調整庫存（增減量），會留下異動紀錄",
+        "tags": [
+          "Admin / Products"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/stock-movements": {
+      "get": {
+        "operationId": "AdminProducts_stockMovements",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StockMovementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "庫存異動紀錄（最新 100 筆）",
+        "tags": [
+          "Admin / Products"
+        ]
+      }
+    },
+    "/v1/admin/brands": {
+      "get": {
+        "operationId": "AdminTaxonomy_listBrands",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminBrandDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Brands & Categories"
+        ]
+      },
+      "post": {
+        "operationId": "AdminTaxonomy_createBrand",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBrandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBrandDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Brands & Categories"
+        ]
+      }
+    },
+    "/v1/admin/brands/{id}": {
+      "patch": {
+        "operationId": "AdminTaxonomy_updateBrand",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBrandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBrandDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Brands & Categories"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminTaxonomy_deleteBrand",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Brands & Categories"
+        ]
+      }
+    },
+    "/v1/admin/categories": {
+      "get": {
+        "operationId": "AdminTaxonomy_listCategories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminCategoryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Brands & Categories"
+        ]
+      },
+      "post": {
+        "operationId": "AdminTaxonomy_createCategory",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Brands & Categories"
+        ]
+      }
+    },
+    "/v1/admin/categories/{id}": {
+      "patch": {
+        "operationId": "AdminTaxonomy_updateCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Brands & Categories"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminTaxonomy_deleteCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Brands & Categories"
+        ]
+      }
+    },
+    "/v1/cart": {
+      "get": {
+        "operationId": "Cart_get",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "購物車內容、小計、各配送方式運費，以及需要處理的問題（售完、超過限購等）",
+        "tags": [
+          "Cart"
+        ]
+      },
+      "delete": {
+        "operationId": "Cart_clear",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "清空購物車",
+        "tags": [
+          "Cart"
+        ]
+      }
+    },
+    "/v1/cart/items/{productId}": {
+      "put": {
+        "operationId": "Cart_setItem",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetCartItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "加入或更新商品數量",
+        "tags": [
+          "Cart"
+        ]
+      },
+      "delete": {
+        "operationId": "Cart_removeItem",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "tags": [
+          "Cart"
+        ]
+      }
+    },
+    "/v1/orders": {
+      "post": {
+        "operationId": "Orders_checkout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "結帳建立訂單。成功後庫存即保留給此訂單，需在 paymentDeadline 前付款，\n接著呼叫 `POST /v1/orders/{orderNo}/payments` 取得付款資訊。",
+        "tags": [
+          "Orders"
+        ]
+      },
+      "get": {
+        "operationId": "Orders_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "我的訂單",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/{orderNo}": {
+      "get": {
+        "operationId": "Orders_get",
+        "parameters": [
+          {
+            "name": "orderNo",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/{orderNo}/cancel": {
+      "post": {
+        "operationId": "Orders_cancel",
+        "parameters": [
+          {
+            "name": "orderNo",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "取消未付款訂單（庫存會立即釋放）",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1/orders/{orderNo}/payments": {
+      "post": {
+        "operationId": "Payments_start",
+        "parameters": [
+          {
+            "name": "orderNo",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentInstructionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "開始付款：回傳導向金流頁的方式。\n`redirect` 直接開啟 url；`form_post` 需以 HTML 表單 POST fields 到 url（綠界規格）。",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/v1/payments/ecpay/notify": {
+      "post": {
+        "operationId": "EcpayCallback_notify",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "summary": "綠界付款結果通知，必須回應 `1|OK`，否則綠界會重送",
+        "tags": [
+          "Payments / Callbacks"
+        ]
+      }
+    },
+    "/v1/payments/ecpay/return": {
+      "post": {
+        "operationId": "EcpayCallback_return",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "付款完成後綠界以瀏覽器 POST 導回，處理結果後轉址回前台",
+        "tags": [
+          "Payments / Callbacks"
+        ]
+      }
+    },
+    "/v1/admin/dashboard": {
+      "get": {
+        "operationId": "AdminDashboard_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "營運儀表板：關鍵指標、14 天營收、熱銷、低庫存、即將發售、最新訂單",
+        "tags": [
+          "Admin / Dashboard"
+        ]
+      }
+    },
+    "/v1/admin/orders": {
+      "get": {
+        "operationId": "AdminOrders_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatus"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "訂單編號、會員 Email、收件人姓名或電話",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "建立時間起（含）",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "建立時間迄（不含）",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Orders"
+        ]
+      }
+    },
+    "/v1/admin/orders/{id}": {
+      "get": {
+        "operationId": "AdminOrders_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Orders"
+        ]
+      }
+    },
+    "/v1/admin/orders/{id}/status": {
+      "post": {
+        "operationId": "AdminOrders_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "變更訂單狀態（依狀態機檢查；取消與退款會自動釋放庫存）",
+        "tags": [
+          "Admin / Orders"
+        ]
+      }
+    },
+    "/v1/admin/orders/{id}/notes": {
+      "post": {
+        "operationId": "AdminOrders_addNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddOrderNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "新增內部備註",
+        "tags": [
+          "Admin / Orders"
+        ]
+      }
+    },
+    "/v1/admin/members": {
+      "get": {
+        "operationId": "AdminMembers_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/MemberStatus"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Email、姓名或電話",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMemberListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Members"
+        ]
+      }
+    },
+    "/v1/admin/members/{id}": {
+      "get": {
+        "operationId": "AdminMembers_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMemberDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Members"
+        ]
+      }
+    },
+    "/v1/admin/members/{id}/status": {
+      "patch": {
+        "operationId": "AdminMembers_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMemberDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "停權或恢復會員",
+        "tags": [
+          "Admin / Members"
+        ]
+      }
+    },
+    "/v1/health": {
+      "get": {
+        "operationId": "Health_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "部署平台用的健康檢查：資料庫與 Redis 都正常才回 200",
+        "tags": [
+          "Health"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Paddock 64 API",
+    "description": "模型車收藏電商平台 API，供 Web 前台、Admin 後台與 iOS／Android App 共用。\n\n**認證**：`/v1/auth/*` 取得會員權杖、`/v1/admin/auth/*` 取得後台權杖，\n呼叫需要登入的 API 時帶上 `Authorization: Bearer <accessToken>`；access token 過期後以 refresh token 換發。\n\n**語系**：商品等內容 API 支援 `?locale=zh-TW|en|zh-CN`，未指定時依 `Accept-Language` 判斷。\n\n**錯誤格式**：所有錯誤皆為 `{ \"error\": { \"code\": \"OUT_OF_STOCK\", \"message\": \"...\", \"details\": ... } }`，\n請以 `code` 判斷錯誤類型。",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "member": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "admin": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ],
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "至少 8 個字元",
+            "minLength": 8,
+            "maxLength": 72
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "marketingOptIn": {
+            "type": "boolean",
+            "description": "是否同意收到新品與活動電子報"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "name"
+        ]
+      },
+      "MemberProfileDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "marketingOptIn": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "locale",
+          "id",
+          "email",
+          "name",
+          "phone",
+          "marketingOptIn",
+          "createdAt"
+        ]
+      },
+      "TokenPairDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "短效 JWT，放在 `Authorization: Bearer <token>`"
+          },
+          "accessTokenExpiresIn": {
+            "type": "number",
+            "description": "access token 有效秒數"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "用來換發新 access token 的長效權杖；每次刷新都會輪替"
+          },
+          "refreshTokenExpiresAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "accessTokenExpiresIn",
+          "refreshToken",
+          "refreshTokenExpiresAt"
+        ]
+      },
+      "MemberAuthResultDto": {
+        "type": "object",
+        "properties": {
+          "member": {
+            "$ref": "#/components/schemas/MemberProfileDto"
+          },
+          "tokens": {
+            "$ref": "#/components/schemas/TokenPairDto"
+          }
+        },
+        "required": [
+          "member",
+          "tokens"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "minLength": 20
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "AdminLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AdminRoleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "permissions"
+        ]
+      },
+      "AdminProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/AdminRoleDto"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name",
+          "role"
+        ]
+      },
+      "AdminAuthResultDto": {
+        "type": "object",
+        "properties": {
+          "admin": {
+            "$ref": "#/components/schemas/AdminProfileDto"
+          },
+          "tokens": {
+            "$ref": "#/components/schemas/TokenPairDto"
+          }
+        },
+        "required": [
+          "admin",
+          "tokens"
+        ]
+      },
+      "UpdateProfileDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "phone": {
+            "type": "string",
+            "description": "台灣手機號碼，例如 0912345678",
+            "pattern": "^09\\d{8}$"
+          },
+          "marketingOptIn": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 72
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "DeleteAccountDto": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "為避免誤刪，需再次輸入密碼",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "BrandDto": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "productCount": {
+            "type": "number",
+            "description": "上架中的商品數"
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "country",
+          "logoUrl",
+          "description",
+          "productCount",
+          "id",
+          "slug",
+          "name"
+        ]
+      },
+      "CategoryDto": {
+        "type": "object",
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryDto"
+            }
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
+          "productCount": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "children",
+          "description",
+          "parentId",
+          "productCount",
+          "id",
+          "slug",
+          "name"
+        ]
+      },
+      "ScaleOptionDto": {
+        "type": "object",
+        "properties": {
+          "scale": {
+            "type": "string"
+          },
+          "productCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "scale",
+          "productCount"
+        ]
+      },
+      "SaleType": {
+        "type": "string",
+        "enum": [
+          "REGULAR",
+          "PRE_ORDER",
+          "LIMITED"
+        ]
+      },
+      "Availability": {
+        "type": "string",
+        "enum": [
+          "IN_STOCK",
+          "LOW_STOCK",
+          "SOLD_OUT",
+          "COMING_SOON",
+          "PREORDER_OPEN",
+          "PREORDER_CLOSED"
+        ]
+      },
+      "BrandSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name"
+        ]
+      },
+      "CategorySummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name"
+        ]
+      },
+      "ProductSummaryDto": {
+        "type": "object",
+        "properties": {
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "availability": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Availability"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "brand": {
+            "$ref": "#/components/schemas/BrandSummaryDto"
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategorySummaryDto"
+          },
+          "scale": {
+            "type": "string",
+            "description": "比例，例如 1:64"
+          },
+          "price": {
+            "type": "number",
+            "description": "售價（新台幣）"
+          },
+          "compareAtPrice": {
+            "type": "number",
+            "nullable": true
+          },
+          "releaseAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "開賣（或預購開放）時間"
+          },
+          "remaining": {
+            "type": "number",
+            "nullable": true,
+            "description": "低庫存時顯示剩餘數量，其餘情況為 null（不公開實際庫存）"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isFeatured": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "saleType",
+          "availability",
+          "id",
+          "slug",
+          "sku",
+          "name",
+          "subtitle",
+          "brand",
+          "category",
+          "scale",
+          "price",
+          "compareAtPrice",
+          "releaseAt",
+          "remaining",
+          "imageUrl",
+          "isFeatured"
+        ]
+      },
+      "PageMeta": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "page",
+          "pageSize",
+          "total",
+          "totalPages"
+        ]
+      },
+      "ProductListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductSummaryDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ProductImageDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "alt": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "url",
+          "alt"
+        ]
+      },
+      "ProductDetailDto": {
+        "type": "object",
+        "properties": {
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "availability": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Availability"
+              }
+            ]
+          },
+          "specs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "規格表，例如材質、輪胎、包裝"
+          },
+          "description": {
+            "type": "string"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImageDto"
+            }
+          },
+          "purchaseLimit": {
+            "type": "number",
+            "nullable": true,
+            "description": "每位會員限購數量；null 表示不限"
+          },
+          "preorderClosesAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "expectedShipAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "預購商品預計出貨時間"
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "brand": {
+            "$ref": "#/components/schemas/BrandSummaryDto"
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategorySummaryDto"
+          },
+          "scale": {
+            "type": "string",
+            "description": "比例，例如 1:64"
+          },
+          "price": {
+            "type": "number",
+            "description": "售價（新台幣）"
+          },
+          "compareAtPrice": {
+            "type": "number",
+            "nullable": true
+          },
+          "releaseAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "開賣（或預購開放）時間"
+          },
+          "remaining": {
+            "type": "number",
+            "nullable": true,
+            "description": "低庫存時顯示剩餘數量，其餘情況為 null（不公開實際庫存）"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isFeatured": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "saleType",
+          "availability",
+          "specs",
+          "description",
+          "images",
+          "purchaseLimit",
+          "preorderClosesAt",
+          "expectedShipAt",
+          "id",
+          "slug",
+          "sku",
+          "name",
+          "subtitle",
+          "brand",
+          "category",
+          "scale",
+          "price",
+          "compareAtPrice",
+          "releaseAt",
+          "remaining",
+          "imageUrl",
+          "isFeatured"
+        ]
+      },
+      "ProductStatus": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "ACTIVE",
+          "ARCHIVED"
+        ]
+      },
+      "AdminProductListItemDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductStatus"
+              }
+            ]
+          },
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "availability": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Availability"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "繁中名稱"
+          },
+          "brandName": {
+            "type": "string"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "scale": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "stock": {
+            "type": "number"
+          },
+          "releaseAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "saleType",
+          "availability",
+          "id",
+          "slug",
+          "sku",
+          "name",
+          "brandName",
+          "categoryName",
+          "scale",
+          "price",
+          "stock",
+          "releaseAt",
+          "imageUrl",
+          "updatedAt"
+        ]
+      },
+      "AdminProductListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminProductListItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ProductTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "locale",
+          "name",
+          "subtitle",
+          "description"
+        ]
+      },
+      "AdminProductImageDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "description": "可直接顯示的完整網址"
+          },
+          "path": {
+            "type": "string",
+            "description": "資料庫儲存的原始值（編輯時回傳這個）"
+          },
+          "alt": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "path",
+          "alt",
+          "sortOrder"
+        ]
+      },
+      "AdminProductDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductStatus"
+              }
+            ]
+          },
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "specs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "availability": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Availability"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "brandId": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "scale": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "compareAtPrice": {
+            "type": "number",
+            "nullable": true
+          },
+          "stock": {
+            "type": "number"
+          },
+          "releaseAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "preorderClosesAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "expectedShipAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "purchaseLimit": {
+            "type": "number",
+            "nullable": true
+          },
+          "isFeatured": {
+            "type": "boolean"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductTranslationDto"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminProductImageDto"
+            }
+          },
+          "soldCount": {
+            "type": "number",
+            "description": "已成立（非取消）訂單的累計售出數量"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "saleType",
+          "specs",
+          "availability",
+          "id",
+          "slug",
+          "sku",
+          "brandId",
+          "categoryId",
+          "scale",
+          "price",
+          "compareAtPrice",
+          "stock",
+          "releaseAt",
+          "preorderClosesAt",
+          "expectedShipAt",
+          "purchaseLimit",
+          "isFeatured",
+          "translations",
+          "images",
+          "soldCount",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ProductTranslationInput": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000
+          }
+        },
+        "required": [
+          "locale",
+          "name",
+          "description"
+        ]
+      },
+      "ProductImageInput": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "圖片網址（完整網址，或內建示範圖片的 /static/... 路徑）",
+            "maxLength": 2048
+          },
+          "alt": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "CreateProductDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductStatus"
+              }
+            ]
+          },
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "specs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "sku": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "brandId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scale": {
+            "type": "string",
+            "description": "例如 1:64、1:43、1:18",
+            "pattern": "^1:\\d{1,3}$"
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "compareAtPrice": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0
+          },
+          "stock": {
+            "type": "number",
+            "description": "初始庫存（之後請用庫存調整 API，系統會留下異動紀錄）",
+            "minimum": 0
+          },
+          "releaseAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "preorderClosesAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "expectedShipAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "purchaseLimit": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 1
+          },
+          "isFeatured": {
+            "type": "boolean"
+          },
+          "translations": {
+            "description": "至少需要繁體中文（zh-TW）",
+            "minItems": 1,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductTranslationInput"
+            }
+          },
+          "images": {
+            "maxItems": 12,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImageInput"
+            }
+          }
+        },
+        "required": [
+          "status",
+          "saleType",
+          "slug",
+          "sku",
+          "brandId",
+          "categoryId",
+          "scale",
+          "price",
+          "stock",
+          "translations"
+        ]
+      },
+      "UpdateProductDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductStatus"
+              }
+            ]
+          },
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "specs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "sku": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "brandId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scale": {
+            "type": "string",
+            "description": "例如 1:64、1:43、1:18",
+            "pattern": "^1:\\d{1,3}$"
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "compareAtPrice": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0
+          },
+          "releaseAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "preorderClosesAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "expectedShipAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "purchaseLimit": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 1
+          },
+          "isFeatured": {
+            "type": "boolean"
+          },
+          "translations": {
+            "description": "至少需要繁體中文（zh-TW）",
+            "minItems": 1,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductTranslationInput"
+            }
+          },
+          "images": {
+            "maxItems": 12,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImageInput"
+            }
+          }
+        }
+      },
+      "AdjustStockDto": {
+        "type": "object",
+        "properties": {
+          "delta": {
+            "type": "number",
+            "description": "增減量，正數為入庫、負數為扣除"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "delta"
+        ]
+      },
+      "StockLevelDto": {
+        "type": "object",
+        "properties": {
+          "stock": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "stock"
+        ]
+      },
+      "StockMovementReason": {
+        "type": "string",
+        "enum": [
+          "ADMIN_ADJUSTMENT",
+          "ORDER_PLACED",
+          "ORDER_CANCELLED",
+          "ORDER_EXPIRED"
+        ]
+      },
+      "StockMovementDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StockMovementReason"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "delta": {
+            "type": "number"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "orderId": {
+            "type": "string",
+            "nullable": true
+          },
+          "actorId": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason",
+          "id",
+          "delta",
+          "balance",
+          "orderId",
+          "actorId",
+          "note",
+          "createdAt"
+        ]
+      },
+      "BrandTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "locale",
+          "description"
+        ]
+      },
+      "AdminBrandDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrandTranslationDto"
+            }
+          },
+          "productCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "country",
+          "logoUrl",
+          "sortOrder",
+          "isActive",
+          "translations",
+          "productCount"
+        ]
+      },
+      "BrandTranslationInput": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "locale",
+          "description"
+        ]
+      },
+      "CreateBrandDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "country": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 60
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2048
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "translations": {
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrandTranslationInput"
+            }
+          }
+        },
+        "required": [
+          "slug",
+          "name"
+        ]
+      },
+      "UpdateBrandDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "country": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 60
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2048
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "translations": {
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrandTranslationInput"
+            }
+          }
+        }
+      },
+      "CategoryTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "locale",
+          "name",
+          "description"
+        ]
+      },
+      "AdminCategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryTranslationDto"
+            }
+          },
+          "productCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "parentId",
+          "sortOrder",
+          "isActive",
+          "translations",
+          "productCount"
+        ]
+      },
+      "CategoryTranslationInput": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "locale",
+          "name"
+        ]
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "parentId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "translations": {
+            "description": "至少需要繁體中文（zh-TW）",
+            "minItems": 1,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryTranslationInput"
+            }
+          }
+        },
+        "required": [
+          "slug",
+          "translations"
+        ]
+      },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "parentId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "translations": {
+            "description": "至少需要繁體中文（zh-TW）",
+            "minItems": 1,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryTranslationInput"
+            }
+          }
+        }
+      },
+      "CartIssue": {
+        "type": "string",
+        "enum": [
+          "UNAVAILABLE",
+          "NOT_RELEASED",
+          "SOLD_OUT",
+          "INSUFFICIENT_STOCK",
+          "LIMIT_EXCEEDED"
+        ],
+        "description": "結帳前需處理的問題；null 表示可以結帳"
+      },
+      "CartItemDto": {
+        "type": "object",
+        "properties": {
+          "issue": {
+            "nullable": true,
+            "description": "結帳前需處理的問題；null 表示可以結帳",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CartIssue"
+              }
+            ]
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductSummaryDto"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "lineTotal": {
+            "type": "number"
+          },
+          "maxQuantity": {
+            "type": "number",
+            "description": "目前最多可購買數量（已考慮庫存與限購）"
+          }
+        },
+        "required": [
+          "issue",
+          "product",
+          "quantity",
+          "lineTotal",
+          "maxQuantity"
+        ]
+      },
+      "ShippingMethod": {
+        "type": "string",
+        "enum": [
+          "HOME_DELIVERY",
+          "CVS_711",
+          "CVS_FAMILY",
+          "CVS_HILIFE",
+          "CVS_OKMART"
+        ]
+      },
+      "ShippingOptionDto": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShippingMethod"
+              }
+            ]
+          },
+          "fee": {
+            "type": "number",
+            "description": "依目前小計計算的運費"
+          },
+          "freeThreshold": {
+            "type": "number",
+            "description": "免運門檻"
+          }
+        },
+        "required": [
+          "method",
+          "fee",
+          "freeThreshold"
+        ]
+      },
+      "CartDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartItemDto"
+            }
+          },
+          "itemCount": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "hasIssues": {
+            "type": "boolean",
+            "description": "是否有商品需要調整才能結帳"
+          },
+          "shippingOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShippingOptionDto"
+            }
+          }
+        },
+        "required": [
+          "items",
+          "itemCount",
+          "subtotal",
+          "hasIssues",
+          "shippingOptions"
+        ]
+      },
+      "SetCartItemDto": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          }
+        },
+        "required": [
+          "quantity"
+        ]
+      },
+      "InvoiceType": {
+        "type": "string",
+        "enum": [
+          "MEMBER_CARRIER",
+          "MOBILE_BARCODE",
+          "CITIZEN_CERT",
+          "DONATION",
+          "COMPANY"
+        ]
+      },
+      "CheckoutItemDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          }
+        },
+        "required": [
+          "productId",
+          "quantity"
+        ]
+      },
+      "CheckoutDto": {
+        "type": "object",
+        "properties": {
+          "shippingMethod": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShippingMethod"
+              }
+            ]
+          },
+          "invoiceType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceType"
+              }
+            ]
+          },
+          "locale": {
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ],
+            "type": "string"
+          },
+          "items": {
+            "description": "直接購買（不經購物車，例如限量發售的「立即購買」）；省略則結帳整個購物車",
+            "minItems": 1,
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckoutItemDto"
+            }
+          },
+          "recipientName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "recipientPhone": {
+            "type": "string",
+            "description": "手機號碼（超商取貨通知會寄到這支手機）"
+          },
+          "recipientEmail": {
+            "type": "string",
+            "description": "預設為會員 Email",
+            "format": "email"
+          },
+          "postalCode": {
+            "type": "string",
+            "pattern": "^\\d{3}(\\d{2,3})?$"
+          },
+          "city": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20
+          },
+          "district": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20
+          },
+          "addressLine": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "cvsStoreId": {
+            "type": "string",
+            "description": "超商門市代號（由電子地圖選店取得）",
+            "minLength": 1,
+            "maxLength": 20
+          },
+          "cvsStoreName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "cvsStoreAddress": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "invoiceCarrierNum": {
+            "type": "string",
+            "description": "手機條碼（/ 開頭 8 碼）或自然人憑證號碼，依 invoiceType 而定"
+          },
+          "invoiceDonationCode": {
+            "type": "string"
+          },
+          "invoiceTaxId": {
+            "type": "string"
+          },
+          "invoiceTitle": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "shippingMethod",
+          "invoiceType",
+          "recipientName",
+          "recipientPhone"
+        ]
+      },
+      "OrderStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING_PAYMENT",
+          "PAID",
+          "PROCESSING",
+          "SHIPPED",
+          "COMPLETED",
+          "CANCELLED",
+          "REFUNDED"
+        ]
+      },
+      "OrderItemDto": {
+        "type": "object",
+        "properties": {
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "productId": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "unitPrice": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "lineTotal": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "saleType",
+          "productId",
+          "sku",
+          "name",
+          "imageUrl",
+          "unitPrice",
+          "quantity",
+          "lineTotal"
+        ]
+      },
+      "PaymentProvider": {
+        "type": "string",
+        "enum": [
+          "MOCK",
+          "ECPAY"
+        ]
+      },
+      "PaymentStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "SUCCEEDED",
+          "FAILED"
+        ]
+      },
+      "OrderPaymentDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentProvider"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentStatus"
+              }
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "method": {
+            "type": "string",
+            "nullable": true
+          },
+          "paidAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "status",
+          "amount",
+          "method",
+          "paidAt",
+          "createdAt"
+        ]
+      },
+      "OrderDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderStatus"
+              }
+            ]
+          },
+          "shippingMethod": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShippingMethod"
+              }
+            ]
+          },
+          "invoiceType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceType"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "orderNo": {
+            "type": "string"
+          },
+          "locale": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "shippingFee": {
+            "type": "number"
+          },
+          "discountTotal": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "recipientName": {
+            "type": "string"
+          },
+          "recipientPhone": {
+            "type": "string"
+          },
+          "recipientEmail": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "addressLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "cvsStoreId": {
+            "type": "string",
+            "nullable": true
+          },
+          "cvsStoreName": {
+            "type": "string",
+            "nullable": true
+          },
+          "cvsStoreAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceCarrierNum": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceDonationCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceTaxId": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "paymentDeadline": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "未付款訂單的付款期限，逾期自動取消"
+          },
+          "paidAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "shippedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "cancelledAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "cancelReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemDto"
+            }
+          },
+          "payments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderPaymentDto"
+            }
+          },
+          "canPay": {
+            "type": "boolean",
+            "description": "是否可以（重新）付款"
+          },
+          "canCancel": {
+            "type": "boolean",
+            "description": "會員是否可自行取消"
+          }
+        },
+        "required": [
+          "status",
+          "shippingMethod",
+          "invoiceType",
+          "id",
+          "orderNo",
+          "locale",
+          "currency",
+          "subtotal",
+          "shippingFee",
+          "discountTotal",
+          "total",
+          "recipientName",
+          "recipientPhone",
+          "recipientEmail",
+          "postalCode",
+          "city",
+          "district",
+          "addressLine",
+          "cvsStoreId",
+          "cvsStoreName",
+          "cvsStoreAddress",
+          "invoiceCarrierNum",
+          "invoiceDonationCode",
+          "invoiceTaxId",
+          "invoiceTitle",
+          "note",
+          "paymentDeadline",
+          "paidAt",
+          "shippedAt",
+          "completedAt",
+          "cancelledAt",
+          "cancelReason",
+          "createdAt",
+          "items",
+          "payments",
+          "canPay",
+          "canCancel"
+        ]
+      },
+      "OrderSummaryDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderStatus"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "orderNo": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          },
+          "itemCount": {
+            "type": "number"
+          },
+          "firstItemName": {
+            "type": "string"
+          },
+          "firstItemImageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "paymentDeadline": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "id",
+          "orderNo",
+          "total",
+          "itemCount",
+          "firstItemName",
+          "firstItemImageUrl",
+          "paymentDeadline",
+          "createdAt"
+        ]
+      },
+      "OrderListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderSummaryDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "StartPaymentDto": {
+        "type": "object",
+        "properties": {
+          "returnUrl": {
+            "type": "string",
+            "description": "付款完成後導回的網址（Web 頁面或 App deep link，需在允許清單內）。\n省略時導回 Web 前台的訂單頁。",
+            "maxLength": 500
+          }
+        }
+      },
+      "PaymentInstructionDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentProvider"
+              }
+            ]
+          },
+          "type": {
+            "description": "redirect：直接導向 url；form_post：以 POST 表單把 fields 送到 url（綠界）",
+            "enum": [
+              "redirect",
+              "form_post"
+            ],
+            "type": "string"
+          },
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "url": {
+            "type": "string"
+          },
+          "merchantTradeNo": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "訂單付款期限"
+          }
+        },
+        "required": [
+          "provider",
+          "type",
+          "fields",
+          "url",
+          "merchantTradeNo",
+          "expiresAt"
+        ]
+      },
+      "DashboardKpisDto": {
+        "type": "object",
+        "properties": {
+          "todayRevenue": {
+            "type": "number",
+            "description": "今日（台灣時間）已付款營收"
+          },
+          "todayOrders": {
+            "type": "number"
+          },
+          "revenue30d": {
+            "type": "number",
+            "description": "近 30 天已付款營收"
+          },
+          "orders30d": {
+            "type": "number"
+          },
+          "averageOrderValue30d": {
+            "type": "number",
+            "description": "平均客單價（近 30 天）"
+          },
+          "pendingPaymentCount": {
+            "type": "number"
+          },
+          "toShipCount": {
+            "type": "number",
+            "description": "已付款待出貨（已付款＋處理中）"
+          },
+          "newMembers30d": {
+            "type": "number"
+          },
+          "totalMembers": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "todayRevenue",
+          "todayOrders",
+          "revenue30d",
+          "orders30d",
+          "averageOrderValue30d",
+          "pendingPaymentCount",
+          "toShipCount",
+          "newMembers30d",
+          "totalMembers"
+        ]
+      },
+      "SalesPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "YYYY-MM-DD（台灣時間）"
+          },
+          "revenue": {
+            "type": "number"
+          },
+          "orders": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "revenue",
+          "orders"
+        ]
+      },
+      "TopProductDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "revenue": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "productId",
+          "name",
+          "sku",
+          "quantity",
+          "revenue"
+        ]
+      },
+      "LowStockProductDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "stock": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "sku",
+          "stock"
+        ]
+      },
+      "UpcomingReleaseDto": {
+        "type": "object",
+        "properties": {
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "releaseAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "stock": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "saleType",
+          "id",
+          "name",
+          "releaseAt",
+          "stock"
+        ]
+      },
+      "AdminOrderListItemDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderStatus"
+              }
+            ]
+          },
+          "shippingMethod": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShippingMethod"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "orderNo": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          },
+          "itemCount": {
+            "type": "number"
+          },
+          "memberEmail": {
+            "type": "string"
+          },
+          "recipientName": {
+            "type": "string"
+          },
+          "paidAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "shippingMethod",
+          "id",
+          "orderNo",
+          "total",
+          "itemCount",
+          "memberEmail",
+          "recipientName",
+          "paidAt",
+          "createdAt"
+        ]
+      },
+      "DashboardDto": {
+        "type": "object",
+        "properties": {
+          "kpis": {
+            "$ref": "#/components/schemas/DashboardKpisDto"
+          },
+          "salesTrend": {
+            "description": "近 14 天每日營收",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SalesPointDto"
+            }
+          },
+          "topProducts": {
+            "description": "近 30 天熱銷商品",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopProductDto"
+            }
+          },
+          "lowStock": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LowStockProductDto"
+            }
+          },
+          "upcomingReleases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpcomingReleaseDto"
+            }
+          },
+          "recentOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminOrderListItemDto"
+            }
+          }
+        },
+        "required": [
+          "kpis",
+          "salesTrend",
+          "topProducts",
+          "lowStock",
+          "upcomingReleases",
+          "recentOrders"
+        ]
+      },
+      "AdminOrderListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminOrderListItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "OrderMemberDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name",
+          "phone"
+        ]
+      },
+      "ActorType": {
+        "type": "string",
+        "enum": [
+          "SYSTEM",
+          "MEMBER",
+          "ADMIN"
+        ]
+      },
+      "OrderEventDto": {
+        "type": "object",
+        "properties": {
+          "fromStatus": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderStatus"
+              }
+            ]
+          },
+          "toStatus": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderStatus"
+              }
+            ]
+          },
+          "actorType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActorType"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fromStatus",
+          "toStatus",
+          "actorType",
+          "id",
+          "type",
+          "actorId",
+          "message",
+          "createdAt"
+        ]
+      },
+      "AdminOrderDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderStatus"
+              }
+            ]
+          },
+          "shippingMethod": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShippingMethod"
+              }
+            ]
+          },
+          "invoiceType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceType"
+              }
+            ]
+          },
+          "nextStatuses": {
+            "type": "array",
+            "description": "依狀態機目前可以變更成的狀態",
+            "items": {
+              "$ref": "#/components/schemas/OrderStatus"
+            }
+          },
+          "member": {
+            "$ref": "#/components/schemas/OrderMemberDto"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderEventDto"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "orderNo": {
+            "type": "string"
+          },
+          "locale": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "shippingFee": {
+            "type": "number"
+          },
+          "discountTotal": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "recipientName": {
+            "type": "string"
+          },
+          "recipientPhone": {
+            "type": "string"
+          },
+          "recipientEmail": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "addressLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "cvsStoreId": {
+            "type": "string",
+            "nullable": true
+          },
+          "cvsStoreName": {
+            "type": "string",
+            "nullable": true
+          },
+          "cvsStoreAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceCarrierNum": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceDonationCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceTaxId": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "paymentDeadline": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "未付款訂單的付款期限，逾期自動取消"
+          },
+          "paidAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "shippedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "cancelledAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "cancelReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemDto"
+            }
+          },
+          "payments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderPaymentDto"
+            }
+          },
+          "canPay": {
+            "type": "boolean",
+            "description": "是否可以（重新）付款"
+          },
+          "canCancel": {
+            "type": "boolean",
+            "description": "會員是否可自行取消"
+          }
+        },
+        "required": [
+          "status",
+          "shippingMethod",
+          "invoiceType",
+          "nextStatuses",
+          "member",
+          "events",
+          "id",
+          "orderNo",
+          "locale",
+          "currency",
+          "subtotal",
+          "shippingFee",
+          "discountTotal",
+          "total",
+          "recipientName",
+          "recipientPhone",
+          "recipientEmail",
+          "postalCode",
+          "city",
+          "district",
+          "addressLine",
+          "cvsStoreId",
+          "cvsStoreName",
+          "cvsStoreAddress",
+          "invoiceCarrierNum",
+          "invoiceDonationCode",
+          "invoiceTaxId",
+          "invoiceTitle",
+          "note",
+          "paymentDeadline",
+          "paidAt",
+          "shippedAt",
+          "completedAt",
+          "cancelledAt",
+          "cancelReason",
+          "createdAt",
+          "items",
+          "payments",
+          "canPay",
+          "canCancel"
+        ]
+      },
+      "UpdateOrderStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderStatus"
+              }
+            ]
+          },
+          "note": {
+            "type": "string",
+            "description": "會記錄在訂單事件中，例如物流單號或退款原因",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "AddOrderNoteDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "MemberStatus": {
+        "type": "string",
+        "enum": [
+          "ACTIVE",
+          "SUSPENDED",
+          "DELETED"
+        ]
+      },
+      "AdminMemberListItemDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberStatus"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalSpent": {
+            "type": "number"
+          },
+          "orderCount": {
+            "type": "number"
+          },
+          "lastLoginAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "id",
+          "email",
+          "name",
+          "phone",
+          "totalSpent",
+          "orderCount",
+          "lastLoginAt",
+          "createdAt"
+        ]
+      },
+      "AdminMemberListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminMemberListItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminMemberDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberStatus"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalSpent": {
+            "type": "number"
+          },
+          "orderCount": {
+            "type": "number"
+          },
+          "lastLoginAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "locale": {
+            "type": "string"
+          },
+          "marketingOptIn": {
+            "type": "boolean"
+          },
+          "recentOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminOrderListItemDto"
+            }
+          }
+        },
+        "required": [
+          "status",
+          "id",
+          "email",
+          "name",
+          "phone",
+          "totalSpent",
+          "orderCount",
+          "lastLoginAt",
+          "createdAt",
+          "locale",
+          "marketingOptIn",
+          "recentOrders"
+        ]
+      },
+      "UpdateMemberStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "停權後會立即登出該會員所有裝置",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "HealthDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}
