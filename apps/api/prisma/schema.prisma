@@ -1,0 +1,389 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// 管理員與權限
+// ─────────────────────────────────────────────
+
+model AdminUser {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  email        String    @unique
+  passwordHash String
+  name         String
+  roleId       String    @db.Uuid
+  role         Role      @relation(fields: [roleId], references: [id])
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Role {
+  id          String      @id @default(uuid(7)) @db.Uuid
+  key         String      @unique
+  name        String
+  description String?
+  /// 權限字串，例如 product:write、order:read
+  permissions String[]
+  /// 系統內建角色不可刪除
+  isSystem    Boolean     @default(false)
+  admins      AdminUser[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// 會員與登入工作階段
+// ─────────────────────────────────────────────
+
+enum MemberStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+model Member {
+  id              String       @id @default(uuid(7)) @db.Uuid
+  email           String       @unique
+  passwordHash    String
+  name            String
+  phone           String?
+  locale          String       @default("zh-TW")
+  status          MemberStatus @default(ACTIVE)
+  marketingOptIn  Boolean      @default(false)
+  /// 累計有效消費金額（新台幣），用於會員等級計算
+  totalSpent      Int          @default(0)
+  lastLoginAt     DateTime?
+  deletedAt       DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  cart            Cart?
+  orders          Order[]
+
+  @@index([createdAt])
+}
+
+enum AuthSubject {
+  MEMBER
+  ADMIN
+}
+
+/// Refresh token 工作階段。每次刷新都輪替（rotation），同一 family 的舊 token 被重複使用時整個 family 作廢。
+model AuthSession {
+  id          String      @id @default(uuid(7)) @db.Uuid
+  subjectType AuthSubject
+  subjectId   String      @db.Uuid
+  familyId    String      @db.Uuid
+  tokenHash   String      @unique
+  expiresAt   DateTime
+  rotatedAt   DateTime?
+  revokedAt   DateTime?
+  userAgent   String?
+  ip          String?
+  createdAt   DateTime    @default(now())
+
+  @@index([subjectType, subjectId])
+  @@index([familyId])
+}
+
+// ─────────────────────────────────────────────
+// 商品目錄
+// ─────────────────────────────────────────────
+
+model Brand {
+  id           String             @id @default(uuid(7)) @db.Uuid
+  slug         String             @unique
+  name         String
+  country      String?
+  logoUrl      String?
+  sortOrder    Int                @default(0)
+  isActive     Boolean            @default(true)
+  translations BrandTranslation[]
+  products     Product[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model BrandTranslation {
+  brandId     String @db.Uuid
+  locale      String
+  description String
+  brand       Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@id([brandId, locale])
+}
+
+model Category {
+  id           String                @id @default(uuid(7)) @db.Uuid
+  slug         String                @unique
+  parentId     String?               @db.Uuid
+  parent       Category?             @relation("CategoryTree", fields: [parentId], references: [id])
+  children     Category[]            @relation("CategoryTree")
+  sortOrder    Int                   @default(0)
+  isActive     Boolean               @default(true)
+  translations CategoryTranslation[]
+  products     Product[]
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+}
+
+model CategoryTranslation {
+  categoryId  String   @db.Uuid
+  locale      String
+  name        String
+  description String?
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([categoryId, locale])
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+/// REGULAR：現貨；PRE_ORDER：預購（到貨後出貨）；LIMITED：限量發售（開賣時間一到才能購買）
+enum SaleType {
+  REGULAR
+  PRE_ORDER
+  LIMITED
+}
+
+model Product {
+  id               String               @id @default(uuid(7)) @db.Uuid
+  slug             String               @unique
+  sku              String               @unique
+  brandId          String               @db.Uuid
+  brand            Brand                @relation(fields: [brandId], references: [id])
+  categoryId       String               @db.Uuid
+  category         Category             @relation(fields: [categoryId], references: [id])
+  /// 比例，例如 1:64
+  scale            String
+  /// 售價（新台幣，整數）
+  price            Int
+  compareAtPrice   Int?
+  /// 可售庫存。下單時以條件式 UPDATE 原子扣減，避免超賣
+  stock            Int                  @default(0)
+  status           ProductStatus        @default(DRAFT)
+  saleType         SaleType             @default(REGULAR)
+  /// 開賣時間（限量發售）或預購開放時間
+  releaseAt        DateTime?
+  preorderClosesAt DateTime?
+  expectedShipAt   DateTime?
+  /// 每位會員限購數量（含已成立訂單）
+  purchaseLimit    Int?
+  isFeatured       Boolean              @default(false)
+  /// 規格，例如 { "material": "Diecast", "wheels": "Rubber" }
+  specs            Json?
+  translations     ProductTranslation[]
+  images           ProductImage[]
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  @@index([status, saleType])
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([releaseAt])
+}
+
+model ProductTranslation {
+  productId   String  @db.Uuid
+  locale      String
+  name        String
+  subtitle    String?
+  description String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, locale])
+}
+
+model ProductImage {
+  id        String  @id @default(uuid(7)) @db.Uuid
+  productId String  @db.Uuid
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, sortOrder])
+}
+
+// ─────────────────────────────────────────────
+// 購物車與訂單
+// ─────────────────────────────────────────────
+
+model Cart {
+  id        String     @id @default(uuid(7)) @db.Uuid
+  memberId  String     @unique @db.Uuid
+  member    Member     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  cartId    String   @db.Uuid
+  productId String   @db.Uuid
+  quantity  Int
+  addedAt   DateTime @default(now())
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([cartId, productId])
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  SHIPPED
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum ShippingMethod {
+  HOME_DELIVERY
+  CVS_711
+  CVS_FAMILY
+  CVS_HILIFE
+  CVS_OKMART
+}
+
+/// 電子發票：會員載具、手機條碼、自然人憑證、捐贈、公司（統編）
+enum InvoiceType {
+  MEMBER_CARRIER
+  MOBILE_BARCODE
+  CITIZEN_CERT
+  DONATION
+  COMPANY
+}
+
+model Order {
+  id                  String         @id @default(uuid(7)) @db.Uuid
+  orderNo             String         @unique
+  memberId            String         @db.Uuid
+  member              Member         @relation(fields: [memberId], references: [id])
+  status              OrderStatus    @default(PENDING_PAYMENT)
+  locale              String
+  currency            String         @default("TWD")
+  subtotal            Int
+  shippingFee         Int
+  discountTotal       Int            @default(0)
+  total               Int
+  shippingMethod      ShippingMethod
+  recipientName       String
+  recipientPhone      String
+  recipientEmail      String
+  postalCode          String?
+  city                String?
+  district            String?
+  addressLine         String?
+  cvsStoreId          String?
+  cvsStoreName        String?
+  cvsStoreAddress     String?
+  invoiceType         InvoiceType
+  invoiceCarrierNum   String?
+  invoiceDonationCode String?
+  invoiceTaxId        String?
+  invoiceTitle        String?
+  note                String?
+  /// 未付款訂單的保留期限；逾期由排程取消並釋放庫存
+  paymentDeadline     DateTime?
+  paidAt              DateTime?
+  shippedAt           DateTime?
+  completedAt         DateTime?
+  cancelledAt         DateTime?
+  cancelReason        String?
+  items               OrderItem[]
+  payments            Payment[]
+  events              OrderEvent[]
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  @@index([memberId, createdAt])
+  @@index([status, paymentDeadline])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  orderId   String   @db.Uuid
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String   @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id])
+  sku       String
+  /// 下單當下的商品名稱快照（依訂單語系）
+  name      String
+  imageUrl  String?
+  saleType  SaleType
+  unitPrice Int
+  quantity  Int
+  lineTotal Int
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+enum PaymentProvider {
+  MOCK
+  ECPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+model Payment {
+  id              String          @id @default(uuid(7)) @db.Uuid
+  orderId         String          @db.Uuid
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider        PaymentProvider
+  status          PaymentStatus   @default(PENDING)
+  /// 送給金流商的交易編號（綠界限 20 碼英數字），每次付款嘗試都不同
+  merchantTradeNo String          @unique
+  providerTradeNo String?
+  amount          Int
+  method          String?
+  rawNotify       Json?
+  paidAt          DateTime?
+  failedReason    String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([orderId])
+}
+
+enum ActorType {
+  SYSTEM
+  MEMBER
+  ADMIN
+}
+
+/// 訂單事件軌跡（狀態變更、付款、備註），後台可完整追溯
+model OrderEvent {
+  id         String       @id @default(uuid(7)) @db.Uuid
+  orderId    String       @db.Uuid
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type       String
+  fromStatus OrderStatus?
+  toStatus   OrderStatus?
+  actorType  ActorType
+  actorId    String?
+  message    String?
+  createdAt  DateTime     @default(now())
+
+  @@index([orderId, createdAt])
+}
