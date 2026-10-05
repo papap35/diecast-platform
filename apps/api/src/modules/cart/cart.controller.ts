@@ -1,11 +1,22 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiLocaleQuery, ReqLocale } from '../../common/i18n/locale.decorator.js';
 import type { Locale } from '../../common/i18n/locale.js';
 import type { MemberPrincipal } from '../auth/auth.types.js';
 import { CurrentMember, MemberAuth } from '../auth/decorators.js';
 import { CartService } from './cart.service.js';
-import { CartDto, SetCartItemDto } from './dto/cart.dto.js';
+import { CartDto, QuoteDto, SetCartItemDto } from './dto/cart.dto.js';
 
 @ApiTags('Cart')
 @MemberAuth()
@@ -40,6 +51,18 @@ export class CartController {
     @ReqLocale() locale: Locale,
   ): Promise<CartDto> {
     return this.cart.removeItem(member.id, productId, locale);
+  }
+
+  /** 結帳試算（立即購買用）：不影響購物車內容 */
+  @Post('quote')
+  @HttpCode(HttpStatus.OK)
+  @ApiLocaleQuery()
+  quote(
+    @CurrentMember() member: MemberPrincipal,
+    @Body() dto: QuoteDto,
+    @ReqLocale() locale: Locale,
+  ): Promise<CartDto> {
+    return this.cart.quote(member.id, dto.items, locale);
   }
 
   /** 清空購物車 */

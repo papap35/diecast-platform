@@ -5,6 +5,7 @@ import {
   Header,
   HttpCode,
   HttpStatus,
+  Inject,
   Logger,
   Param,
   Post,
@@ -13,7 +14,8 @@ import {
 import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import type { Response } from 'express';
-import { ReqLocale } from '../../common/i18n/locale.decorator.js';
+import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
+import { ApiLocaleQuery, ReqLocale } from '../../common/i18n/locale.decorator.js';
 import type { Locale } from '../../common/i18n/locale.js';
 import type { MemberPrincipal } from '../auth/auth.types.js';
 import { CurrentMember, MemberAuth } from '../auth/decorators.js';
@@ -33,6 +35,7 @@ export class PaymentsController {
    */
   @Post('orders/:orderNo/payments')
   @MemberAuth()
+  @ApiLocaleQuery()
   start(
     @CurrentMember() member: MemberPrincipal,
     @Param('orderNo') orderNo: string,
@@ -90,13 +93,27 @@ export class EcpayCallbackController {
 @SkipThrottle()
 @Controller('payments/mock')
 export class MockPaymentController {
-  constructor(private readonly payments: PaymentsService) {}
+  constructor(
+    private readonly payments: PaymentsService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
+  ) {}
 
   @Get(':merchantTradeNo')
   @ApiExcludeEndpoint()
   @Header('Content-Type', 'text/html; charset=utf-8')
-  async page(@Param('merchantTradeNo') merchantTradeNo: string): Promise<string> {
+  async page(
+    @Param('merchantTradeNo') merchantTradeNo: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<string> {
     const payment = await this.payments.findForMockPage(merchantTradeNo);
+    // 表單送出後會轉址回前台；瀏覽器對轉址也套用 form-action，因此要列出允許的前台網域
+    const origins = [this.config.WEB_BASE_URL, ...this.config.CORS_ORIGINS].map(
+      (url) => new URL(url).origin,
+    );
+    res.setHeader(
+      'Content-Security-Policy',
+      `default-src 'none'; style-src 'unsafe-inline'; form-action 'self' ${[...new Set(origins)].join(' ')} paddock64:; base-uri 'none'; frame-ancestors 'none'`,
+    );
     return renderMockPaymentPage(payment);
   }
 

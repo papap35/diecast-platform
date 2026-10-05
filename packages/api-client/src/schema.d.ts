@@ -440,6 +440,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/cart/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 結帳試算（立即購買用）：不影響購物車內容 */
+        post: operations["Cart_quote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/orders": {
         parameters: {
             query?: never;
@@ -1171,6 +1188,14 @@ export interface components {
         };
         SetCartItemDto: {
             quantity: number;
+        };
+        QuoteItemDto: {
+            /** Format: uuid */
+            productId: string;
+            quantity: number;
+        };
+        QuoteDto: {
+            items: components["schemas"]["QuoteItemDto"][];
         };
         /** @enum {string} */
         InvoiceType: "MEMBER_CARRIER" | "MOBILE_BARCODE" | "CITIZEN_CERT" | "DONATION" | "COMPANY";
@@ -2363,6 +2388,31 @@ export interface operations {
             };
         };
     };
+    Cart_quote: {
+        parameters: {
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuoteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartDto"];
+                };
+            };
+        };
+    };
     Orders_list: {
         parameters: {
             query?: {
@@ -2388,7 +2438,9 @@ export interface operations {
     };
     Orders_checkout: {
         parameters: {
-            query?: never;
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2453,7 +2505,9 @@ export interface operations {
     };
     Payments_start: {
         parameters: {
-            query?: never;
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
             header?: never;
             path: {
                 orderNo: string;

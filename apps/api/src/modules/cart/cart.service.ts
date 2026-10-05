@@ -4,7 +4,11 @@ import type { Locale } from '../../common/i18n/locale.js';
 import type { ShippingMethod } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { Availability, computeAvailability, isPurchasable } from '../catalog/availability.js';
-import { CatalogService, productSummaryInclude } from '../catalog/catalog.service.js';
+import {
+  CatalogService,
+  productSummaryInclude,
+  type ProductWithSummary,
+} from '../catalog/catalog.service.js';
 import { calculateShippingFee, SHIPPING_RATES } from '../orders/order-rules.js';
 import { purchasedQuantities } from '../orders/purchase-history.js';
 import {
@@ -45,7 +49,35 @@ export class CartService {
         },
       },
     });
-    const items = cart?.items ?? [];
+    return this.summarize(memberId, cart?.items ?? [], locale);
+  }
+
+  /**
+   * 結帳試算：不經購物車，直接以指定商品計算小計、運費與可購買狀態。
+   * 用於「立即購買」（例如限量發售）與 App 的快速結帳。
+   */
+  async quote(
+    memberId: string,
+    items: { productId: string; quantity: number }[],
+    locale: Locale,
+  ): Promise<CartDto> {
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: items.map((item) => item.productId) } },
+      include: productSummaryInclude,
+    });
+    const byId = new Map(products.map((product) => [product.id, product]));
+    const lines = items.flatMap(({ productId, quantity }) => {
+      const product = byId.get(productId);
+      return product ? [{ productId, quantity, product }] : [];
+    });
+    return this.summarize(memberId, lines, locale);
+  }
+
+  private async summarize(
+    memberId: string,
+    items: { productId: string; quantity: number; product: ProductWithSummary }[],
+    locale: Locale,
+  ): Promise<CartDto> {
     const purchased = await purchasedQuantities(
       this.prisma,
       memberId,

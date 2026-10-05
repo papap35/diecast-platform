@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ReqLocale } from '../../common/i18n/locale.decorator.js';
+import { ApiLocaleQuery, ReqLocale } from '../../common/i18n/locale.decorator.js';
 import type { Locale } from '../../common/i18n/locale.js';
 import type { MemberPrincipal } from '../auth/auth.types.js';
 import { CurrentMember, MemberAuth } from '../auth/decorators.js';
@@ -18,6 +18,7 @@ export class OrdersController {
    * 接著呼叫 `POST /v1/orders/{orderNo}/payments` 取得付款資訊。
    */
   @Post()
+  @ApiLocaleQuery()
   checkout(
     @CurrentMember() member: MemberPrincipal,
     @Body() dto: CheckoutDto,

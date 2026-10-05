@@ -26,7 +26,9 @@ export const productSummaryInclude = {
   images: { orderBy: { sortOrder: 'asc' }, take: 1 },
 } satisfies Prisma.ProductInclude;
 
-type ProductWithSummary = Prisma.ProductGetPayload<{ include: typeof productSummaryInclude }>;
+export type ProductWithSummary = Prisma.ProductGetPayload<{
+  include: typeof productSummaryInclude;
+}>;
 
 const productDetailInclude = {
   ...productSummaryInclude,

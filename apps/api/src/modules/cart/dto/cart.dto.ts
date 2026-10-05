@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsInt,
+  IsUUID,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 import { ShippingMethod } from '../../../generated/prisma/enums.js';
 import { ProductSummaryDto } from '../../catalog/dto/catalog.dto.js';
 
@@ -48,4 +57,22 @@ export class CartDto {
   /** 是否有商品需要調整才能結帳 */
   hasIssues!: boolean;
   shippingOptions!: ShippingOptionDto[];
+}
+
+export class QuoteItemDto {
+  @IsUUID()
+  productId!: string;
+
+  @IsInt()
+  @Min(1)
+  @Max(MAX_QUANTITY_PER_ITEM)
+  quantity!: number;
+}
+
+export class QuoteDto {
+  @ValidateNested({ each: true })
+  @Type(() => QuoteItemDto)
+  @ArrayMinSize(1)
+  @ArrayMaxSize(20)
+  items!: QuoteItemDto[];
 }

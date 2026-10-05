@@ -1484,10 +1484,75 @@
         ]
       }
     },
+    "/v1/cart/quote": {
+      "post": {
+        "operationId": "Cart_quote",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "結帳試算（立即購買用）：不影響購物車內容",
+        "tags": [
+          "Cart"
+        ]
+      }
+    },
     "/v1/orders": {
       "post": {
         "operationId": "Orders_checkout",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1656,6 +1721,19 @@
             "required": true,
             "in": "path",
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
               "type": "string"
             }
           }
@@ -3944,6 +4022,40 @@
         },
         "required": [
           "quantity"
+        ]
+      },
+      "QuoteItemDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          }
+        },
+        "required": [
+          "productId",
+          "quantity"
+        ]
+      },
+      "QuoteDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "minItems": 1,
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuoteItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "InvoiceType": {
