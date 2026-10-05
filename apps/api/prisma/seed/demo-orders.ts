@@ -2,8 +2,13 @@
  * 示範訂單：讓後台儀表板、訂單列表一打開就有資料。
  * 只建立一次（以第一位示範會員是否存在判斷）；使用固定亂數種子，每次產生的資料都一樣。
  */
-import type { OrderStatus, PrismaClient } from '../../src/generated/prisma/client.js';
+import type {
+  OrderStatus,
+  PrismaClient,
+  ShipmentStatus,
+} from '../../src/generated/prisma/client.js';
 import { hashPassword } from '../../src/common/security/password.js';
+import { LOGISTICS_KIND } from '../../src/modules/logistics/ecpay-logistics.js';
 
 const MEMBERS = [
   ['陳冠宇', 'guanyu.chen'],
@@ -290,3 +295,107 @@ export async function seedDemoOrders(prisma: PrismaClient): Promise<number> {
   }
   return created;
 }
+
+const SHIPMENT_FOR: Partial<Record<OrderStatus, ShipmentStatus>> = {
+  PROCESSING: 'CREATED',
+  SHIPPED: 'IN_TRANSIT',
+  COMPLETED: 'PICKED_UP',
+};
+
+/**
+ * 示範訂單的電子發票與物流單（模擬服務）。可重複執行：只補上還沒有的，
+ * 號碼由訂單編號推導，每次產生的結果都一樣。
+ */
+export async function seedDemoFulfilment(prisma: PrismaClient): Promise<number> {
+  const orders = await prisma.order.findMany({
+    where: {
+      member: { email: { endsWith: '@example.com' } },
+      status: { in: ['PAID', 'PROCESSING', 'SHIPPED', 'COMPLETED'] },
+    },
+    include: { invoice: true, shipment: true },
+    orderBy: { createdAt: 'asc' },
+  });
+  let updated = 0;
+  for (const order of orders) {
+    const random = rng([...order.orderNo].reduce((sum, c) => sum * 31 + c.charCodeAt(0), 7) >>> 0);
+    const digits = (length: number) =>
+      Array.from({ length }, () => Math.floor(random() * 10)).join('');
+    const paidAt = order.paidAt ?? order.createdAt;
+    const shipmentStatus = SHIPMENT_FOR[order.status];
+    if (order.invoice && (order.shipment || !shipmentStatus)) continue;
+
+    await prisma.$transaction(async (tx) => {
+      if (!order.invoice) {
+        const invoiceNo = `${'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(random() * 24)]}${'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(random() * 24)]}${digits(8)}`;
+        const issuedAt = new Date(paidAt.getTime() + 60_000);
+        await tx.invoice.create({
+          data: {
+            orderId: order.id,
+            provider: 'MOCK',
+            status: 'ISSUED',
+            invoiceNo,
+            invoiceDate: issuedAt,
+            randomNumber: digits(4),
+            amount: order.total,
+            attempts: 1,
+            raw: { simulated: true },
+            createdAt: paidAt,
+          },
+        });
+        await tx.orderEvent.create({
+          data: {
+            orderId: order.id,
+            type: 'INVOICE_ISSUED',
+            actorType: 'SYSTEM',
+            message: `電子發票已開立：${invoiceNo}`,
+            createdAt: issuedAt,
+          },
+        });
+      }
+      if (!order.shipment && shipmentStatus) {
+        const kind = LOGISTICS_KIND[order.shippingMethod];
+        const createdAt = new Date(paidAt.getTime() + 2 * HOUR);
+        const home = order.shippingMethod === 'HOME_DELIVERY';
+        const shipmentNo = digits(home ? 12 : 8);
+        const progress = MOCK_PROGRESS[shipmentStatus];
+        await tx.shipment.create({
+          data: {
+            orderId: order.id,
+            provider: 'MOCK',
+            logisticsType: kind.logisticsType,
+            logisticsSubType: kind.logisticsSubType,
+            merchantTradeNo: `DEMO${order.orderNo.slice(3)}`,
+            logisticsId: digits(7),
+            shipmentNo,
+            validationNo: order.shippingMethod === 'CVS_711' ? digits(4) : null,
+            status: shipmentStatus,
+            statusCode: progress.code,
+            statusMessage: progress.message,
+            raw: { simulated: true },
+            createdAt,
+            updatedAt: order.completedAt ?? order.shippedAt ?? createdAt,
+          },
+        });
+        await tx.orderEvent.create({
+          data: {
+            orderId: order.id,
+            type: 'SHIPMENT_CREATED',
+            actorType: 'ADMIN',
+            message: `已建立物流單（模擬物流），寄貨編號 ${shipmentNo}`,
+            createdAt,
+          },
+        });
+      }
+    });
+    updated += 1;
+  }
+  return updated;
+}
+
+const MOCK_PROGRESS: Record<ShipmentStatus, { code: string; message: string }> = {
+  CREATED: { code: '300', message: '訂單處理中（模擬物流）' },
+  IN_TRANSIT: { code: '2068', message: '交貨便收件（模擬）' },
+  ARRIVED: { code: '2073', message: '商品配達買家取貨門市（模擬）' },
+  PICKED_UP: { code: '2067', message: '消費者成功取件（模擬）' },
+  RETURNED: { code: '2074', message: '消費者七天未取，商品退回（模擬）' },
+};

@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { APP_CONFIG, type AppConfig } from '../../../config/config.module.js';
-import type { CheckoutContext, GatewayRedirect, PaymentGateway } from './payment-gateway.js';
+import type { GatewayRedirect } from '../../../common/http/gateway-redirect.dto.js';
+import type { CheckoutContext, PaymentGateway } from './payment-gateway.js';
 
 /**
  * 模擬金流：導向 API 內建的模擬付款頁，可選擇付款成功或失敗。

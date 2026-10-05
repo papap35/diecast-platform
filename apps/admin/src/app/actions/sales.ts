@@ -50,3 +50,42 @@ export async function updateMemberStatusAction(
   refresh();
   return { ok: true, data: undefined };
 }
+
+type SimulatedStatus = Schemas['SimulateShipmentDto']['status'];
+
+export async function createShipmentAction(id: string): Promise<ActionResult> {
+  if (!(await ensureAccessToken())) return { ok: false, error: UNAUTHORIZED };
+  const api = await actionApi();
+  const { error, response } = await api.POST('/v1/admin/orders/{id}/shipment', {
+    params: { path: { id } },
+  });
+  if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
+  refresh();
+  return { ok: true, data: undefined };
+}
+
+export async function simulateShipmentAction(
+  id: string,
+  status: SimulatedStatus,
+): Promise<ActionResult> {
+  if (!(await ensureAccessToken())) return { ok: false, error: UNAUTHORIZED };
+  const api = await actionApi();
+  const { error, response } = await api.POST('/v1/admin/orders/{id}/shipment/simulate', {
+    params: { path: { id } },
+    body: { status },
+  });
+  if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
+  refresh();
+  return { ok: true, data: undefined };
+}
+
+export async function retryInvoiceAction(id: string): Promise<ActionResult> {
+  if (!(await ensureAccessToken())) return { ok: false, error: UNAUTHORIZED };
+  const api = await actionApi();
+  const { error, response } = await api.POST('/v1/admin/orders/{id}/invoice/retry', {
+    params: { path: { id } },
+  });
+  if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
+  refresh();
+  return { ok: true, data: undefined };
+}

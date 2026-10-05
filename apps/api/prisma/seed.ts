@@ -9,7 +9,7 @@ import { PrismaClient } from '../src/generated/prisma/client.js';
 import { hashPassword } from '../src/common/security/password.js';
 import { Permission } from '../src/modules/auth/permissions.js';
 import { BRANDS, CATEGORIES, PRODUCTS, type SeedProduct } from './seed/catalog-data.js';
-import { seedDemoOrders } from './seed/demo-orders.js';
+import { seedDemoFulfilment, seedDemoOrders } from './seed/demo-orders.js';
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
@@ -263,6 +263,7 @@ async function main() {
   const categoryIds = await seedCategories();
   await seedProducts(brandIds, categoryIds);
   const orders = await seedDemoOrders(prisma);
+  await seedDemoFulfilment(prisma);
 
   console.log(`✔ 示範資料建立完成${orders ? `（新增 ${orders} 筆示範訂單）` : ''}`);
   console.log(`  後台：${DEMO_ACCOUNTS.superAdmin.email} / ${DEMO_ACCOUNTS.superAdmin.password}`);

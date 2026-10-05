@@ -76,6 +76,58 @@ export const CVS_CHECKOUT = {
   invoiceType: 'MEMBER_CARRIER',
 };
 
+export interface OrderOptions {
+  quantity?: number;
+  price?: number;
+  stock?: number;
+  checkout?: Record<string, unknown>;
+}
+
+/** 新會員下單一件新商品（預設超商取貨） */
+export async function placeOrder(ctx: TestContext, options: OrderOptions = {}) {
+  const product = await createProduct(ctx.prisma, {
+    price: options.price ?? 1000,
+    stock: options.stock ?? 10,
+  });
+  const member = await registerMember(ctx);
+  const order = await ctx
+    .http()
+    .post('/v1/orders')
+    .set(member.auth)
+    .send({
+      ...(options.checkout ?? CVS_CHECKOUT),
+      items: [{ productId: product.id, quantity: options.quantity ?? 1 }],
+    })
+    .expect(201);
+  return { product, member, order: order.body };
+}
+
+/** 以模擬金流完成付款 */
+export async function payWithMock(
+  ctx: TestContext,
+  member: { auth: Record<string, string> },
+  orderNo: string,
+) {
+  const start = await ctx
+    .http()
+    .post(`/v1/orders/${orderNo}/payments`)
+    .set(member.auth)
+    .send({})
+    .expect(201);
+  await ctx
+    .http()
+    .post(`/v1/payments/mock/${start.body.merchantTradeNo}/complete`)
+    .type('form')
+    .send({ result: 'success' })
+    .expect(303);
+}
+
+export async function placePaidOrder(ctx: TestContext, options: OrderOptions = {}) {
+  const placed = await placeOrder(ctx, options);
+  await payWithMock(ctx, placed.member, placed.order.orderNo);
+  return placed;
+}
+
 export async function createAdmin(
   ctx: TestContext,
   permissions: string[] = ['*'],

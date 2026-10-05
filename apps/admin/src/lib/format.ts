@@ -25,6 +25,22 @@ export function formatDateTime(value: string | Date, locale: string): string {
   }).format(new Date(value));
 }
 
+export function formatDate(value: string | Date, locale: string): string {
+  return new Intl.DateTimeFormat(DATE_LOCALES[locale] ?? 'zh-TW', {
+    timeZone: TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(value));
+}
+
+/** 統一發票號碼的印刷格式：AB-12345678 */
+export function formatInvoiceNo(invoiceNo: string): string {
+  return /^[A-Z]{2}\d{8}$/.test(invoiceNo)
+    ? `${invoiceNo.slice(0, 2)}-${invoiceNo.slice(2)}`
+    : invoiceNo;
+}
+
 export function formatShortDate(value: string, locale: string): string {
   // value 為 YYYY-MM-DD（台灣日期）
   const [, m, d] = value.split('-');

@@ -195,7 +195,6 @@
     "storeAddress": "门店地址",
     "pickStore": "选择门店",
     "changeStore": "更换门店",
-    "storeDemoHint": "示范站使用预设门店列表；正式对接时改为绿界便利店电子地图。",
     "invoice": "电子发票",
     "carrierNum": "载具号码",
     "carrierHintMobile": "手机条码：/ 开头共 8 码",
@@ -226,7 +225,12 @@
       "DONATION": "捐赠发票",
       "COMPANY": "公司（统编）"
     },
-    "total": "总计"
+    "total": "总计",
+    "storeRequired": "尚未选择取货门市",
+    "storeMapHint": "将打开超商电子地图选择门市，选好后会回到这一页，已填写的数据会保留。",
+    "openingMap": "打开电子地图…",
+    "storeCancelled": "已取消选择门市",
+    "storeExpired": "选店已逾时，请重新选择门市"
   },
   "orders": {
     "title": "我的订单",
@@ -261,6 +265,31 @@
       "PENDING": "处理中",
       "SUCCEEDED": "成功",
       "FAILED": "失败"
+    },
+    "shipment": "物流进度",
+    "shipmentNo": "寄货编号",
+    "trackingNo": "托运单号",
+    "validationNo": "验证码",
+    "updatedAt": "更新于 {time}",
+    "shipmentStatus": {
+      "CREATED": "已创建物流单，准备寄出",
+      "IN_TRANSIT": "配送中",
+      "ARRIVED": "已到店，请携带证件取货",
+      "PICKED_UP": "已取件／签收",
+      "RETURNED": "包裹已退回"
+    },
+    "invoiceStatusLabel": "发票状态",
+    "invoiceNo": "发票号码",
+    "invoiceDate": "开立日期",
+    "randomNumber": "随机码",
+    "allowanceNo": "折让单号",
+    "invoiceStatus": {
+      "PENDING": "开立中",
+      "ISSUED": "已开立",
+      "VOID_PENDING": "作废处理中",
+      "VOIDED": "已作废",
+      "ALLOWANCE_ISSUED": "已开立折让单",
+      "CANCELLED": "不需开立"
     }
   },
   "account": {
@@ -316,7 +345,8 @@
     "CART_EMPTY": "购物车是空的",
     "ORDER_NOT_PAYABLE": "订单目前无法付款",
     "ORDER_NOT_CANCELLABLE": "订单已付款，请联系客服取消",
-    "RATE_LIMITED": "操作太频繁，请稍候再试"
+    "RATE_LIMITED": "操作太频繁，请稍候再试",
+    "CVS_SELECTION_NOT_FOUND": "选店数据已过期，请重新选择门市"
   },
   "footer": {
     "tagline": "为模型车收藏家打造的线上车库。",

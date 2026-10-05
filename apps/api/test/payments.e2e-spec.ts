@@ -1,4 +1,4 @@
-import { generateCheckMacValue } from '../src/modules/payments/providers/ecpay-checkmac.js';
+import { generateCheckMacValue } from '../src/modules/ecpay/checkmac.js';
 import { OrdersService } from '../src/modules/orders/orders.service.js';
 import { createProduct, CVS_CHECKOUT, registerMember } from './fixtures.js';
 import { TEST_ENV } from './test-env.js';

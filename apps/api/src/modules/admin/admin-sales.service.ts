@@ -7,6 +7,8 @@ import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { LOW_STOCK_THRESHOLD } from '../catalog/availability.js';
 import { TokenService } from '../auth/token.service.js';
 import { nextStatuses, SPENT_STATUSES } from '../orders/order-rules.js';
+import { MAX_INVOICE_ATTEMPTS } from '../invoices/invoices.service.js';
+import { canCreateShipment } from '../logistics/logistics.service.js';
 import { orderDetailInclude, OrdersService } from '../orders/orders.service.js';
 import type {
   AdminMemberDto,
@@ -84,8 +86,31 @@ export class AdminSalesService {
       },
     });
     if (!order) throw AppException.notFound(ErrorCode.ORDER_NOT_FOUND, '找不到這筆訂單');
+    const base = this.orders.toDto(order);
     return {
-      ...this.orders.toDto(order),
+      ...base,
+      shipment:
+        base.shipment && order.shipment
+          ? {
+              ...base.shipment,
+              merchantTradeNo: order.shipment.merchantTradeNo,
+              logisticsId: order.shipment.logisticsId,
+              statusCode: order.shipment.statusCode,
+            }
+          : null,
+      invoice:
+        base.invoice && order.invoice
+          ? {
+              ...base.invoice,
+              provider: order.invoice.provider,
+              attempts: order.invoice.attempts,
+              nextAttemptAt: order.invoice.nextAttemptAt,
+              lastError: order.invoice.lastError,
+              needsAttention:
+                (order.invoice.status === 'PENDING' || order.invoice.status === 'VOID_PENDING') &&
+                order.invoice.attempts >= MAX_INVOICE_ATTEMPTS,
+            }
+          : null,
       member: order.member,
       events: order.events.map((event) => ({
         id: event.id,
@@ -98,6 +123,7 @@ export class AdminSalesService {
         createdAt: event.createdAt,
       })),
       nextStatuses: nextStatuses(order.status).filter((status) => status !== 'PAID'),
+      canCreateShipment: canCreateShipment(order.status, order.shipment?.status),
     };
   }
 

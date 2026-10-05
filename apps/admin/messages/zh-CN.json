@@ -233,7 +233,7 @@
     "noTransitions": "此订单状态无法再变更",
     "addNote": "添加备注",
     "notePlaceholder": "内部备注，顾客看不到",
-    "refundWarning": "退款会释放库存并扣回会员累计消费，金流退款需另行处理。",
+    "refundWarning": "退款会扣回会员累计消费，并自动作废电子发票（跨期改开折让单）。出货完成前退款会释放库存；已完成订单的退货请验货后手动调整库存。金流退款需另行处理。",
     "statuses": {
       "PENDING_PAYMENT": "待付款",
       "PAID": "已付款",
@@ -267,13 +267,64 @@
       "STATUS_CHANGED": "状态变更",
       "PAYMENT_FAILED": "付款失败",
       "LATE_PAYMENT": "延迟付款（需退款）",
-      "NOTE": "备注"
+      "NOTE": "备注",
+      "SHIPMENT_CREATED": "创建物流单",
+      "SHIPMENT_FAILED": "创建物流单失败",
+      "SHIPMENT_STATUS": "物流状态",
+      "SHIPMENT_RETURNED": "包裹退回",
+      "INVOICE_ISSUED": "发票开立",
+      "INVOICE_VOIDED": "发票作废",
+      "INVOICE_ALLOWANCE": "开立折让单",
+      "INVOICE_FAILED": "发票处理失败",
+      "INVOICE_RETRY": "手动重试发票"
     },
     "paymentStatuses": {
       "PENDING": "处理中",
       "SUCCEEDED": "成功",
       "FAILED": "失败"
-    }
+    },
+    "shipmentTitle": "物流",
+    "createShipment": "创建物流单",
+    "reship": "重新寄送",
+    "shipmentHint": "创建后会产生寄货编号，已付款的订单转为「备货中」。",
+    "noShipment": "付款完成后才能创建物流单",
+    "provider": "服务商",
+    "providers": {
+      "MOCK": "仿真",
+      "ECPAY": "绿界"
+    },
+    "shipmentNo": "寄货编号",
+    "trackingNo": "托运单号",
+    "validationNo": "验证码",
+    "logisticsId": "绿界物流编号",
+    "latestStatus": "最新状态",
+    "updatedAt": "更新时间",
+    "simulate": "仿真配送进度（示范用）",
+    "shipmentStatuses": {
+      "CREATED": "已建单",
+      "IN_TRANSIT": "配送中",
+      "ARRIVED": "已到店",
+      "PICKED_UP": "已取件",
+      "RETURNED": "已退回"
+    },
+    "invoiceTitle": "电子发票",
+    "invoiceStatuses": {
+      "PENDING": "待开立",
+      "ISSUED": "已开立",
+      "VOID_PENDING": "待作废",
+      "VOIDED": "已作废",
+      "ALLOWANCE_ISSUED": "已折让",
+      "CANCELLED": "不需开立"
+    },
+    "invoiceNo": "发票号码",
+    "invoiceDate": "开立日期",
+    "randomNumber": "随机码",
+    "allowanceNo": "折让单号",
+    "invoiceError": "处理失败（已尝试 {attempts} 次）",
+    "invoiceNeedsAttention": "自动重试已停止，请确认错误原因后手动重试。",
+    "invoiceNextAttempt": "下次自动重试：{time}",
+    "retryInvoice": "立即重试",
+    "noInvoice": "付款成功后自动开立"
   },
   "members": {
     "title": "会员",
@@ -306,6 +357,9 @@
     "CONFLICT": "数据冲突（可能是 slug 或 SKU 重复，或仍有关联数据）",
     "INVALID_STATUS_TRANSITION": "订单目前的状态不允许这个变更",
     "NOT_FOUND": "找不到数据",
-    "UNAUTHORIZED": "请重新登录"
+    "UNAUTHORIZED": "请重新登录",
+    "SHIPMENT_NOT_ALLOWED": "这笔订单目前不能创建物流单",
+    "PROVIDER_ERROR": "第三方服务回传错误",
+    "INVOICE_NOT_RETRYABLE": "这张发票没有待处理的工作"
   }
 }

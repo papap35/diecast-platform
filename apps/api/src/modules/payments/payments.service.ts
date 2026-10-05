@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
+import { frontendOrigins, resolveReturnUrl, withQuery } from '../../common/http/return-url.js';
 import type { Locale } from '../../common/i18n/locale.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
@@ -59,7 +60,11 @@ export class PaymentsService {
         provider: gateway.provider,
         merchantTradeNo: generateMerchantTradeNo(),
         amount: order.total,
-        returnUrl: this.resolveReturnUrl(returnUrl, locale, order.orderNo),
+        returnUrl: resolveReturnUrl(
+          returnUrl,
+          `${this.config.WEB_BASE_URL}/${locale}/account/orders/${order.orderNo}`,
+          frontendOrigins(this.config),
+        ),
       },
     });
 
@@ -165,26 +170,9 @@ export class PaymentsService {
     }
     return payment;
   }
-
-  /** 付款後導回的網址只接受自家網域（避免被利用成開放式重新導向）或 App 的 deep link */
-  private resolveReturnUrl(requested: string | undefined, locale: Locale, orderNo: string): string {
-    const fallback = `${this.config.WEB_BASE_URL}/${locale}/account/orders/${orderNo}`;
-    if (!requested) return fallback;
-    if (requested.startsWith('paddock64://')) return requested;
-    try {
-      const origin = new URL(requested).origin;
-      const allowed = [this.config.WEB_BASE_URL, ...this.config.CORS_ORIGINS].map(
-        (url) => new URL(url).origin,
-      );
-      return allowed.includes(origin) ? requested : fallback;
-    } catch {
-      return fallback;
-    }
-  }
 }
 
 /** 在導回網址附上付款結果 */
 export function withPaymentResult(returnUrl: string, success: boolean): string {
-  const separator = returnUrl.includes('?') ? '&' : '?';
-  return `${returnUrl}${separator}payment=${success ? 'success' : 'failed'}`;
+  return withQuery(returnUrl, { payment: success ? 'success' : 'failed' });
 }

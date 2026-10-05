@@ -1,5 +1,7 @@
 {
-  "meta": { "title": "Paddock 64 營運後台" },
+  "meta": {
+    "title": "Paddock 64 營運後台"
+  },
   "nav": {
     "dashboard": "儀表板",
     "catalog": "商品目錄",
@@ -22,7 +24,11 @@
     "submit": "登入",
     "submitting": "登入中…",
     "demoTitle": "示範帳號（點選帶入）",
-    "roles": { "super_admin": "超級管理員", "operator": "營運人員", "customer_service": "客服人員" }
+    "roles": {
+      "super_admin": "超級管理員",
+      "operator": "營運人員",
+      "customer_service": "客服人員"
+    }
   },
   "common": {
     "save": "儲存",
@@ -148,8 +154,16 @@
     "archive": "下架封存",
     "archiveConfirm": "確定要下架這個商品嗎？前台將不再顯示。",
     "created": "商品已建立",
-    "statuses": { "DRAFT": "草稿", "ACTIVE": "上架中", "ARCHIVED": "已下架" },
-    "saleTypes": { "REGULAR": "現貨", "PRE_ORDER": "預購", "LIMITED": "限量發售" },
+    "statuses": {
+      "DRAFT": "草稿",
+      "ACTIVE": "上架中",
+      "ARCHIVED": "已下架"
+    },
+    "saleTypes": {
+      "REGULAR": "現貨",
+      "PRE_ORDER": "預購",
+      "LIMITED": "限量發售"
+    },
     "availabilities": {
       "IN_STOCK": "現貨",
       "LOW_STOCK": "低庫存",
@@ -219,7 +233,7 @@
     "noTransitions": "此訂單狀態無法再變更",
     "addNote": "新增備註",
     "notePlaceholder": "內部備註，顧客看不到",
-    "refundWarning": "退款會釋放庫存並扣回會員累計消費，金流退款需另行處理。",
+    "refundWarning": "退款會扣回會員累計消費，並自動作廢電子發票（跨期改開折讓單）。出貨完成前退款會釋放庫存；已完成訂單的退貨請驗貨後手動調整庫存。金流退款需另行處理。",
     "statuses": {
       "PENDING_PAYMENT": "待付款",
       "PAID": "已付款",
@@ -243,15 +257,74 @@
       "DONATION": "捐贈",
       "COMPANY": "公司統編"
     },
-    "actors": { "SYSTEM": "系統", "MEMBER": "會員", "ADMIN": "管理員" },
+    "actors": {
+      "SYSTEM": "系統",
+      "MEMBER": "會員",
+      "ADMIN": "管理員"
+    },
     "events": {
       "CREATED": "訂單成立",
       "STATUS_CHANGED": "狀態變更",
       "PAYMENT_FAILED": "付款失敗",
       "LATE_PAYMENT": "延遲付款（需退款）",
-      "NOTE": "備註"
+      "NOTE": "備註",
+      "SHIPMENT_CREATED": "建立物流單",
+      "SHIPMENT_FAILED": "建立物流單失敗",
+      "SHIPMENT_STATUS": "物流狀態",
+      "SHIPMENT_RETURNED": "包裹退回",
+      "INVOICE_ISSUED": "發票開立",
+      "INVOICE_VOIDED": "發票作廢",
+      "INVOICE_ALLOWANCE": "開立折讓單",
+      "INVOICE_FAILED": "發票處理失敗",
+      "INVOICE_RETRY": "手動重試發票"
     },
-    "paymentStatuses": { "PENDING": "處理中", "SUCCEEDED": "成功", "FAILED": "失敗" }
+    "paymentStatuses": {
+      "PENDING": "處理中",
+      "SUCCEEDED": "成功",
+      "FAILED": "失敗"
+    },
+    "shipmentTitle": "物流",
+    "createShipment": "建立物流單",
+    "reship": "重新寄送",
+    "shipmentHint": "建立後會產生寄貨編號，已付款的訂單轉為「備貨中」。",
+    "noShipment": "付款完成後才能建立物流單",
+    "provider": "服務商",
+    "providers": {
+      "MOCK": "模擬",
+      "ECPAY": "綠界"
+    },
+    "shipmentNo": "寄貨編號",
+    "trackingNo": "託運單號",
+    "validationNo": "驗證碼",
+    "logisticsId": "綠界物流編號",
+    "latestStatus": "最新狀態",
+    "updatedAt": "更新時間",
+    "simulate": "模擬配送進度（示範用）",
+    "shipmentStatuses": {
+      "CREATED": "已建單",
+      "IN_TRANSIT": "配送中",
+      "ARRIVED": "已到店",
+      "PICKED_UP": "已取件",
+      "RETURNED": "已退回"
+    },
+    "invoiceTitle": "電子發票",
+    "invoiceStatuses": {
+      "PENDING": "待開立",
+      "ISSUED": "已開立",
+      "VOID_PENDING": "待作廢",
+      "VOIDED": "已作廢",
+      "ALLOWANCE_ISSUED": "已折讓",
+      "CANCELLED": "不需開立"
+    },
+    "invoiceNo": "發票號碼",
+    "invoiceDate": "開立日期",
+    "randomNumber": "隨機碼",
+    "allowanceNo": "折讓單號",
+    "invoiceError": "處理失敗（已嘗試 {attempts} 次）",
+    "invoiceNeedsAttention": "自動重試已停止，請確認錯誤原因後手動重試。",
+    "invoiceNextAttempt": "下次自動重試：{time}",
+    "retryInvoice": "立即重試",
+    "noInvoice": "付款成功後自動開立"
   },
   "members": {
     "title": "會員",
@@ -269,7 +342,11 @@
     "suspend": "停權",
     "activate": "恢復正常",
     "suspendConfirm": "停權後會立即登出該會員所有裝置，確定嗎？",
-    "statuses": { "ACTIVE": "正常", "SUSPENDED": "停權", "DELETED": "已刪除" }
+    "statuses": {
+      "ACTIVE": "正常",
+      "SUSPENDED": "停權",
+      "DELETED": "已刪除"
+    }
   },
   "errors": {
     "generic": "發生錯誤，請稍後再試",
@@ -280,6 +357,9 @@
     "CONFLICT": "資料衝突（可能是 slug 或 SKU 重複，或仍有關聯資料）",
     "INVALID_STATUS_TRANSITION": "訂單目前的狀態不允許這個變更",
     "NOT_FOUND": "找不到資料",
-    "UNAUTHORIZED": "請重新登入"
+    "UNAUTHORIZED": "請重新登入",
+    "SHIPMENT_NOT_ALLOWED": "這筆訂單目前不能建立物流單",
+    "PROVIDER_ERROR": "第三方服務回傳錯誤",
+    "INVOICE_NOT_RETRYABLE": "這張發票沒有待處理的工作"
   }
 }

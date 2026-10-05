@@ -3,6 +3,9 @@ import { ApiTags } from '@nestjs/swagger';
 import type { AdminPrincipal } from '../auth/auth.types.js';
 import { AdminAuth, CurrentAdmin, RequirePermissions } from '../auth/decorators.js';
 import { Permission } from '../auth/permissions.js';
+import { InvoicesService } from '../invoices/invoices.service.js';
+import { SimulateShipmentDto } from '../logistics/dto/logistics.dto.js';
+import { LogisticsService } from '../logistics/logistics.service.js';
 import { AdminSalesService } from './admin-sales.service.js';
 import {
   AdminMemberDto,
@@ -36,7 +39,11 @@ export class AdminDashboardController {
 @AdminAuth(Permission.OrderRead)
 @Controller('admin/orders')
 export class AdminOrdersController {
-  constructor(private readonly sales: AdminSalesService) {}
+  constructor(
+    private readonly sales: AdminSalesService,
+    private readonly logistics: LogisticsService,
+    private readonly invoices: InvoicesService,
+  ) {}
 
   @Get()
   list(@Query() query: AdminOrderQueryDto): Promise<AdminOrderListDto> {
@@ -68,6 +75,39 @@ export class AdminOrdersController {
     @CurrentAdmin() admin: AdminPrincipal,
   ): Promise<AdminOrderDto> {
     return this.sales.addOrderNote(id, dto.message, admin.id);
+  }
+
+  /** 建立物流單（綠界 C2C 店到店／黑貓宅配；模擬物流產生假單號）。已付款的訂單會轉為處理中 */
+  @Post(':id/shipment')
+  @RequirePermissions(Permission.OrderWrite)
+  async createShipment(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentAdmin() admin: AdminPrincipal,
+  ): Promise<AdminOrderDto> {
+    await this.logistics.createShipment(id, admin.id);
+    return this.sales.getOrder(id);
+  }
+
+  /** 推進模擬物流的配送狀態（示範用），訂單狀態會跟著更新 */
+  @Post(':id/shipment/simulate')
+  @RequirePermissions(Permission.OrderWrite)
+  async simulateShipment(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: SimulateShipmentDto,
+  ): Promise<AdminOrderDto> {
+    await this.logistics.simulate(id, dto.status);
+    return this.sales.getOrder(id);
+  }
+
+  /** 立即重試開立或作廢電子發票（重設自動重試次數） */
+  @Post(':id/invoice/retry')
+  @RequirePermissions(Permission.OrderWrite)
+  async retryInvoice(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentAdmin() admin: AdminPrincipal,
+  ): Promise<AdminOrderDto> {
+    await this.invoices.retry(id, admin.id);
+    return this.sales.getOrder(id);
   }
 }
 

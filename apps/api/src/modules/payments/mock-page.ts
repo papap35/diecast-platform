@@ -1,15 +1,11 @@
+import { escapeHtml as escape } from '../../common/http/html.js';
+
 interface MockPagePayment {
   merchantTradeNo: string;
   amount: number;
   status: string;
   order: { orderNo: string; paymentDeadline: Date | null };
 }
-
-const escape = (value: string) =>
-  value.replace(
-    /[&<>"']/g,
-    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
-  );
 
 /** 模擬第三方金流的付款頁：沒有任何真實扣款，只用來走完付款流程 */
 export function renderMockPaymentPage(payment: MockPagePayment): string {

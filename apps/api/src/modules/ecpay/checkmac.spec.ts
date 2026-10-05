@@ -1,4 +1,4 @@
-import { ecpayUrlEncode, generateCheckMacValue, verifyCheckMacValue } from './ecpay-checkmac.js';
+import { ecpayUrlEncode, generateCheckMacValue, verifyCheckMacValue } from './checkmac.js';
 
 // 綠界公開的測試商店（全方位金流）
 const HASH_KEY = '5294y06JbISpM5x9';

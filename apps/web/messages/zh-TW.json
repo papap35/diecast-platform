@@ -195,7 +195,6 @@
     "storeAddress": "門市地址",
     "pickStore": "選擇門市",
     "changeStore": "更換門市",
-    "storeDemoHint": "示範站使用預設門市清單；正式串接時改為綠界超商電子地圖。",
     "invoice": "電子發票",
     "carrierNum": "載具號碼",
     "carrierHintMobile": "手機條碼：/ 開頭共 8 碼",
@@ -226,7 +225,12 @@
       "DONATION": "捐贈發票",
       "COMPANY": "公司（統編）"
     },
-    "total": "總計"
+    "total": "總計",
+    "storeRequired": "尚未選擇取貨門市",
+    "storeMapHint": "將開啟超商電子地圖選擇門市，選好後會回到這一頁，已填寫的資料會保留。",
+    "openingMap": "開啟電子地圖…",
+    "storeCancelled": "已取消選擇門市",
+    "storeExpired": "選店已逾時，請重新選擇門市"
   },
   "orders": {
     "title": "我的訂單",
@@ -261,6 +265,31 @@
       "PENDING": "處理中",
       "SUCCEEDED": "成功",
       "FAILED": "失敗"
+    },
+    "shipment": "物流進度",
+    "shipmentNo": "寄貨編號",
+    "trackingNo": "託運單號",
+    "validationNo": "驗證碼",
+    "updatedAt": "更新於 {time}",
+    "shipmentStatus": {
+      "CREATED": "已建立物流單，準備寄出",
+      "IN_TRANSIT": "配送中",
+      "ARRIVED": "已到店，請攜帶證件取貨",
+      "PICKED_UP": "已取件／簽收",
+      "RETURNED": "包裹已退回"
+    },
+    "invoiceStatusLabel": "發票狀態",
+    "invoiceNo": "發票號碼",
+    "invoiceDate": "開立日期",
+    "randomNumber": "隨機碼",
+    "allowanceNo": "折讓單號",
+    "invoiceStatus": {
+      "PENDING": "開立中",
+      "ISSUED": "已開立",
+      "VOID_PENDING": "作廢處理中",
+      "VOIDED": "已作廢",
+      "ALLOWANCE_ISSUED": "已開立折讓單",
+      "CANCELLED": "不需開立"
     }
   },
   "account": {
@@ -316,7 +345,8 @@
     "CART_EMPTY": "購物車是空的",
     "ORDER_NOT_PAYABLE": "訂單目前無法付款",
     "ORDER_NOT_CANCELLABLE": "訂單已付款，請聯繫客服取消",
-    "RATE_LIMITED": "操作太頻繁，請稍候再試"
+    "RATE_LIMITED": "操作太頻繁，請稍候再試",
+    "CVS_SELECTION_NOT_FOUND": "選店資料已過期，請重新選擇門市"
   },
   "footer": {
     "tagline": "為模型車收藏家打造的線上車庫。",

@@ -1,8 +1,8 @@
 import {
   createAdmin,
   createCatalogBasics,
-  createProduct,
   CVS_CHECKOUT,
+  placePaidOrder,
   registerMember,
 } from './fixtures.js';
 import { createTestApp, resetDatabase, type TestContext } from './utils.js';
@@ -22,29 +22,7 @@ describe('後台 (e2e)', () => {
     await ctx.app.close();
   });
 
-  async function paidOrder(quantity = 1) {
-    const product = await createProduct(ctx.prisma, { price: 1000, stock: 10 });
-    const member = await registerMember(ctx);
-    const order = await ctx
-      .http()
-      .post('/v1/orders')
-      .set(member.auth)
-      .send({ ...CVS_CHECKOUT, items: [{ productId: product.id, quantity }] })
-      .expect(201);
-    const start = await ctx
-      .http()
-      .post(`/v1/orders/${order.body.orderNo}/payments`)
-      .set(member.auth)
-      .send({})
-      .expect(201);
-    await ctx
-      .http()
-      .post(`/v1/payments/mock/${start.body.merchantTradeNo}/complete`)
-      .type('form')
-      .send({ result: 'success' })
-      .expect(303);
-    return { product, member, order: order.body };
-  }
+  const paidOrder = (quantity = 1) => placePaidOrder(ctx, { quantity });
 
   it('後台登入後可取得自己的角色與權限', async () => {
     const admin = await createAdmin(ctx, ['order:read']);

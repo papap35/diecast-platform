@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { APP_CONFIG, type AppConfig } from '../../../config/config.module.js';
 import type { Locale } from '../../../common/i18n/locale.js';
-import { generateCheckMacValue, verifyCheckMacValue } from './ecpay-checkmac.js';
-import type { CheckoutContext, GatewayRedirect, PaymentGateway } from './payment-gateway.js';
+import { generateCheckMacValue, verifyCheckMacValue } from '../../ecpay/checkmac.js';
+import { ecpayDateTime } from '../../ecpay/format.js';
+import type { GatewayRedirect } from '../../../common/http/gateway-redirect.dto.js';
+import type { CheckoutContext, PaymentGateway } from './payment-gateway.js';
 
 const ENDPOINTS = {
   stage: 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5',
@@ -11,15 +13,6 @@ const ENDPOINTS = {
 
 /** 綠界付款頁語系：預設繁中，英文與簡中另外指定 */
 const LANGUAGE: Partial<Record<Locale, string>> = { en: 'ENG', 'zh-CN': 'CHI' };
-
-/** 綠界要求的交易時間格式：yyyy/MM/dd HH:mm:ss（台灣時間） */
-export function ecpayTradeDate(date: Date): string {
-  const taipei = new Date(date.getTime() + 8 * 60 * 60 * 1000);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${taipei.getUTCFullYear()}/${pad(taipei.getUTCMonth() + 1)}/${pad(taipei.getUTCDate())} ${pad(
-    taipei.getUTCHours(),
-  )}:${pad(taipei.getUTCMinutes())}:${pad(taipei.getUTCSeconds())}`;
-}
 
 /** 商品名稱以 # 分隔，總長不得超過 400 字元 */
 export function ecpayItemName(items: { name: string; quantity: number }[]): string {
@@ -42,7 +35,7 @@ export class EcpayGateway implements PaymentGateway {
     const fields: Record<string, string> = {
       MerchantID: this.config.ECPAY_MERCHANT_ID,
       MerchantTradeNo: payment.merchantTradeNo,
-      MerchantTradeDate: ecpayTradeDate(payment.createdAt),
+      MerchantTradeDate: ecpayDateTime(payment.createdAt),
       PaymentType: 'aio',
       TotalAmount: String(payment.amount),
       TradeDesc: `Paddock 64 ${order.orderNo}`,

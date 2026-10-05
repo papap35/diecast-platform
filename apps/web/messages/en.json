@@ -195,7 +195,6 @@
     "storeAddress": "Store address",
     "pickStore": "Choose store",
     "changeStore": "Change store",
-    "storeDemoHint": "The demo uses a preset store list; production uses the ECPay store-locator map.",
     "invoice": "E-invoice",
     "carrierNum": "Carrier number",
     "carrierHintMobile": "Mobile barcode: 8 characters starting with /",
@@ -226,7 +225,12 @@
       "DONATION": "Donate invoice",
       "COMPANY": "Company (tax ID)"
     },
-    "total": "Total"
+    "total": "Total",
+    "storeRequired": "No pickup store selected yet",
+    "storeMapHint": "You'll pick a store on the convenience-store map, then come back here with your details kept.",
+    "openingMap": "Opening store map…",
+    "storeCancelled": "Store selection cancelled",
+    "storeExpired": "Store selection expired. Please pick a store again."
   },
   "orders": {
     "title": "My orders",
@@ -261,6 +265,31 @@
       "PENDING": "Pending",
       "SUCCEEDED": "Succeeded",
       "FAILED": "Failed"
+    },
+    "shipment": "Shipment",
+    "shipmentNo": "Shipment no.",
+    "trackingNo": "Tracking no.",
+    "validationNo": "Verification code",
+    "updatedAt": "Updated {time}",
+    "shipmentStatus": {
+      "CREATED": "Label created",
+      "IN_TRANSIT": "In transit",
+      "ARRIVED": "Ready for pickup",
+      "PICKED_UP": "Delivered",
+      "RETURNED": "Returned to sender"
+    },
+    "invoiceStatusLabel": "Invoice status",
+    "invoiceNo": "Invoice no.",
+    "invoiceDate": "Issued on",
+    "randomNumber": "Random code",
+    "allowanceNo": "Allowance no.",
+    "invoiceStatus": {
+      "PENDING": "Being issued",
+      "ISSUED": "Issued",
+      "VOID_PENDING": "Voiding",
+      "VOIDED": "Voided",
+      "ALLOWANCE_ISSUED": "Allowance issued",
+      "CANCELLED": "Not required"
     }
   },
   "account": {
@@ -316,7 +345,8 @@
     "CART_EMPTY": "Your cart is empty",
     "ORDER_NOT_PAYABLE": "This order can't be paid right now",
     "ORDER_NOT_CANCELLABLE": "Paid orders must be cancelled by support",
-    "RATE_LIMITED": "Too many attempts. Please wait a moment."
+    "RATE_LIMITED": "Too many attempts. Please wait a moment.",
+    "CVS_SELECTION_NOT_FOUND": "Store selection expired. Please pick a store again."
   },
   "footer": {
     "tagline": "An online garage built for diecast collectors.",

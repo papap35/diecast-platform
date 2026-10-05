@@ -2,6 +2,7 @@
 
 import type { Schemas } from '@paddock64/api-client';
 import { refresh } from 'next/cache';
+import { headers } from 'next/headers';
 import { getPathname } from '@/i18n/navigation';
 import type { AppLocale } from '@/i18n/routing';
 import {
@@ -11,6 +12,7 @@ import {
   UNAUTHORIZED,
 } from '@/lib/action-result';
 import { actionApi } from '@/lib/api';
+import { saveCheckoutDraft } from '@/lib/checkout-draft';
 import { SITE_URL } from '@/lib/env';
 import { ensureAccessToken } from '@/lib/session';
 
@@ -21,6 +23,11 @@ export interface CheckoutState {
   error?: ActionError;
   orderNo?: string;
   payment?: Instruction;
+}
+
+export interface CvsMapState {
+  error?: ActionError;
+  instruction?: Schemas['CvsMapInstructionDto'];
 }
 
 const text = (formData: FormData, key: string) => {
@@ -66,10 +73,41 @@ export async function placeOrderAction(
     return { error: toActionError(order.error, order.response.status) };
   }
 
-  // 不呼叫 refresh()：購物車已清空，重新渲染結帳頁會被導回購物車，蓋掉接下來的付款導向
+  // 不呼叫 refresh()、也不改 cookie（例如清除選店草稿；草稿 30 分鐘後自動失效）：
+  // 兩者都會讓結帳頁重新渲染，購物車已清空會被導回購物車，蓋掉接下來的付款導向
   const payment = await startPayment(order.data.orderNo, locale);
   if (!payment.ok) return { orderNo: order.data.orderNo, error: payment.error };
   return { orderNo: order.data.orderNo, payment: payment.data };
+}
+
+/**
+ * 開啟超商電子地圖：先暫存已填寫的資料，選好門市後回到同一個結帳網址（含「立即購買」參數），
+ * 頁面再以 cvsToken 取回門市。
+ */
+export async function openCvsMapAction(
+  _prev: CvsMapState,
+  formData: FormData,
+): Promise<CvsMapState> {
+  if (!(await ensureAccessToken())) return { error: UNAUTHORIZED };
+  const locale = formData.get('locale') as AppLocale;
+  const buyNow = text(formData, 'buyNowProductId');
+  const query = buyNow
+    ? `?${new URLSearchParams({ buyNow, qty: String(formData.get('buyNowQuantity') ?? 1) })}`
+    : '';
+  await saveCheckoutDraft(formData);
+
+  const userAgent = (await headers()).get('user-agent') ?? '';
+  const api = await actionApi(locale);
+  const { data, error, response } = await api.POST('/v1/logistics/cvs-map', {
+    params: { query: { locale } },
+    body: {
+      method: formData.get('shippingMethod') as Schemas['StartCvsMapDto']['method'],
+      returnUrl: `${SITE_URL}${getPathname({ href: '/checkout', locale })}${query}`,
+      mobile: /Mobi|Android|iPhone|iPad/i.test(userAgent),
+    },
+  });
+  if (!response.ok || !data) return { error: toActionError(error, response.status) };
+  return { instruction: data };
 }
 
 export async function startPaymentAction(

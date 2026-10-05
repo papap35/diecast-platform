@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, randomInt } from 'node:crypto';
 
 /** 產生不透明的隨機權杖（refresh token 等），回傳 base64url 字串 */
 export function generateOpaqueToken(bytes = 32): string {
@@ -20,4 +20,9 @@ export function randomCode(length: number): string {
     out += ALPHANUMERIC[bytes[i]! % ALPHANUMERIC.length];
   }
   return out;
+}
+
+/** 指定長度的隨機數字字串（模擬物流單號、發票號碼等） */
+export function randomDigits(length: number): string {
+  return Array.from({ length }, () => randomInt(10)).join('');
 }

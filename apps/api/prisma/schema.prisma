@@ -51,22 +51,22 @@ enum MemberStatus {
 }
 
 model Member {
-  id              String       @id @default(uuid(7)) @db.Uuid
-  email           String       @unique
-  passwordHash    String
-  name            String
-  phone           String?
-  locale          String       @default("zh-TW")
-  status          MemberStatus @default(ACTIVE)
-  marketingOptIn  Boolean      @default(false)
+  id             String       @id @default(uuid(7)) @db.Uuid
+  email          String       @unique
+  passwordHash   String
+  name           String
+  phone          String?
+  locale         String       @default("zh-TW")
+  status         MemberStatus @default(ACTIVE)
+  marketingOptIn Boolean      @default(false)
   /// 累計有效消費金額（新台幣），用於會員等級計算
-  totalSpent      Int          @default(0)
-  lastLoginAt     DateTime?
-  deletedAt       DateTime?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  cart            Cart?
-  orders          Order[]
+  totalSpent     Int          @default(0)
+  lastLoginAt    DateTime?
+  deletedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  cart           Cart?
+  orders         Order[]
 
   @@index([createdAt])
 }
@@ -332,6 +332,8 @@ model Order {
   items               OrderItem[]
   payments            Payment[]
   events              OrderEvent[]
+  shipment            Shipment?
+  invoice             Invoice?
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
 
@@ -412,4 +414,87 @@ model OrderEvent {
   createdAt  DateTime     @default(now())
 
   @@index([orderId, createdAt])
+}
+
+// ─────────────────────────────────────────────
+// 物流與電子發票
+// ─────────────────────────────────────────────
+
+enum IntegrationProvider {
+  MOCK
+  ECPAY
+}
+
+enum ShipmentStatus {
+  /// 物流單已建立，等待寄件
+  CREATED
+  /// 已寄件、配送中
+  IN_TRANSIT
+  /// 已到取件門市
+  ARRIVED
+  /// 已取件或已送達
+  PICKED_UP
+  /// 逾期未取或拒收，退回寄件人
+  RETURNED
+}
+
+/// 物流單（綠界 C2C 店到店／宅配）。一筆訂單一張；退回後可重新建立
+model Shipment {
+  id               String              @id @default(uuid(7)) @db.Uuid
+  orderId          String              @unique @db.Uuid
+  order            Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider         IntegrationProvider
+  logisticsType    String
+  logisticsSubType String
+  merchantTradeNo  String              @unique
+  /// 綠界物流交易編號 AllPayLogisticsID
+  logisticsId      String?
+  /// 寄貨編號（超商）或託運單號（宅配）
+  shipmentNo       String?
+  validationNo     String?
+  status           ShipmentStatus      @default(CREATED)
+  statusCode       String?
+  statusMessage    String?
+  raw              Json?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+enum InvoiceStatus {
+  /// 等待開立（付款成功後由排程開立，失敗會重試）
+  PENDING
+  ISSUED
+  /// 訂單退款，等待作廢或開立折讓
+  VOID_PENDING
+  /// 已作廢（開立當期退款）
+  VOIDED
+  /// 已開立折讓單（跨期退款不能作廢）
+  ALLOWANCE_ISSUED
+  /// 開立前訂單就已退款，不需開立
+  CANCELLED
+}
+
+/// 電子發票。付款成功後開立；退款時當期作廢、跨期開立折讓
+model Invoice {
+  id            String              @id @default(uuid(7)) @db.Uuid
+  orderId       String              @unique @db.Uuid
+  order         Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider      IntegrationProvider
+  status        InvoiceStatus       @default(PENDING)
+  invoiceNo     String?
+  invoiceDate   DateTime?
+  randomNumber  String?
+  allowanceNo   String?
+  amount        Int
+  /// 作廢或折讓完成時間
+  reversedAt    DateTime?
+  /// 開立／作廢的重試次數與下次重試時間；超過上限停止重試，由後台人工處理
+  attempts      Int                 @default(0)
+  nextAttemptAt DateTime?
+  lastError     String?
+  raw           Json?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([status, nextAttemptAt])
 }

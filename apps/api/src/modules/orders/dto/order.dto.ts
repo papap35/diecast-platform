@@ -28,11 +28,14 @@ import {
   TW_MOBILE,
 } from '../../../common/validation/tw.js';
 import {
+  IntegrationProvider,
+  InvoiceStatus,
   InvoiceType,
   OrderStatus,
   PaymentProvider,
   PaymentStatus,
   SaleType,
+  ShipmentStatus,
   ShippingMethod,
 } from '../../../generated/prisma/enums.js';
 
@@ -206,6 +209,35 @@ export class OrderPaymentDto {
   createdAt!: Date;
 }
 
+export class OrderShipmentDto {
+  @ApiProperty({ enum: IntegrationProvider, enumName: 'IntegrationProvider' })
+  provider!: IntegrationProvider;
+  @ApiProperty({ enum: ShipmentStatus, enumName: 'ShipmentStatus' })
+  status!: ShipmentStatus;
+  /** 綠界物流子類型，例如 UNIMARTC2C、TCAT */
+  logisticsSubType!: string;
+  /** 寄貨編號（超商）或託運單號（宅配），可用來查詢配送進度 */
+  shipmentNo!: string | null;
+  /** 驗證碼（7-ELEVEN 交貨便） */
+  validationNo!: string | null;
+  /** 最新物流狀態說明 */
+  statusMessage!: string | null;
+  createdAt!: Date;
+  updatedAt!: Date;
+}
+
+export class OrderInvoiceDto {
+  @ApiProperty({ enum: InvoiceStatus, enumName: 'InvoiceStatus' })
+  status!: InvoiceStatus;
+  invoiceNo!: string | null;
+  invoiceDate!: Date | null;
+  /** 發票隨機碼（對獎、查詢用） */
+  randomNumber!: string | null;
+  /** 跨期退款開立的折讓單號 */
+  allowanceNo!: string | null;
+  amount!: number;
+}
+
 export class OrderDto {
   id!: string;
   orderNo!: string;
@@ -246,6 +278,10 @@ export class OrderDto {
   createdAt!: Date;
   items!: OrderItemDto[];
   payments!: OrderPaymentDto[];
+  /** 物流單（出貨後才有） */
+  shipment!: OrderShipmentDto | null;
+  /** 電子發票（付款成功後開立） */
+  invoice!: OrderInvoiceDto | null;
   /** 是否可以（重新）付款 */
   canPay!: boolean;
   /** 會員是否可自行取消 */

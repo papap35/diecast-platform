@@ -32,8 +32,10 @@ const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   PENDING_PAYMENT: ['PAID', 'CANCELLED'],
   PAID: ['PROCESSING', 'REFUNDED'],
   PROCESSING: ['SHIPPED', 'REFUNDED'],
-  SHIPPED: ['COMPLETED'],
-  COMPLETED: [],
+  // 包裹逾期未取被退回時退款
+  SHIPPED: ['COMPLETED', 'REFUNDED'],
+  // 七天鑑賞期內退貨
+  COMPLETED: ['REFUNDED'],
   // 已取消的訂單若收到延遲付款，退款後標記為已退款
   CANCELLED: ['REFUNDED'],
   REFUNDED: [],
@@ -47,11 +49,14 @@ export function nextStatuses(from: OrderStatus): OrderStatus[] {
   return TRANSITIONS[from];
 }
 
-/** 會釋放庫存的狀態變更：未付款取消、付款後退款（已取消的訂單庫存早已釋放） */
+/**
+ * 會釋放庫存的狀態變更：未付款取消、出貨完成前退款（含包裹退回）。
+ * 已取消的訂單庫存早已釋放；已完成訂單的退貨要先驗貨，由後台手動調整庫存。
+ */
 export function releasesStock(from: OrderStatus, to: OrderStatus): boolean {
   return (
     (from === 'PENDING_PAYMENT' && to === 'CANCELLED') ||
-    (from !== 'CANCELLED' && to === 'REFUNDED')
+    (to === 'REFUNDED' && from !== 'CANCELLED' && from !== 'COMPLETED')
   );
 }
 

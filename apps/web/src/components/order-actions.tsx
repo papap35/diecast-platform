@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { cancelOrderAction, startPaymentAction } from '@/app/actions/checkout';
 import type { AppLocale } from '@/i18n/routing';
-import { PaymentRedirect } from './payment-redirect';
+import { GatewayRedirect } from './gateway-redirect';
 import { Button } from './ui/button';
 
 export function OrderActions({ order }: { order: Schemas['OrderDto'] }) {
@@ -17,7 +17,7 @@ export function OrderActions({ order }: { order: Schemas['OrderDto'] }) {
   const [error, setError] = useState<string | null>(null);
 
   if (!order.canPay && !order.canCancel) return null;
-  if (instruction) return <PaymentRedirect instruction={instruction} />;
+  if (instruction) return <GatewayRedirect instruction={instruction} label={t('paying')} />;
 
   const fail = (code: string, message: string) => setError(te.has(code) ? te(code) : message);
 

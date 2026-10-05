@@ -565,6 +565,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/logistics/cvs-map": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 開啟超商電子地圖選店。回傳導向地圖的方式（同付款：`redirect` 或 `form_post`），
+         *     選好門市後會導回 returnUrl 並附上 `cvsToken`。
+         */
+        post: operations["Logistics_startCvsMap"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/logistics/cvs-map/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 以 cvsToken 取回選店結果（30 分鐘內有效） */
+        get: operations["Logistics_getSelection"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/logistics/ecpay/map-reply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 電子地圖選店後綠界以瀏覽器 POST 帶回門市，存入選店工作階段後導回前台 */
+        post: operations["EcpayLogisticsCallback_mapReply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/logistics/ecpay/notify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 物流狀態通知，必須回應 `1|OK`，否則綠界會重送 */
+        post: operations["EcpayLogisticsCallback_notify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/dashboard": {
         parameters: {
             query?: never;
@@ -642,6 +713,57 @@ export interface paths {
         put?: never;
         /** 新增內部備註 */
         post: operations["AdminOrders_addNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/orders/{id}/shipment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 建立物流單（綠界 C2C 店到店／黑貓宅配；模擬物流產生假單號）。已付款的訂單會轉為處理中 */
+        post: operations["AdminOrders_createShipment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/orders/{id}/shipment/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 推進模擬物流的配送狀態（示範用），訂單狀態會跟著更新 */
+        post: operations["AdminOrders_simulateShipment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/orders/{id}/invoice/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 立即重試開立或作廢電子發票（重設自動重試次數） */
+        post: operations["AdminOrders_retryInvoice"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1260,6 +1382,39 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        /** @enum {string} */
+        IntegrationProvider: "MOCK" | "ECPAY";
+        /** @enum {string} */
+        ShipmentStatus: "CREATED" | "IN_TRANSIT" | "ARRIVED" | "PICKED_UP" | "RETURNED";
+        OrderShipmentDto: {
+            provider: components["schemas"]["IntegrationProvider"];
+            status: components["schemas"]["ShipmentStatus"];
+            /** @description 綠界物流子類型，例如 UNIMARTC2C、TCAT */
+            logisticsSubType: string;
+            /** @description 寄貨編號（超商）或託運單號（宅配），可用來查詢配送進度 */
+            shipmentNo: string | null;
+            /** @description 驗證碼（7-ELEVEN 交貨便） */
+            validationNo: string | null;
+            /** @description 最新物流狀態說明 */
+            statusMessage: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        /** @enum {string} */
+        InvoiceStatus: "PENDING" | "ISSUED" | "VOID_PENDING" | "VOIDED" | "ALLOWANCE_ISSUED" | "CANCELLED";
+        OrderInvoiceDto: {
+            status: components["schemas"]["InvoiceStatus"];
+            invoiceNo: string | null;
+            /** Format: date-time */
+            invoiceDate: string | null;
+            /** @description 發票隨機碼（對獎、查詢用） */
+            randomNumber: string | null;
+            /** @description 跨期退款開立的折讓單號 */
+            allowanceNo: string | null;
+            amount: number;
+        };
         OrderDto: {
             status: components["schemas"]["OrderStatus"];
             shippingMethod: components["schemas"]["ShippingMethod"];
@@ -1305,6 +1460,10 @@ export interface components {
             createdAt: string;
             items: components["schemas"]["OrderItemDto"][];
             payments: components["schemas"]["OrderPaymentDto"][];
+            /** @description 物流單（出貨後才有） */
+            shipment: components["schemas"]["OrderShipmentDto"] | null;
+            /** @description 電子發票（付款成功後開立） */
+            invoice: components["schemas"]["OrderInvoiceDto"] | null;
             /** @description 是否可以（重新）付款 */
             canPay: boolean;
             /** @description 會員是否可自行取消 */
@@ -1335,7 +1494,6 @@ export interface components {
             returnUrl?: string;
         };
         PaymentInstructionDto: {
-            provider: components["schemas"]["PaymentProvider"];
             /**
              * @description redirect：直接導向 url；form_post：以 POST 表單把 fields 送到 url（綠界）
              * @enum {string}
@@ -1344,13 +1502,44 @@ export interface components {
             fields: {
                 [key: string]: string;
             };
-            url: string;
+            provider: components["schemas"]["PaymentProvider"];
             merchantTradeNo: string;
             /**
              * Format: date-time
              * @description 訂單付款期限
              */
             expiresAt: string | null;
+            url: string;
+        };
+        StartCvsMapDto: {
+            /** @description 超商（宅配不需選店） */
+            method: components["schemas"]["ShippingMethod"];
+            /**
+             * @description 選店完成後導回的網址（Web 頁面或 App deep link，需在允許清單內），會附上 `?cvsToken=…`。
+             *     省略時導回 Web 前台結帳頁。
+             */
+            returnUrl?: string;
+            /** @description 行動裝置開啟手機版電子地圖 */
+            mobile?: boolean;
+        };
+        CvsMapInstructionDto: {
+            /**
+             * @description redirect：直接導向 url；form_post：以 POST 表單把 fields 送到 url（綠界）
+             * @enum {string}
+             */
+            type: "redirect" | "form_post";
+            fields: {
+                [key: string]: string;
+            };
+            /** @description 選店工作階段代碼，選店完成後以 `cvsToken` 帶回 */
+            token: string;
+            url: string;
+        };
+        CvsSelectionDto: {
+            method: components["schemas"]["ShippingMethod"];
+            storeId: string;
+            storeName: string;
+            storeAddress: string;
         };
         DashboardKpisDto: {
             /** @description 今日（台灣時間）已付款營收 */
@@ -1422,6 +1611,47 @@ export interface components {
             data: components["schemas"]["AdminOrderListItemDto"][];
             meta: components["schemas"]["PageMeta"];
         };
+        AdminShipmentDto: {
+            provider: components["schemas"]["IntegrationProvider"];
+            status: components["schemas"]["ShipmentStatus"];
+            /** @description 綠界物流子類型，例如 UNIMARTC2C、TCAT */
+            logisticsSubType: string;
+            /** @description 寄貨編號（超商）或託運單號（宅配），可用來查詢配送進度 */
+            shipmentNo: string | null;
+            /** @description 驗證碼（7-ELEVEN 交貨便） */
+            validationNo: string | null;
+            /** @description 最新物流狀態說明 */
+            statusMessage: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            /** @description 本站送給物流商的交易編號 */
+            merchantTradeNo: string;
+            /** @description 綠界物流交易編號（AllPayLogisticsID） */
+            logisticsId: string | null;
+            /** @description 最新物流狀態代碼 */
+            statusCode: string | null;
+        };
+        AdminInvoiceDto: {
+            status: components["schemas"]["InvoiceStatus"];
+            provider: components["schemas"]["IntegrationProvider"];
+            /** @description 開立或作廢的失敗次數 */
+            attempts: number;
+            /** Format: date-time */
+            nextAttemptAt: string | null;
+            lastError: string | null;
+            /** @description 自動重試已達上限，需要人工處理 */
+            needsAttention: boolean;
+            invoiceNo: string | null;
+            /** Format: date-time */
+            invoiceDate: string | null;
+            /** @description 發票隨機碼（對獎、查詢用） */
+            randomNumber: string | null;
+            /** @description 跨期退款開立的折讓單號 */
+            allowanceNo: string | null;
+            amount: number;
+        };
         OrderMemberDto: {
             id: string;
             email: string;
@@ -1445,10 +1675,22 @@ export interface components {
             status: components["schemas"]["OrderStatus"];
             shippingMethod: components["schemas"]["ShippingMethod"];
             invoiceType: components["schemas"]["InvoiceType"];
+            /**
+             * @description 物流單（出貨後才有）
+             * @default null
+             */
+            shipment: components["schemas"]["AdminShipmentDto"] | null;
+            /**
+             * @description 電子發票（付款成功後開立）
+             * @default null
+             */
+            invoice: components["schemas"]["AdminInvoiceDto"] | null;
             /** @description 依狀態機目前可以變更成的狀態 */
             nextStatuses: components["schemas"]["OrderStatus"][];
             member: components["schemas"]["OrderMemberDto"];
             events: components["schemas"]["OrderEventDto"][];
+            /** @description 目前可以建立（或退回後重新建立）物流單 */
+            canCreateShipment: boolean;
             id: string;
             orderNo: string;
             locale: string;
@@ -1502,6 +1744,10 @@ export interface components {
         };
         AddOrderNoteDto: {
             message: string;
+        };
+        SimulateShipmentDto: {
+            /** @enum {string} */
+            status: "IN_TRANSIT" | "ARRIVED" | "PICKED_UP" | "RETURNED";
         };
         /** @enum {string} */
         MemberStatus: "ACTIVE" | "SUSPENDED" | "DELETED";
@@ -2566,6 +2812,88 @@ export interface operations {
             };
         };
     };
+    Logistics_startCvsMap: {
+        parameters: {
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartCvsMapDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CvsMapInstructionDto"];
+                };
+            };
+        };
+    };
+    Logistics_getSelection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CvsSelectionDto"];
+                };
+            };
+        };
+    };
+    EcpayLogisticsCallback_mapReply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EcpayLogisticsCallback_notify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+        };
+    };
     AdminDashboard_get: {
         parameters: {
             query?: never;
@@ -2674,6 +3002,73 @@ export interface operations {
                 "application/json": components["schemas"]["AddOrderNoteDto"];
             };
         };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOrderDto"];
+                };
+            };
+        };
+    };
+    AdminOrders_createShipment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOrderDto"];
+                };
+            };
+        };
+    };
+    AdminOrders_simulateShipment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulateShipmentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOrderDto"];
+                };
+            };
+        };
+    };
+    AdminOrders_retryInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             201: {
                 headers: {

@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { InvoicesModule } from '../invoices/invoices.module.js';
+import { LogisticsModule } from '../logistics/logistics.module.js';
 import { OrdersModule } from '../orders/orders.module.js';
 import {
   AdminDashboardController,
@@ -8,7 +10,7 @@ import {
 import { AdminSalesService } from './admin-sales.service.js';
 
 @Module({
-  imports: [OrdersModule],
+  imports: [OrdersModule, LogisticsModule, InvoicesModule],
   controllers: [AdminDashboardController, AdminOrdersController, AdminMembersController],
   providers: [AdminSalesService],
 })

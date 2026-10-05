@@ -11,6 +11,8 @@ import { CartModule } from './modules/cart/cart.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 import { InventoryModule } from './modules/inventory/inventory.module.js';
+import { InvoicesModule } from './modules/invoices/invoices.module.js';
+import { LogisticsModule } from './modules/logistics/logistics.module.js';
 import { MembersModule } from './modules/members/members.module.js';
 import { OrdersModule } from './modules/orders/orders.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
@@ -32,6 +34,8 @@ import { PaymentsModule } from './modules/payments/payments.module.js';
     CartModule,
     OrdersModule,
     PaymentsModule,
+    LogisticsModule,
+    InvoicesModule,
     AdminModule,
     HealthModule,
   ],

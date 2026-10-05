@@ -11,6 +11,7 @@ import { RedisService } from '../../infra/redis/redis.service.js';
 import { assertPurchasable, assertQuantityAllowed } from '../cart/cart.service.js';
 import { computeAvailability } from '../catalog/availability.js';
 import { InventoryService } from '../inventory/inventory.service.js';
+import { queueInvoice, reverseInvoice } from '../invoices/invoice-lifecycle.js';
 import type { CheckoutDto, OrderDto, OrderListDto, OrderListQueryDto } from './dto/order.dto.js';
 import { generateOrderNo } from './order-number.js';
 import {
@@ -25,6 +26,8 @@ import { purchasedQuantities } from './purchase-history.js';
 export const orderDetailInclude = {
   items: { orderBy: { id: 'asc' } },
   payments: { orderBy: { createdAt: 'desc' } },
+  shipment: true,
+  invoice: true,
 } satisfies Prisma.OrderInclude;
 
 export type OrderWithDetail = Prisma.OrderGetPayload<{ include: typeof orderDetailInclude }>;
@@ -307,6 +310,11 @@ export class OrdersService {
       }
     }
 
+    if (to === 'PAID') {
+      await queueInvoice(tx, order, this.config.INVOICE_PROVIDER === 'ecpay' ? 'ECPAY' : 'MOCK');
+    }
+    if (to === 'REFUNDED') await reverseInvoice(tx, order.id);
+
     const wasSpent = SPENT_STATUSES.includes(from);
     const isSpent = SPENT_STATUSES.includes(to);
     if (wasSpent !== isSpent) {
@@ -415,6 +423,28 @@ export class OrdersService {
         paidAt: payment.paidAt,
         createdAt: payment.createdAt,
       })),
+      shipment: order.shipment
+        ? {
+            provider: order.shipment.provider,
+            status: order.shipment.status,
+            logisticsSubType: order.shipment.logisticsSubType,
+            shipmentNo: order.shipment.shipmentNo,
+            validationNo: order.shipment.validationNo,
+            statusMessage: order.shipment.statusMessage,
+            createdAt: order.shipment.createdAt,
+            updatedAt: order.shipment.updatedAt,
+          }
+        : null,
+      invoice: order.invoice
+        ? {
+            status: order.invoice.status,
+            invoiceNo: order.invoice.invoiceNo,
+            invoiceDate: order.invoice.invoiceDate,
+            randomNumber: order.invoice.randomNumber,
+            allowanceNo: order.invoice.allowanceNo,
+            amount: order.invoice.amount,
+          }
+        : null,
       canPay: order.status === 'PENDING_PAYMENT' && !deadlinePassed,
       canCancel: order.status === 'PENDING_PAYMENT',
     };

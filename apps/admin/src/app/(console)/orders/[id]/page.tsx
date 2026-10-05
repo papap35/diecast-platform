@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { FulfilmentPanel } from '@/components/fulfilment-panel';
 import { OrderStatusControl } from '@/components/order-status-control';
 import { PageHeader } from '@/components/page-header';
 import { OrderStatusBadge } from '@/components/status-badges';
@@ -9,6 +10,15 @@ import { serverApi } from '@/lib/api';
 import { cn } from '@/lib/cn';
 import { formatDateTime, formatPrice } from '@/lib/format';
 import { can, getAdmin } from '@/lib/permissions';
+
+/** 需要人員注意的事件，時間軸以強調色標示 */
+const ALERT_EVENTS = new Set([
+  'LATE_PAYMENT',
+  'PAYMENT_FAILED',
+  'SHIPMENT_FAILED',
+  'SHIPMENT_RETURNED',
+  'INVOICE_FAILED',
+]);
 
 export async function generateMetadata({ params }: PageProps<'/orders/[id]'>): Promise<Metadata> {
   const { id } = await params;
@@ -141,7 +151,7 @@ export default async function OrderPage({ params }: PageProps<'/orders/[id]'>) {
                   <span
                     className={cn(
                       'absolute top-1.5 -left-[25px] h-2.5 w-2.5 rounded-full ring-4 ring-surface',
-                      event.type === 'LATE_PAYMENT' || event.type === 'PAYMENT_FAILED'
+                      ALERT_EVENTS.has(event.type)
                         ? 'bg-accent'
                         : event.type === 'NOTE'
                           ? 'bg-faint'
@@ -163,7 +173,8 @@ export default async function OrderPage({ params }: PageProps<'/orders/[id]'>) {
             </ol>
           </section>
         </div>
-        <div className="xl:sticky xl:top-6 xl:self-start">
+        <div className="flex flex-col gap-5 xl:sticky xl:top-6 xl:self-start">
+          <FulfilmentPanel order={order} canWrite={can(admin, 'order:write')} />
           <OrderStatusControl
             orderId={order.id}
             nextStatuses={order.nextStatuses}

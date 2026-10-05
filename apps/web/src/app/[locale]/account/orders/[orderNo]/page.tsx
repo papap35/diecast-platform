@@ -10,7 +10,7 @@ import { Link } from '@/i18n/navigation';
 import { pageLocale } from '@/i18n/page-locale';
 import { serverApi } from '@/lib/api';
 import { requestTime } from '@/lib/time';
-import { formatDateTime, formatPrice } from '@/lib/format';
+import { formatDate, formatDateTime, formatInvoiceNo, formatPrice } from '@/lib/format';
 
 export async function generateMetadata({
   params,
@@ -38,6 +38,7 @@ export default async function OrderDetailPage({
     order.invoiceCarrierNum ??
     order.invoiceDonationCode ??
     (order.invoiceTaxId ? `${order.invoiceTaxId} ${order.invoiceTitle ?? ''}` : null);
+  const { shipment, invoice } = order;
 
   return (
     <div className="space-y-6">
@@ -143,11 +144,50 @@ export default async function OrderDetailPage({
               ? `${order.cvsStoreName}（${order.cvsStoreId}）${order.cvsStoreAddress ?? ''}`
               : `${order.postalCode ?? ''} ${order.city ?? ''}${order.district ?? ''}${order.addressLine ?? ''}`}
           </p>
+          {shipment ? (
+            <div className="mt-4 rounded-2xl bg-paper p-4">
+              <p className="text-xs text-mute">{t('shipment')}</p>
+              <p className="mt-0.5 font-semibold">{t(`shipmentStatus.${shipment.status}`)}</p>
+              {shipment.shipmentNo ? (
+                <p className="mt-1 text-xs text-ink-2">
+                  {t(order.shippingMethod === 'HOME_DELIVERY' ? 'trackingNo' : 'shipmentNo')}{' '}
+                  <span className="font-medium tabular">{shipment.shipmentNo}</span>
+                  {shipment.validationNo ? (
+                    <>
+                      {' · '}
+                      {t('validationNo')}{' '}
+                      <span className="font-medium tabular">{shipment.validationNo}</span>
+                    </>
+                  ) : null}
+                </p>
+              ) : null}
+              <p className="mt-1 text-xs text-mute">
+                {t('updatedAt', { time: formatDateTime(shipment.updatedAt, locale) })}
+              </p>
+            </div>
+          ) : null}
         </section>
         <section className="rounded-3xl bg-surface p-6 text-sm ring-1 ring-line">
           <h2 className="mb-3 text-base font-semibold">{t('invoiceInfo')}</h2>
           <p className="font-medium">{tc('invoiceTypes.' + order.invoiceType)}</p>
           {invoiceDetail ? <p className="mt-1 text-ink-2 tabular">{invoiceDetail}</p> : null}
+          {invoice ? (
+            <dl className="mt-3 space-y-1.5 text-xs">
+              <Row label={t('invoiceStatusLabel')} value={t(`invoiceStatus.${invoice.status}`)} />
+              {invoice.invoiceNo ? (
+                <Row label={t('invoiceNo')} value={formatInvoiceNo(invoice.invoiceNo)} />
+              ) : null}
+              {invoice.invoiceDate ? (
+                <Row label={t('invoiceDate')} value={formatDate(invoice.invoiceDate, locale)} />
+              ) : null}
+              {invoice.randomNumber ? (
+                <Row label={t('randomNumber')} value={invoice.randomNumber} />
+              ) : null}
+              {invoice.allowanceNo ? (
+                <Row label={t('allowanceNo')} value={invoice.allowanceNo} />
+              ) : null}
+            </dl>
+          ) : null}
           {order.payments.length ? (
             <>
               <h3 className="mt-4 mb-2 text-sm font-semibold">{t('paymentInfo')}</h3>

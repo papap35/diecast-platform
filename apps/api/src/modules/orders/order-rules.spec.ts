@@ -23,13 +23,20 @@ describe('訂單狀態機', () => {
   it('禁止逆向或跳躍的變更', () => {
     expect(canTransition('SHIPPED', 'PENDING_PAYMENT')).toBe(false);
     expect(canTransition('PENDING_PAYMENT', 'SHIPPED')).toBe(false);
-    expect(canTransition('COMPLETED', 'REFUNDED')).toBe(false);
+    expect(canTransition('COMPLETED', 'PROCESSING')).toBe(false);
   });
 
-  it('只有未付款取消與付款後退款會釋放庫存', () => {
+  it('包裹退回與鑑賞期退貨可以退款', () => {
+    expect(canTransition('SHIPPED', 'REFUNDED')).toBe(true);
+    expect(canTransition('COMPLETED', 'REFUNDED')).toBe(true);
+  });
+
+  it('未付款取消與出貨完成前的退款會釋放庫存，已完成訂單的退貨不自動回補', () => {
     expect(releasesStock('PENDING_PAYMENT', 'CANCELLED')).toBe(true);
     expect(releasesStock('PAID', 'REFUNDED')).toBe(true);
+    expect(releasesStock('SHIPPED', 'REFUNDED')).toBe(true);
     expect(releasesStock('CANCELLED', 'REFUNDED')).toBe(false);
+    expect(releasesStock('COMPLETED', 'REFUNDED')).toBe(false);
     expect(releasesStock('PAID', 'PROCESSING')).toBe(false);
   });
 });

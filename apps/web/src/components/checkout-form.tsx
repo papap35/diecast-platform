@@ -4,11 +4,17 @@ import type { Schemas } from '@paddock64/api-client';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { useActionState, useState } from 'react';
-import { type CheckoutState, placeOrderAction } from '@/app/actions/checkout';
+import {
+  type CheckoutState,
+  type CvsMapState,
+  openCvsMapAction,
+  placeOrderAction,
+} from '@/app/actions/checkout';
+import type { CheckoutDraft } from '@/lib/checkout-draft';
 import { cn } from '@/lib/cn';
 import { formatPrice } from '@/lib/format';
-import { DEMO_STORES, TW_CITIES } from '@/lib/taiwan';
-import { PaymentRedirect } from './payment-redirect';
+import { TW_CITIES } from '@/lib/taiwan';
+import { GatewayRedirect } from './gateway-redirect';
 import { Button } from './ui/button';
 import { Field, Input, Select } from './ui/field';
 
@@ -16,7 +22,7 @@ type Cart = Schemas['CartDto'];
 type Profile = Schemas['MemberProfileDto'];
 type ShippingMethod = Schemas['ShippingOptionDto']['method'];
 type InvoiceType = Schemas['CheckoutDto']['invoiceType'];
-type CvsMethod = keyof typeof DEMO_STORES;
+type Store = Schemas['CvsSelectionDto'];
 
 const INVOICE_TYPES: InvoiceType[] = [
   'MEMBER_CARRIER',
@@ -30,26 +36,41 @@ export function CheckoutForm({
   cart,
   profile,
   buyNow,
+  store,
+  storeError,
+  draft = {},
 }: {
   cart: Cart;
   profile: Profile;
   buyNow?: { productId: string; quantity: number };
+  /** 電子地圖選好的門市 */
+  store?: Store;
+  /** 選店失敗原因：cancelled、expired */
+  storeError?: string;
+  /** 前往電子地圖前已填寫的資料 */
+  draft?: CheckoutDraft;
 }) {
   const t = useTranslations('checkout');
   const te = useTranslations('errors');
   const tc = useTranslations('cart');
+  const to = useTranslations('orders');
   const locale = useLocale();
   const [state, formAction, pending] = useActionState<CheckoutState, FormData>(
     placeOrderAction,
     {},
   );
-  const [method, setMethod] = useState<ShippingMethod>('CVS_711');
-  const [storeIndex, setStoreIndex] = useState(0);
-  const [invoiceType, setInvoiceType] = useState<InvoiceType>('MEMBER_CARRIER');
+  const [mapState, mapAction, mapPending] = useActionState<CvsMapState, FormData>(
+    openCvsMapAction,
+    {},
+  );
+  const [method, setMethod] = useState<ShippingMethod>(store?.method ?? 'CVS_711');
+  const [invoiceType, setInvoiceType] = useState<InvoiceType>(
+    (draft.invoiceType as InvoiceType | undefined) ?? 'MEMBER_CARRIER',
+  );
 
   const isCvs = method !== 'HOME_DELIVERY';
-  const stores = isCvs ? DEMO_STORES[method as CvsMethod] : [];
-  const store = stores[Math.min(storeIndex, stores.length - 1)];
+  // 換成其他超商時，原本選的門市不適用
+  const selected = isCvs && store?.method === method ? store : undefined;
   const option = cart.shippingOptions.find((o) => o.method === method);
   const shippingFee = option?.fee ?? 0;
   const fields = state.error?.fields ?? {};
@@ -58,6 +79,15 @@ export function CheckoutForm({
       ? te(state.error.code)
       : state.error.message
     : null;
+  const mapError = mapState.error
+    ? te.has(mapState.error.code)
+      ? te(mapState.error.code)
+      : mapState.error.message
+    : storeError === 'cancelled'
+      ? t('storeCancelled')
+      : storeError
+        ? t('storeExpired')
+        : null;
 
   return (
     <form action={formAction} className="grid gap-8 lg:grid-cols-[1fr_24rem]" noValidate>
@@ -88,10 +118,7 @@ export function CheckoutForm({
                     name="shippingMethod"
                     value={o.method}
                     checked={method === o.method}
-                    onChange={() => {
-                      setMethod(o.method);
-                      setStoreIndex(0);
-                    }}
+                    onChange={() => setMethod(o.method)}
                     className="h-4 w-4 accent-ink"
                   />
                   <span className="text-sm font-semibold">{t(`methods.${o.method}`)}</span>
@@ -105,25 +132,45 @@ export function CheckoutForm({
             ))}
           </div>
 
-          {isCvs && store ? (
+          {isCvs ? (
             <div className="mt-4 space-y-3 rounded-2xl bg-paper p-4">
-              <Field label={t('store')} name="store-select" hint={t('storeDemoHint')}>
-                <Select
-                  id="store-select"
-                  value={storeIndex}
-                  onChange={(e) => setStoreIndex(Number(e.target.value))}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                {selected ? (
+                  <div className="min-w-0">
+                    <p className="text-xs text-mute">{t('store')}</p>
+                    <p className="mt-0.5 font-semibold">{selected.storeName}</p>
+                    <p className="text-xs text-mute">
+                      {selected.storeAddress} · {t('storeId')} {selected.storeId}
+                    </p>
+                    <input type="hidden" name="cvsStoreId" value={selected.storeId} />
+                    <input type="hidden" name="cvsStoreName" value={selected.storeName} />
+                    <input type="hidden" name="cvsStoreAddress" value={selected.storeAddress} />
+                  </div>
+                ) : (
+                  <p className="text-sm font-medium text-ink-2">{t('storeRequired')}</p>
+                )}
+                {/* 送出整張表單到選店 action：已填寫的資料會先暫存，回來時帶回 */}
+                <Button
+                  type="submit"
+                  formAction={mapAction}
+                  formNoValidate
+                  variant={selected ? 'secondary' : 'primary'}
+                  size="sm"
+                  disabled={mapPending || !!mapState.instruction}
                 >
-                  {stores.map((s, index) => (
-                    <option key={s.id} value={index}>
-                      {s.name}（{s.id}）
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-              <p className="text-xs text-mute">{store.address}</p>
-              <input type="hidden" name="cvsStoreId" value={store.id} />
-              <input type="hidden" name="cvsStoreName" value={store.name} />
-              <input type="hidden" name="cvsStoreAddress" value={store.address} />
+                  {selected ? t('changeStore') : t('pickStore')}
+                </Button>
+              </div>
+              {mapState.instruction ? (
+                <GatewayRedirect instruction={mapState.instruction} label={t('openingMap')} />
+              ) : (
+                <p className="text-xs text-mute">{t('storeMapHint')}</p>
+              )}
+              {mapError || fields.cvsStoreId ? (
+                <p role="alert" className="text-sm text-accent">
+                  {mapError ?? fields.cvsStoreId}
+                </p>
+              ) : null}
             </div>
           ) : null}
         </Section>
@@ -135,7 +182,7 @@ export function CheckoutForm({
                 id="recipientName"
                 name="recipientName"
                 autoComplete="name"
-                defaultValue={profile.name}
+                defaultValue={draft.recipientName ?? profile.name}
                 required
                 aria-invalid={!!fields.recipientName}
               />
@@ -147,7 +194,7 @@ export function CheckoutForm({
                 inputMode="tel"
                 autoComplete="tel"
                 placeholder="0912345678"
-                defaultValue={profile.phone ?? ''}
+                defaultValue={draft.recipientPhone ?? profile.phone ?? ''}
                 required
                 aria-invalid={!!fields.recipientPhone}
               />
@@ -163,7 +210,7 @@ export function CheckoutForm({
                 name="recipientEmail"
                 type="email"
                 autoComplete="email"
-                defaultValue={profile.email}
+                defaultValue={draft.recipientEmail ?? profile.email}
                 aria-invalid={!!fields.recipientEmail}
               />
             </Field>
@@ -252,6 +299,7 @@ export function CheckoutForm({
                   id="invoiceCarrierNum"
                   name="invoiceCarrierNum"
                   placeholder={invoiceType === 'MOBILE_BARCODE' ? '/ABC1234' : 'AB12345678901234'}
+                  defaultValue={draft.invoiceCarrierNum}
                   aria-invalid={!!fields.invoiceCarrierNum}
                 />
               </Field>
@@ -266,7 +314,7 @@ export function CheckoutForm({
                   id="invoiceDonationCode"
                   name="invoiceDonationCode"
                   inputMode="numeric"
-                  defaultValue="168001"
+                  defaultValue={draft.invoiceDonationCode ?? '168001'}
                   aria-invalid={!!fields.invoiceDonationCode}
                 />
               </Field>
@@ -279,6 +327,7 @@ export function CheckoutForm({
                     name="invoiceTaxId"
                     inputMode="numeric"
                     maxLength={8}
+                    defaultValue={draft.invoiceTaxId}
                     aria-invalid={!!fields.invoiceTaxId}
                   />
                 </Field>
@@ -286,6 +335,7 @@ export function CheckoutForm({
                   <Input
                     id="invoiceTitle"
                     name="invoiceTitle"
+                    defaultValue={draft.invoiceTitle}
                     aria-invalid={!!fields.invoiceTitle}
                   />
                 </Field>
@@ -299,6 +349,7 @@ export function CheckoutForm({
             name="note"
             rows={3}
             maxLength={200}
+            defaultValue={draft.note}
             placeholder={t('notePlaceholder')}
             className="w-full rounded-xl border border-line-strong bg-surface p-3.5 text-sm placeholder:text-faint focus:border-ink focus:outline-none"
           />
@@ -354,14 +405,14 @@ export function CheckoutForm({
         ) : null}
 
         {state.payment ? (
-          <PaymentRedirect instruction={state.payment} />
+          <GatewayRedirect instruction={state.payment} label={to('paying')} />
         ) : (
           <Button
             type="submit"
             variant="accent"
             size="lg"
             className="w-full"
-            disabled={pending || cart.hasIssues}
+            disabled={pending || cart.hasIssues || (isCvs && !selected)}
           >
             {pending ? t('placing') : t('placeOrder')}
           </Button>

@@ -2,8 +2,13 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDate, IsIn, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { PageMeta, PaginationQuery } from '../../../common/http/pagination.dto.js';
-import { ActorType, OrderStatus, ShippingMethod } from '../../../generated/prisma/enums.js';
-import { OrderDto } from '../../orders/dto/order.dto.js';
+import {
+  ActorType,
+  IntegrationProvider,
+  OrderStatus,
+  ShippingMethod,
+} from '../../../generated/prisma/enums.js';
+import { OrderDto, OrderInvoiceDto, OrderShipmentDto } from '../../orders/dto/order.dto.js';
 
 export class AdminOrderQueryDto extends PaginationQuery {
   @ApiPropertyOptional({ enum: OrderStatus, enumName: 'OrderStatus' })
@@ -71,12 +76,40 @@ export class OrderEventDto {
   createdAt!: Date;
 }
 
+export class AdminShipmentDto extends OrderShipmentDto {
+  /** 本站送給物流商的交易編號 */
+  merchantTradeNo!: string;
+  /** 綠界物流交易編號（AllPayLogisticsID） */
+  logisticsId!: string | null;
+  /** 最新物流狀態代碼 */
+  statusCode!: string | null;
+}
+
+export class AdminInvoiceDto extends OrderInvoiceDto {
+  @ApiProperty({ enum: IntegrationProvider, enumName: 'IntegrationProvider' })
+  provider!: IntegrationProvider;
+  /** 開立或作廢的失敗次數 */
+  attempts!: number;
+  nextAttemptAt!: Date | null;
+  lastError!: string | null;
+  /** 自動重試已達上限，需要人工處理 */
+  needsAttention!: boolean;
+}
+
 export class AdminOrderDto extends OrderDto {
+  // 覆寫為後台版本（多了內部編號與重試資訊）。初始值只為滿足 TS 的類別欄位覆寫規則；
+  // 明確標註 ApiProperty，否則 Swagger 會沿用父類別已產生的欄位定義
+  @ApiProperty({ type: () => AdminShipmentDto, nullable: true })
+  shipment: AdminShipmentDto | null = null;
+  @ApiProperty({ type: () => AdminInvoiceDto, nullable: true })
+  invoice: AdminInvoiceDto | null = null;
   member!: OrderMemberDto;
   events!: OrderEventDto[];
   /** 依狀態機目前可以變更成的狀態 */
   @ApiProperty({ enum: OrderStatus, enumName: 'OrderStatus', isArray: true })
   nextStatuses!: OrderStatus[];
+  /** 目前可以建立（或退回後重新建立）物流單 */
+  canCreateShipment!: boolean;
 }
 
 export class UpdateOrderStatusDto {

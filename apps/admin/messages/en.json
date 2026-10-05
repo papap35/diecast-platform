@@ -1,5 +1,7 @@
 {
-  "meta": { "title": "Paddock 64 Admin" },
+  "meta": {
+    "title": "Paddock 64 Admin"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "catalog": "Catalog",
@@ -22,7 +24,11 @@
     "submit": "Sign in",
     "submitting": "Signing in…",
     "demoTitle": "Demo accounts (click to fill)",
-    "roles": { "super_admin": "Super admin", "operator": "Operator", "customer_service": "Customer service" }
+    "roles": {
+      "super_admin": "Super admin",
+      "operator": "Operator",
+      "customer_service": "Customer service"
+    }
   },
   "common": {
     "save": "Save",
@@ -148,8 +154,16 @@
     "archive": "Archive",
     "archiveConfirm": "Archive this product? It will disappear from the storefront.",
     "created": "Product created",
-    "statuses": { "DRAFT": "Draft", "ACTIVE": "Active", "ARCHIVED": "Archived" },
-    "saleTypes": { "REGULAR": "In stock", "PRE_ORDER": "Pre-order", "LIMITED": "Limited drop" },
+    "statuses": {
+      "DRAFT": "Draft",
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived"
+    },
+    "saleTypes": {
+      "REGULAR": "In stock",
+      "PRE_ORDER": "Pre-order",
+      "LIMITED": "Limited drop"
+    },
     "availabilities": {
       "IN_STOCK": "In stock",
       "LOW_STOCK": "Low stock",
@@ -219,7 +233,7 @@
     "noTransitions": "This order's status can no longer change",
     "addNote": "Add note",
     "notePlaceholder": "Internal note, not visible to the customer",
-    "refundWarning": "Refunding releases stock and deducts the member's lifetime spend. Process the payment refund separately.",
+    "refundWarning": "Refunds deduct the member’s total spend and void the e-invoice (or issue an allowance across periods). Refunds before completion release stock; returns of completed orders need a manual stock adjustment after inspection. Refund the payment separately.",
     "statuses": {
       "PENDING_PAYMENT": "Awaiting payment",
       "PAID": "Paid",
@@ -243,15 +257,74 @@
       "DONATION": "Donation",
       "COMPANY": "Company tax ID"
     },
-    "actors": { "SYSTEM": "System", "MEMBER": "Member", "ADMIN": "Admin" },
+    "actors": {
+      "SYSTEM": "System",
+      "MEMBER": "Member",
+      "ADMIN": "Admin"
+    },
     "events": {
       "CREATED": "Order placed",
       "STATUS_CHANGED": "Status changed",
       "PAYMENT_FAILED": "Payment failed",
       "LATE_PAYMENT": "Late payment (refund needed)",
-      "NOTE": "Note"
+      "NOTE": "Note",
+      "SHIPMENT_CREATED": "Shipment created",
+      "SHIPMENT_FAILED": "Shipment failed",
+      "SHIPMENT_STATUS": "Shipment update",
+      "SHIPMENT_RETURNED": "Package returned",
+      "INVOICE_ISSUED": "Invoice issued",
+      "INVOICE_VOIDED": "Invoice voided",
+      "INVOICE_ALLOWANCE": "Allowance issued",
+      "INVOICE_FAILED": "Invoice failed",
+      "INVOICE_RETRY": "Invoice retried"
     },
-    "paymentStatuses": { "PENDING": "Pending", "SUCCEEDED": "Succeeded", "FAILED": "Failed" }
+    "paymentStatuses": {
+      "PENDING": "Pending",
+      "SUCCEEDED": "Succeeded",
+      "FAILED": "Failed"
+    },
+    "shipmentTitle": "Shipment",
+    "createShipment": "Create shipment",
+    "reship": "Ship again",
+    "shipmentHint": "Creates a shipment number and moves a paid order to processing.",
+    "noShipment": "Available after payment",
+    "provider": "Provider",
+    "providers": {
+      "MOCK": "Mock",
+      "ECPAY": "ECPay"
+    },
+    "shipmentNo": "Shipment no.",
+    "trackingNo": "Tracking no.",
+    "validationNo": "code",
+    "logisticsId": "ECPay logistics ID",
+    "latestStatus": "Latest status",
+    "updatedAt": "Updated",
+    "simulate": "Simulate delivery (demo)",
+    "shipmentStatuses": {
+      "CREATED": "Created",
+      "IN_TRANSIT": "In transit",
+      "ARRIVED": "At store",
+      "PICKED_UP": "Picked up",
+      "RETURNED": "Returned"
+    },
+    "invoiceTitle": "E-invoice",
+    "invoiceStatuses": {
+      "PENDING": "Pending",
+      "ISSUED": "Issued",
+      "VOID_PENDING": "Voiding",
+      "VOIDED": "Voided",
+      "ALLOWANCE_ISSUED": "Allowance",
+      "CANCELLED": "Not required"
+    },
+    "invoiceNo": "Invoice no.",
+    "invoiceDate": "Issued on",
+    "randomNumber": "Random code",
+    "allowanceNo": "Allowance no.",
+    "invoiceError": "Failed ({attempts} attempts)",
+    "invoiceNeedsAttention": "Automatic retries stopped. Check the error, then retry manually.",
+    "invoiceNextAttempt": "Next automatic retry: {time}",
+    "retryInvoice": "Retry now",
+    "noInvoice": "Issued automatically after payment"
   },
   "members": {
     "title": "Members",
@@ -269,7 +342,11 @@
     "suspend": "Suspend",
     "activate": "Reactivate",
     "suspendConfirm": "Suspending signs this member out of every device. Continue?",
-    "statuses": { "ACTIVE": "Active", "SUSPENDED": "Suspended", "DELETED": "Deleted" }
+    "statuses": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "DELETED": "Deleted"
+    }
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -280,6 +357,9 @@
     "CONFLICT": "Conflict — the slug or SKU may already exist, or related records remain",
     "INVALID_STATUS_TRANSITION": "The order's current status doesn't allow this change",
     "NOT_FOUND": "Not found",
-    "UNAUTHORIZED": "Please sign in again"
+    "UNAUTHORIZED": "Please sign in again",
+    "SHIPMENT_NOT_ALLOWED": "A shipment can’t be created for this order now",
+    "PROVIDER_ERROR": "The provider returned an error",
+    "INVOICE_NOT_RETRYABLE": "Nothing to retry for this invoice"
   }
 }

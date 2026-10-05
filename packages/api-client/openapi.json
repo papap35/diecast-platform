@@ -1808,6 +1808,130 @@
         ]
       }
     },
+    "/v1/logistics/cvs-map": {
+      "post": {
+        "operationId": "Logistics_startCvsMap",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartCvsMapDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CvsMapInstructionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "開啟超商電子地圖選店。回傳導向地圖的方式（同付款：`redirect` 或 `form_post`），\n選好門市後會導回 returnUrl 並附上 `cvsToken`。",
+        "tags": [
+          "Logistics"
+        ]
+      }
+    },
+    "/v1/logistics/cvs-map/{token}": {
+      "get": {
+        "operationId": "Logistics_getSelection",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CvsSelectionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "以 cvsToken 取回選店結果（30 分鐘內有效）",
+        "tags": [
+          "Logistics"
+        ]
+      }
+    },
+    "/v1/logistics/ecpay/map-reply": {
+      "post": {
+        "operationId": "EcpayLogisticsCallback_mapReply",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "電子地圖選店後綠界以瀏覽器 POST 帶回門市，存入選店工作階段後導回前台",
+        "tags": [
+          "Logistics / Callbacks"
+        ]
+      }
+    },
+    "/v1/logistics/ecpay/notify": {
+      "post": {
+        "operationId": "EcpayLogisticsCallback_notify",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "summary": "物流狀態通知，必須回應 `1|OK`，否則綠界會重送",
+        "tags": [
+          "Logistics / Callbacks"
+        ]
+      }
+    },
     "/v1/admin/dashboard": {
       "get": {
         "operationId": "AdminDashboard_get",
@@ -2043,6 +2167,124 @@
           }
         ],
         "summary": "新增內部備註",
+        "tags": [
+          "Admin / Orders"
+        ]
+      }
+    },
+    "/v1/admin/orders/{id}/shipment": {
+      "post": {
+        "operationId": "AdminOrders_createShipment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "建立物流單（綠界 C2C 店到店／黑貓宅配；模擬物流產生假單號）。已付款的訂單會轉為處理中",
+        "tags": [
+          "Admin / Orders"
+        ]
+      }
+    },
+    "/v1/admin/orders/{id}/shipment/simulate": {
+      "post": {
+        "operationId": "AdminOrders_simulateShipment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulateShipmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "推進模擬物流的配送狀態（示範用），訂單狀態會跟著更新",
+        "tags": [
+          "Admin / Orders"
+        ]
+      }
+    },
+    "/v1/admin/orders/{id}/invoice/retry": {
+      "post": {
+        "operationId": "AdminOrders_retryInvoice",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "立即重試開立或作廢電子發票（重設自動重試次數）",
         "tags": [
           "Admin / Orders"
         ]
@@ -4310,6 +4552,132 @@
           "createdAt"
         ]
       },
+      "IntegrationProvider": {
+        "type": "string",
+        "enum": [
+          "MOCK",
+          "ECPAY"
+        ]
+      },
+      "ShipmentStatus": {
+        "type": "string",
+        "enum": [
+          "CREATED",
+          "IN_TRANSIT",
+          "ARRIVED",
+          "PICKED_UP",
+          "RETURNED"
+        ]
+      },
+      "OrderShipmentDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationProvider"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShipmentStatus"
+              }
+            ]
+          },
+          "logisticsSubType": {
+            "type": "string",
+            "description": "綠界物流子類型，例如 UNIMARTC2C、TCAT"
+          },
+          "shipmentNo": {
+            "type": "string",
+            "nullable": true,
+            "description": "寄貨編號（超商）或託運單號（宅配），可用來查詢配送進度"
+          },
+          "validationNo": {
+            "type": "string",
+            "nullable": true,
+            "description": "驗證碼（7-ELEVEN 交貨便）"
+          },
+          "statusMessage": {
+            "type": "string",
+            "nullable": true,
+            "description": "最新物流狀態說明"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "status",
+          "logisticsSubType",
+          "shipmentNo",
+          "validationNo",
+          "statusMessage",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "InvoiceStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "ISSUED",
+          "VOID_PENDING",
+          "VOIDED",
+          "ALLOWANCE_ISSUED",
+          "CANCELLED"
+        ]
+      },
+      "OrderInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceStatus"
+              }
+            ]
+          },
+          "invoiceNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceDate": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "randomNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "發票隨機碼（對獎、查詢用）"
+          },
+          "allowanceNo": {
+            "type": "string",
+            "nullable": true,
+            "description": "跨期退款開立的折讓單號"
+          },
+          "amount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "status",
+          "invoiceNo",
+          "invoiceDate",
+          "randomNumber",
+          "allowanceNo",
+          "amount"
+        ]
+      },
       "OrderDto": {
         "type": "object",
         "properties": {
@@ -4461,6 +4829,26 @@
               "$ref": "#/components/schemas/OrderPaymentDto"
             }
           },
+          "shipment": {
+            "nullable": true,
+            "description": "物流單（出貨後才有）",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderShipmentDto"
+              }
+            ]
+          },
+          "invoice": {
+            "nullable": true,
+            "description": "電子發票（付款成功後開立）",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderInvoiceDto"
+              }
+            ]
+          },
           "canPay": {
             "type": "boolean",
             "description": "是否可以（重新）付款"
@@ -4506,6 +4894,8 @@
           "createdAt",
           "items",
           "payments",
+          "shipment",
+          "invoice",
           "canPay",
           "canCancel"
         ]
@@ -4592,13 +4982,6 @@
       "PaymentInstructionDto": {
         "type": "object",
         "properties": {
-          "provider": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PaymentProvider"
-              }
-            ]
-          },
           "type": {
             "description": "redirect：直接導向 url；form_post：以 POST 表單把 fields 送到 url（綠界）",
             "enum": [
@@ -4613,8 +4996,12 @@
               "type": "string"
             }
           },
-          "url": {
-            "type": "string"
+          "provider": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentProvider"
+              }
+            ]
           },
           "merchantTradeNo": {
             "type": "string"
@@ -4624,15 +5011,102 @@
             "type": "string",
             "nullable": true,
             "description": "訂單付款期限"
+          },
+          "url": {
+            "type": "string"
           }
         },
         "required": [
-          "provider",
           "type",
           "fields",
-          "url",
+          "provider",
           "merchantTradeNo",
-          "expiresAt"
+          "expiresAt",
+          "url"
+        ]
+      },
+      "StartCvsMapDto": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "description": "超商（宅配不需選店）",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShippingMethod"
+              }
+            ]
+          },
+          "returnUrl": {
+            "type": "string",
+            "description": "選店完成後導回的網址（Web 頁面或 App deep link，需在允許清單內），會附上 `?cvsToken=…`。\n省略時導回 Web 前台結帳頁。",
+            "maxLength": 500
+          },
+          "mobile": {
+            "type": "boolean",
+            "description": "行動裝置開啟手機版電子地圖"
+          }
+        },
+        "required": [
+          "method"
+        ]
+      },
+      "CvsMapInstructionDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "redirect：直接導向 url；form_post：以 POST 表單把 fields 送到 url（綠界）",
+            "enum": [
+              "redirect",
+              "form_post"
+            ],
+            "type": "string"
+          },
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "token": {
+            "type": "string",
+            "description": "選店工作階段代碼，選店完成後以 `cvsToken` 帶回"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "fields",
+          "token",
+          "url"
+        ]
+      },
+      "CvsSelectionDto": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShippingMethod"
+              }
+            ]
+          },
+          "storeId": {
+            "type": "string"
+          },
+          "storeName": {
+            "type": "string"
+          },
+          "storeAddress": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "storeId",
+          "storeName",
+          "storeAddress"
         ]
       },
       "DashboardKpisDto": {
@@ -4908,6 +5382,150 @@
           "meta"
         ]
       },
+      "AdminShipmentDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationProvider"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShipmentStatus"
+              }
+            ]
+          },
+          "logisticsSubType": {
+            "type": "string",
+            "description": "綠界物流子類型，例如 UNIMARTC2C、TCAT"
+          },
+          "shipmentNo": {
+            "type": "string",
+            "nullable": true,
+            "description": "寄貨編號（超商）或託運單號（宅配），可用來查詢配送進度"
+          },
+          "validationNo": {
+            "type": "string",
+            "nullable": true,
+            "description": "驗證碼（7-ELEVEN 交貨便）"
+          },
+          "statusMessage": {
+            "type": "string",
+            "nullable": true,
+            "description": "最新物流狀態說明"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "merchantTradeNo": {
+            "type": "string",
+            "description": "本站送給物流商的交易編號"
+          },
+          "logisticsId": {
+            "type": "string",
+            "nullable": true,
+            "description": "綠界物流交易編號（AllPayLogisticsID）"
+          },
+          "statusCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "最新物流狀態代碼"
+          }
+        },
+        "required": [
+          "provider",
+          "status",
+          "logisticsSubType",
+          "shipmentNo",
+          "validationNo",
+          "statusMessage",
+          "createdAt",
+          "updatedAt",
+          "merchantTradeNo",
+          "logisticsId",
+          "statusCode"
+        ]
+      },
+      "AdminInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceStatus"
+              }
+            ]
+          },
+          "provider": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationProvider"
+              }
+            ]
+          },
+          "attempts": {
+            "type": "number",
+            "description": "開立或作廢的失敗次數"
+          },
+          "nextAttemptAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "lastError": {
+            "type": "string",
+            "nullable": true
+          },
+          "needsAttention": {
+            "type": "boolean",
+            "description": "自動重試已達上限，需要人工處理"
+          },
+          "invoiceNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceDate": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "randomNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "發票隨機碼（對獎、查詢用）"
+          },
+          "allowanceNo": {
+            "type": "string",
+            "nullable": true,
+            "description": "跨期退款開立的折讓單號"
+          },
+          "amount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "status",
+          "provider",
+          "attempts",
+          "nextAttemptAt",
+          "lastError",
+          "needsAttention",
+          "invoiceNo",
+          "invoiceDate",
+          "randomNumber",
+          "allowanceNo",
+          "amount"
+        ]
+      },
       "OrderMemberDto": {
         "type": "object",
         "properties": {
@@ -5020,6 +5638,28 @@
               }
             ]
           },
+          "shipment": {
+            "nullable": true,
+            "description": "物流單（出貨後才有）",
+            "default": null,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminShipmentDto"
+              }
+            ]
+          },
+          "invoice": {
+            "nullable": true,
+            "description": "電子發票（付款成功後開立）",
+            "default": null,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminInvoiceDto"
+              }
+            ]
+          },
           "nextStatuses": {
             "type": "array",
             "description": "依狀態機目前可以變更成的狀態",
@@ -5035,6 +5675,10 @@
             "items": {
               "$ref": "#/components/schemas/OrderEventDto"
             }
+          },
+          "canCreateShipment": {
+            "type": "boolean",
+            "description": "目前可以建立（或退回後重新建立）物流單"
           },
           "id": {
             "type": "string"
@@ -5176,9 +5820,12 @@
           "status",
           "shippingMethod",
           "invoiceType",
+          "shipment",
+          "invoice",
           "nextStatuses",
           "member",
           "events",
+          "canCreateShipment",
           "id",
           "orderNo",
           "locale",
@@ -5246,6 +5893,23 @@
         },
         "required": [
           "message"
+        ]
+      },
+      "SimulateShipmentDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "IN_TRANSIT",
+              "ARRIVED",
+              "PICKED_UP",
+              "RETURNED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
         ]
       },
       "MemberStatus": {

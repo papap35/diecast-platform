@@ -28,6 +28,13 @@ export function formatDate(value: string | Date, locale: string): string {
   }).format(new Date(value));
 }
 
+/** 統一發票號碼的印刷格式：AB-12345678 */
+export function formatInvoiceNo(invoiceNo: string): string {
+  return /^[A-Z]{2}\d{8}$/.test(invoiceNo)
+    ? `${invoiceNo.slice(0, 2)}-${invoiceNo.slice(2)}`
+    : invoiceNo;
+}
+
 /** 行事曆用：月／日、星期、時間 */
 export function formatReleaseParts(value: string | Date, locale: string) {
   const date = new Date(value);

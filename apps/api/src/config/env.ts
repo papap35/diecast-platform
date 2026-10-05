@@ -36,6 +36,23 @@ const envSchema = z.object({
   ECPAY_HASH_KEY: z.string().default(''),
   ECPAY_HASH_IV: z.string().default(''),
 
+  /** 物流：mock 使用內建模擬選店頁與假物流單；ecpay 串接綠界 C2C 店到店／宅配 */
+  LOGISTICS_PROVIDER: z.enum(['mock', 'ecpay']).default('mock'),
+  ECPAY_LOGISTICS_MERCHANT_ID: z.string().default(''),
+  ECPAY_LOGISTICS_HASH_KEY: z.string().default(''),
+  ECPAY_LOGISTICS_HASH_IV: z.string().default(''),
+  SHIPPER_NAME: z.string().default('Paddock64'),
+  SHIPPER_PHONE: z.string().default('0223456789'),
+  SHIPPER_CELLPHONE: z.string().default('0912345678'),
+  SHIPPER_ZIP: z.string().default('106'),
+  SHIPPER_ADDRESS: z.string().default('臺北市大安區復興南路一段100號'),
+
+  /** 電子發票：mock 產生模擬發票號碼；ecpay 串接綠界 B2C 電子發票 */
+  INVOICE_PROVIDER: z.enum(['mock', 'ecpay']).default('mock'),
+  ECPAY_INVOICE_MERCHANT_ID: z.string().default(''),
+  ECPAY_INVOICE_HASH_KEY: z.string().default(''),
+  ECPAY_INVOICE_HASH_IV: z.string().default(''),
+
   SWAGGER_ENABLED: z
     .enum(['true', 'false'])
     .default('true')

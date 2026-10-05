@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { GatewayRedirectDto } from '../../../common/http/gateway-redirect.dto.js';
 import { PaymentProvider } from '../../../generated/prisma/enums.js';
 
 export class StartPaymentDto {
@@ -13,15 +14,9 @@ export class StartPaymentDto {
   returnUrl?: string;
 }
 
-export class PaymentInstructionDto {
+export class PaymentInstructionDto extends GatewayRedirectDto {
   @ApiProperty({ enum: PaymentProvider, enumName: 'PaymentProvider' })
   provider!: PaymentProvider;
-  /** redirect：直接導向 url；form_post：以 POST 表單把 fields 送到 url（綠界） */
-  @ApiProperty({ enum: ['redirect', 'form_post'] })
-  type!: 'redirect' | 'form_post';
-  url!: string;
-  @ApiProperty({ type: 'object', additionalProperties: { type: 'string' } })
-  fields!: Record<string, string>;
   merchantTradeNo!: string;
   /** 訂單付款期限 */
   expiresAt!: Date | null;

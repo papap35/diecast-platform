@@ -15,10 +15,13 @@ import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
+import { mockPageCsp } from '../../common/http/html.js';
+import { frontendOrigins } from '../../common/http/return-url.js';
 import { ApiLocaleQuery, ReqLocale } from '../../common/i18n/locale.decorator.js';
 import type { Locale } from '../../common/i18n/locale.js';
 import type { MemberPrincipal } from '../auth/auth.types.js';
 import { CurrentMember, MemberAuth } from '../auth/decorators.js';
+import { parseEcpayDateTime } from '../ecpay/format.js';
 import { PaymentInstructionDto, StartPaymentDto } from './dto/payment.dto.js';
 import { renderMockPaymentPage } from './mock-page.js';
 import { EcpayGateway } from './providers/ecpay.gateway.js';
@@ -106,14 +109,7 @@ export class MockPaymentController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<string> {
     const payment = await this.payments.findForMockPage(merchantTradeNo);
-    // 表單送出後會轉址回前台；瀏覽器對轉址也套用 form-action，因此要列出允許的前台網域
-    const origins = [this.config.WEB_BASE_URL, ...this.config.CORS_ORIGINS].map(
-      (url) => new URL(url).origin,
-    );
-    res.setHeader(
-      'Content-Security-Policy',
-      `default-src 'none'; style-src 'unsafe-inline'; form-action 'self' ${[...new Set(origins)].join(' ')} paddock64:; base-uri 'none'; frame-ancestors 'none'`,
-    );
+    res.setHeader('Content-Security-Policy', mockPageCsp(frontendOrigins(this.config)));
     return renderMockPaymentPage(payment);
   }
 
@@ -145,15 +141,8 @@ export function toPaymentResult(body: Record<string, string>): PaymentResult {
     providerTradeNo: body.TradeNo,
     amount: body.TradeAmt ? Number(body.TradeAmt) : undefined,
     method: body.PaymentType,
-    paidAt: body.PaymentDate ? parseTaipeiTime(body.PaymentDate) : undefined,
+    paidAt: parseEcpayDateTime(body.PaymentDate),
     failedReason: success ? undefined : `${body.RtnCode ?? ''} ${body.RtnMsg ?? ''}`.trim(),
     raw: body,
   };
-}
-
-function parseTaipeiTime(value: string): Date | undefined {
-  const match = /^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})$/.exec(value);
-  if (!match) return undefined;
-  const [, y, m, d, hh, mm, ss] = match;
-  return new Date(`${y}-${m}-${d}T${hh}:${mm}:${ss}+08:00`);
 }

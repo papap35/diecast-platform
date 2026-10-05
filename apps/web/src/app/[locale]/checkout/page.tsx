@@ -4,6 +4,7 @@ import { CheckoutForm } from '@/components/checkout-form';
 import { redirect } from '@/i18n/navigation';
 import { pageLocale } from '@/i18n/page-locale';
 import { serverApi } from '@/lib/api';
+import { readCheckoutDraft } from '@/lib/checkout-draft';
 import { hasSession } from '@/lib/session';
 
 export async function generateMetadata({
@@ -22,12 +23,15 @@ export default async function CheckoutPage({
   const query = await searchParams;
   const buyNowId = typeof query.buyNow === 'string' ? query.buyNow : undefined;
   const quantity = Math.max(1, Math.min(99, Number(query.qty) || 1));
+  // 從超商電子地圖選店回來時帶著 cvsToken（成功）或 cvsError（取消、逾時）
+  const cvsToken = typeof query.cvsToken === 'string' ? query.cvsToken : undefined;
+  const cvsError = typeof query.cvsError === 'string' ? query.cvsError : undefined;
   const self = buyNowId ? `/checkout?buyNow=${buyNowId}&qty=${quantity}` : '/checkout';
   if (!(await hasSession())) redirect({ href: `/login?next=${encodeURIComponent(self)}`, locale });
 
   const t = await getTranslations('checkout');
   const api = await serverApi(locale);
-  const [cartResult, me] = await Promise.all([
+  const [cartResult, me, selection, draft] = await Promise.all([
     buyNowId
       ? api.POST('/v1/cart/quote', {
           params: { query: { locale } },
@@ -35,6 +39,10 @@ export default async function CheckoutPage({
         })
       : api.GET('/v1/cart', { params: { query: { locale } } }),
     api.GET('/v1/me'),
+    cvsToken
+      ? api.GET('/v1/logistics/cvs-map/{token}', { params: { path: { token: cvsToken } } })
+      : undefined,
+    cvsToken || cvsError ? readCheckoutDraft() : undefined,
   ]);
 
   const cart = cartResult.data;
@@ -47,6 +55,9 @@ export default async function CheckoutPage({
         cart={cart!}
         profile={me.data!}
         buyNow={buyNowId ? { productId: buyNowId, quantity } : undefined}
+        store={selection?.data}
+        storeError={cvsError ?? (cvsToken && !selection?.data ? 'expired' : undefined)}
+        draft={draft}
       />
     </div>
   );
