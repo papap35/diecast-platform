@@ -46,7 +46,7 @@ export class ShippingOptionDto {
   method!: ShippingMethod;
   /** 依目前小計計算的運費 */
   fee!: number;
-  /** 免運門檻 */
+  /** 免運門檻（依會員等級，0 表示一律免運） */
   freeThreshold!: number;
 }
 
@@ -54,8 +54,11 @@ export class CartDto {
   items!: CartItemDto[];
   itemCount!: number;
   subtotal!: number;
-  /** 是否有商品需要調整才能結帳 */
+  /** 是否有商品需要調整才能結帳（含預購與現貨混在一起） */
   hasIssues!: boolean;
+  /** 預購商品與現貨同時在購物車：需分開結帳 */
+  preorderMixed!: boolean;
+  /** 免運門檻已套用會員等級優惠 */
   shippingOptions!: ShippingOptionDto[];
 }
 

@@ -24,6 +24,7 @@ export function toMemberProfile(member: Member): MemberProfileDto {
     phone: member.phone,
     locale: member.locale,
     marketingOptIn: member.marketingOptIn,
+    tier: member.tier,
     createdAt: member.createdAt,
   };
 }

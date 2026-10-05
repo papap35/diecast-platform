@@ -9,7 +9,11 @@ import {
   productSummaryInclude,
   type ProductWithSummary,
 } from '../catalog/catalog.service.js';
-import { calculateShippingFee, SHIPPING_RATES } from '../orders/order-rules.js';
+import {
+  calculateShippingFee,
+  freeShippingThreshold,
+  SHIPPING_RATES,
+} from '../orders/order-rules.js';
 import { purchasedQuantities } from '../orders/purchase-history.js';
 import {
   type CartDto,
@@ -78,18 +82,21 @@ export class CartService {
     items: { productId: string; quantity: number; product: ProductWithSummary }[],
     locale: Locale,
   ): Promise<CartDto> {
-    const purchased = await purchasedQuantities(
-      this.prisma,
-      memberId,
-      items.map((item) => item.productId),
-    );
+    const [purchased, tier = 'ROOKIE'] = await Promise.all([
+      purchasedQuantities(
+        this.prisma,
+        memberId,
+        items.map((item) => item.productId),
+      ),
+      this.catalog.memberTier(memberId),
+    ]);
 
     const now = new Date();
     const lines: CartItemDto[] = items.map((item) => {
-      const availability = computeAvailability(item.product, now);
+      const availability = computeAvailability(item.product, now, tier);
       const max = maxPurchasable(item.product, purchased.get(item.productId) ?? 0);
       return {
-        product: this.catalog.toSummary(item.product, locale, now),
+        product: this.catalog.toSummary(item.product, locale, now, tier),
         quantity: item.quantity,
         lineTotal: item.quantity * item.product.price,
         maxQuantity: isPurchasable(availability) && item.product.status === 'ACTIVE' ? max : 0,
@@ -98,15 +105,18 @@ export class CartService {
     });
 
     const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
+    const preorders = items.filter((item) => item.product.saleType === 'PRE_ORDER').length;
+    const preorderMixed = preorders > 0 && preorders < items.length;
     return {
       items: lines,
       itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
       subtotal,
-      hasIssues: lines.some((line) => line.issue !== null),
+      hasIssues: preorderMixed || lines.some((line) => line.issue !== null),
+      preorderMixed,
       shippingOptions: (Object.keys(SHIPPING_RATES) as ShippingMethod[]).map((method) => ({
         method,
-        fee: calculateShippingFee(method, subtotal),
-        freeThreshold: SHIPPING_RATES[method].freeThreshold,
+        fee: calculateShippingFee(method, subtotal, tier),
+        freeThreshold: freeShippingThreshold(method, tier),
       })),
     };
   }
@@ -118,11 +128,14 @@ export class CartService {
     quantity: number,
     locale: Locale,
   ): Promise<CartDto> {
-    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+    const [product, tier] = await Promise.all([
+      this.prisma.product.findUnique({ where: { id: productId } }),
+      this.catalog.memberTier(memberId),
+    ]);
     if (!product || product.status !== 'ACTIVE') {
       throw AppException.notFound(ErrorCode.PRODUCT_NOT_FOUND, '找不到這個商品');
     }
-    assertPurchasable(computeAvailability(product));
+    assertPurchasable(computeAvailability(product, new Date(), tier));
 
     const purchased =
       (await purchasedQuantities(this.prisma, memberId, [productId])).get(productId) ?? 0;

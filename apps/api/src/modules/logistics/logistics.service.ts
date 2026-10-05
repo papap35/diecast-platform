@@ -13,6 +13,7 @@ import type {
 } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { RedisService } from '../../infra/redis/redis.service.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 import { generateMerchantTradeNo } from '../orders/order-number.js';
 import { isConvenienceStore } from '../orders/order-rules.js';
 import { OrdersService } from '../orders/orders.service.js';
@@ -96,6 +97,7 @@ export class LogisticsService {
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly orders: OrdersService,
+    private readonly notifications: NotificationsService,
     private readonly mock: MockLogistics,
     private readonly ecpay: EcpayLogistics,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
@@ -295,6 +297,14 @@ export class LogisticsService {
         });
       }
       if (next !== shipment.status) await this.advanceOrder(tx, shipment.order, next);
+      if (next === 'ARRIVED' && shipment.status !== 'ARRIVED' && shipment.order.cvsStoreName) {
+        await this.notifications.notify(tx, {
+          memberId: shipment.order.memberId,
+          type: 'ORDER_ARRIVED',
+          params: { orderNo: shipment.order.orderNo, store: shipment.order.cvsStoreName },
+          link: `/account/orders/${shipment.order.orderNo}`,
+        });
+      }
       return true;
     });
   }

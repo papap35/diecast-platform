@@ -5,13 +5,25 @@ import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import { toPublicUrl } from '../../common/http/media.js';
 import { pageMeta, skipTake } from '../../common/http/pagination.dto.js';
 import { type Locale, pickTranslation } from '../../common/i18n/locale.js';
-import { Prisma, type ActorType, type OrderStatus } from '../../generated/prisma/client.js';
+import {
+  Prisma,
+  type ActorType,
+  type MemberTier,
+  type NotificationType,
+  type OrderStatus,
+} from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
+import { consumeRateLimit } from '../../infra/redis/rate-limit.js';
 import { RedisService } from '../../infra/redis/redis.service.js';
 import { assertPurchasable, assertQuantityAllowed } from '../cart/cart.service.js';
 import { computeAvailability } from '../catalog/availability.js';
+import { parkOrderInGarage, removeOrderFromGarage } from '../garage/garage-lifecycle.js';
+import { DropGateService } from '../inventory/drop-gate.service.js';
 import { InventoryService } from '../inventory/inventory.service.js';
 import { queueInvoice, reverseInvoice } from '../invoices/invoice-lifecycle.js';
+import { tierFor, tierRank } from '../members/tiers.js';
+import type { NotificationParams } from '../notifications/notification-templates.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 import type { CheckoutDto, OrderDto, OrderListDto, OrderListQueryDto } from './dto/order.dto.js';
 import { generateOrderNo } from './order-number.js';
 import {
@@ -24,7 +36,7 @@ import {
 import { purchasedQuantities } from './purchase-history.js';
 
 export const orderDetailInclude = {
-  items: { orderBy: { id: 'asc' } },
+  items: { orderBy: { id: 'asc' }, include: { product: { select: { expectedShipAt: true } } } },
   payments: { orderBy: { createdAt: 'desc' } },
   shipment: true,
   invoice: true,
@@ -38,6 +50,10 @@ export interface Actor {
 }
 
 type Tx = Prisma.TransactionClient;
+type OrderWithItems = Prisma.OrderGetPayload<{ include: { items: true } }>;
+
+/** 同一會員的結帳頻率上限（擋機器人連發；真人不會碰到） */
+const CHECKOUT_RATE = { limit: 10, windowSeconds: 10 };
 
 const STATUS_TIMESTAMP: Partial<Record<OrderStatus, keyof Prisma.OrderUpdateManyMutationInput>> = {
   PAID: 'paidAt',
@@ -53,12 +69,15 @@ export class OrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly inventory: InventoryService,
+    private readonly gate: DropGateService,
     private readonly redis: RedisService,
+    private readonly notifications: NotificationsService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   /**
    * 結帳：建立訂單並在同一個交易內扣庫存。
+   * - 限量商品先通過 Redis 閘門預扣名額，售完的請求不進資料庫（開賣瞬間的減壓）
    * - 同一會員的結帳以 advisory lock 排隊，限購檢查不會被並發請求繞過
    * - 扣庫存是條件式 UPDATE，任何一件不足整筆回滾，不會出現「部分成立」的訂單
    * - 未付款訂單保留庫存到付款期限，逾期由排程釋放
@@ -69,6 +88,19 @@ export class OrdersService {
     if (!member || member.status !== 'ACTIVE') {
       throw AppException.unauthorized(ErrorCode.ACCOUNT_DISABLED, '帳號已停用或不存在');
     }
+    const allowed = await consumeRateLimit(
+      this.redis,
+      `rl:checkout:${memberId}`,
+      CHECKOUT_RATE.limit,
+      CHECKOUT_RATE.windowSeconds,
+    );
+    if (!allowed) {
+      throw new AppException(
+        ErrorCode.RATE_LIMITED,
+        '結帳太頻繁，請稍候再試',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
 
     const fromCart = !dto.items;
     const requested = mergeItems(dto.items ?? (await this.cartItems(memberId)));
@@ -76,6 +108,59 @@ export class OrdersService {
       throw AppException.badRequest(ErrorCode.CART_EMPTY, '購物車是空的');
     }
 
+    const saleTypes = await this.prisma.product.findMany({
+      where: { id: { in: requested.map((item) => item.productId) } },
+      select: { id: true, saleType: true },
+    });
+    const preorders = saleTypes.filter((product) => product.saleType === 'PRE_ORDER').length;
+    if (preorders > 0 && preorders < requested.length) {
+      throw AppException.badRequest(
+        ErrorCode.PREORDER_SEPARATE_CHECKOUT,
+        '預購商品需與現貨分開結帳',
+      );
+    }
+    const limitedIds = new Set(
+      saleTypes.filter((product) => product.saleType === 'LIMITED').map((product) => product.id),
+    );
+    const reserved = await this.reserveDropSlots(
+      requested.filter((item) => limitedIds.has(item.productId)),
+    );
+
+    try {
+      return await this.placeOrder(member, requested, dto, locale, fromCart);
+    } catch (error) {
+      await Promise.all(reserved.map((item) => this.gate.release(item.productId, item.quantity)));
+      throw error;
+    }
+  }
+
+  /** 限量商品通過閘門才進資料庫；任何一件名額不足就歸還已預扣的並回應售完 */
+  private async reserveDropSlots(
+    items: { productId: string; quantity: number }[],
+  ): Promise<{ productId: string; quantity: number }[]> {
+    const reserved: { productId: string; quantity: number }[] = [];
+    for (const item of items) {
+      if (await this.gate.reserve(item.productId, item.quantity)) {
+        reserved.push(item);
+        continue;
+      }
+      await Promise.all(reserved.map((r) => this.gate.release(r.productId, r.quantity)));
+      throw AppException.conflict(ErrorCode.OUT_OF_STOCK, '限量商品已售完', {
+        productId: item.productId,
+        available: 0,
+      });
+    }
+    return reserved;
+  }
+
+  private async placeOrder(
+    member: { id: string; email: string; tier: MemberTier },
+    requested: { productId: string; quantity: number }[],
+    dto: CheckoutDto,
+    locale: Locale,
+    fromCart: boolean,
+  ): Promise<OrderDto> {
+    const { id: memberId, tier } = member;
     const order = await this.withOrderNoRetry(() =>
       this.prisma.$transaction(
         async (tx) => {
@@ -95,7 +180,7 @@ export class OrdersService {
             if (!product || product.status !== 'ACTIVE') {
               throw AppException.notFound(ErrorCode.PRODUCT_NOT_FOUND, '購物車中有商品已下架');
             }
-            assertPurchasable(computeAvailability(product, now));
+            assertPurchasable(computeAvailability(product, now, tier));
             assertQuantityAllowed(product, purchased.get(productId) ?? 0, quantity);
             return {
               product,
@@ -106,7 +191,7 @@ export class OrdersService {
           });
 
           const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
-          const shippingFee = calculateShippingFee(dto.shippingMethod, subtotal);
+          const shippingFee = calculateShippingFee(dto.shippingMethod, subtotal, tier);
           const hasLimited = lines.some((line) => line.product.saleType === 'LIMITED');
           const timeoutMinutes = hasLimited
             ? this.config.LIMITED_PAYMENT_TIMEOUT_MINUTES
@@ -262,16 +347,23 @@ export class OrdersService {
     actor: Actor,
     message?: string,
   ): Promise<void> {
-    await this.prisma.$transaction(async (tx) => {
+    const order = await this.prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({ where: { id: orderId }, include: { items: true } });
       if (!order) throw AppException.notFound(ErrorCode.ORDER_NOT_FOUND, '找不到這筆訂單');
       await this.applyTransition(tx, order, to, actor, message);
+      return order;
     });
+    // 交易提交後才清掉限量閘門，下一個請求才會讀到已釋放的庫存
+    if (releasesStock(order.status, to)) {
+      await this.gate.invalidate(
+        order.items.filter((item) => item.saleType === 'LIMITED').map((item) => item.productId),
+      );
+    }
   }
 
   async applyTransition(
     tx: Tx,
-    order: Prisma.OrderGetPayload<{ include: { items: true } }>,
+    order: OrderWithItems,
     to: OrderStatus,
     actor: Actor,
     message?: string,
@@ -310,19 +402,7 @@ export class OrdersService {
       }
     }
 
-    if (to === 'PAID') {
-      await queueInvoice(tx, order, this.config.INVOICE_PROVIDER === 'ecpay' ? 'ECPAY' : 'MOCK');
-    }
-    if (to === 'REFUNDED') await reverseInvoice(tx, order.id);
-
-    const wasSpent = SPENT_STATUSES.includes(from);
-    const isSpent = SPENT_STATUSES.includes(to);
-    if (wasSpent !== isSpent) {
-      await tx.member.update({
-        where: { id: order.memberId },
-        data: { totalSpent: { increment: isSpent ? order.total : -order.total } },
-      });
-    }
+    await this.applyEffects(tx, order, from, to, actor);
 
     await tx.orderEvent.create({
       data: {
@@ -335,6 +415,72 @@ export class OrdersService {
         message,
       },
     });
+  }
+
+  /**
+   * 狀態變更的連帶效果（與狀態變更同一個交易）：電子發票、會員累計消費與等級、
+   * 車庫自動入庫、站內通知與 Email。
+   */
+  private async applyEffects(
+    tx: Tx,
+    order: OrderWithItems,
+    from: OrderStatus,
+    to: OrderStatus,
+    actor: Actor,
+  ): Promise<void> {
+    if (to === 'PAID') {
+      await queueInvoice(tx, order, this.config.INVOICE_PROVIDER === 'ecpay' ? 'ECPAY' : 'MOCK');
+    }
+    if (to === 'REFUNDED') await reverseInvoice(tx, order.id);
+
+    const wasSpent = SPENT_STATUSES.includes(from);
+    const isSpent = SPENT_STATUSES.includes(to);
+    if (wasSpent !== isSpent) {
+      const member = await tx.member.update({
+        where: { id: order.memberId },
+        data: { totalSpent: { increment: isSpent ? order.total : -order.total } },
+        select: { totalSpent: true, tier: true },
+      });
+      await this.syncTier(tx, order.memberId, member);
+    }
+
+    if (to === 'COMPLETED') await parkOrderInGarage(tx, order);
+    if (from === 'COMPLETED' && to === 'REFUNDED') await removeOrderFromGarage(tx, order);
+
+    const link = `/account/orders/${order.orderNo}`;
+    const notify = (type: NotificationType, params: NotificationParams = {}) =>
+      this.notifications.notify(tx, {
+        memberId: order.memberId,
+        type,
+        params: { orderNo: order.orderNo, ...params },
+        link,
+      });
+    if (to === 'PAID') await notify('ORDER_PAID', { total: order.total });
+    if (to === 'SHIPPED') await notify('ORDER_SHIPPED');
+    if (to === 'REFUNDED') await notify('ORDER_REFUNDED', { total: order.total });
+    // 會員自己取消的不需通知
+    if (to === 'CANCELLED' && actor.type !== 'MEMBER') {
+      await notify('ORDER_CANCELLED', { expired: actor.type === 'SYSTEM' });
+    }
+  }
+
+  /** 累計消費變動後重新計算等級（升級時通知；退款扣回消費會降級） */
+  private async syncTier(
+    tx: Tx,
+    memberId: string,
+    member: { totalSpent: number; tier: MemberTier },
+  ): Promise<void> {
+    const tier = tierFor(member.totalSpent);
+    if (tier === member.tier) return;
+    await tx.member.update({ where: { id: memberId }, data: { tier, tierUpdatedAt: new Date() } });
+    if (tierRank(tier) > tierRank(member.tier)) {
+      await this.notifications.notify(tx, {
+        memberId,
+        type: 'TIER_UPGRADED',
+        params: { tier },
+        link: '/account',
+      });
+    }
   }
 
   /** 每分鐘取消逾期未付款的訂單並釋放庫存（多台機器部署時以 Redis 鎖確保只有一台執行） */
@@ -445,6 +591,7 @@ export class OrdersService {
             amount: order.invoice.amount,
           }
         : null,
+      expectedShipAt: expectedShipAt(order),
       canPay: order.status === 'PENDING_PAYMENT' && !deadlinePassed,
       canCancel: order.status === 'PENDING_PAYMENT',
     };
@@ -476,6 +623,14 @@ export class OrdersService {
       }
     }
   }
+}
+
+/** 預購訂單的預計出貨時間：取各預購商品中最晚的一個 */
+function expectedShipAt(order: OrderWithDetail): Date | null {
+  const dates = order.items
+    .filter((item) => item.saleType === 'PRE_ORDER' && item.product.expectedShipAt)
+    .map((item) => item.product.expectedShipAt!.getTime());
+  return dates.length ? new Date(Math.max(...dates)) : null;
 }
 
 function mergeItems(items: { productId: string; quantity: number }[]) {

@@ -215,6 +215,8 @@ export class AdminProductsService {
       releaseAt: product.releaseAt,
       preorderClosesAt: product.preorderClosesAt,
       expectedShipAt: product.expectedShipAt,
+      earlyAccessTier: product.earlyAccessTier,
+      earlyAccessAt: product.earlyAccessAt,
       purchaseLimit: product.purchaseLimit,
       isFeatured: product.isFeatured,
       specs: (product.specs as Record<string, string> | null) ?? {},
@@ -242,7 +244,23 @@ export class AdminProductsService {
     saleType?: string;
     releaseAt?: Date | null;
     preorderClosesAt?: Date | null;
+    earlyAccessTier?: string | null;
+    earlyAccessAt?: Date | null;
   }): void {
+    if (product.earlyAccessTier || product.earlyAccessAt) {
+      const valid =
+        !!product.earlyAccessTier &&
+        !!product.earlyAccessAt &&
+        !!product.releaseAt &&
+        product.earlyAccessAt < product.releaseAt;
+      if (!valid) {
+        throw AppException.badRequest(
+          ErrorCode.VALIDATION_FAILED,
+          '優先購需同時設定等級與開始時間，且早於開賣時間',
+          [{ field: 'earlyAccessAt', messages: ['需設定等級，且早於 releaseAt'] }],
+        );
+      }
+    }
     if (product.saleType === 'LIMITED' && !product.releaseAt) {
       throw AppException.badRequest(ErrorCode.VALIDATION_FAILED, '限量發售商品必須設定開賣時間', [
         { field: 'releaseAt', messages: ['限量發售需要開賣時間'] },

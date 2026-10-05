@@ -7,6 +7,8 @@ import type { MemberProfileDto } from '../auth/dto/member-auth.dto.js';
 import { toMemberProfile } from '../auth/member-auth.service.js';
 import { TokenService } from '../auth/token.service.js';
 import type { ChangePasswordDto, UpdateProfileDto } from './dto/me.dto.js';
+import type { MembershipDto } from './dto/membership.dto.js';
+import { toMembership } from './membership.js';
 
 @Injectable()
 export class MeService {
@@ -21,6 +23,14 @@ export class MeService {
       throw AppException.unauthorized(ErrorCode.ACCOUNT_DISABLED, '帳號已停用或不存在');
     }
     return toMemberProfile(member);
+  }
+
+  async membership(memberId: string): Promise<MembershipDto> {
+    const member = await this.prisma.member.findUniqueOrThrow({
+      where: { id: memberId },
+      select: { tier: true, totalSpent: true, tierUpdatedAt: true },
+    });
+    return toMembership(member);
   }
 
   async update(memberId: string, dto: UpdateProfileDto): Promise<MemberProfileDto> {

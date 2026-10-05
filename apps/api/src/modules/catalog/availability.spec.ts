@@ -21,6 +21,25 @@ describe('computeAvailability', () => {
     );
   });
 
+  it('優先購：等級達標的會員在優先購時間後可購買，其他人仍是 COMING_SOON', () => {
+    const drop = {
+      saleType: 'LIMITED' as const,
+      stock: 50,
+      preorderClosesAt: null,
+      releaseAt: future,
+      earlyAccessTier: 'CHAMPION' as const,
+      earlyAccessAt: past,
+    };
+    expect(computeAvailability(drop, now, 'LEGEND')).toBe(Availability.IN_STOCK);
+    expect(computeAvailability(drop, now, 'CHAMPION')).toBe(Availability.IN_STOCK);
+    expect(computeAvailability(drop, now, 'DRIVER')).toBe(Availability.COMING_SOON);
+    expect(computeAvailability(drop, now)).toBe(Availability.COMING_SOON);
+    // 優先購時間還沒到
+    expect(computeAvailability({ ...drop, earlyAccessAt: future }, now, 'LEGEND')).toBe(
+      Availability.COMING_SOON,
+    );
+  });
+
   it('預購在開放期間可下單，截止後關閉，名額用完顯示售完', () => {
     const preorder = { saleType: 'PRE_ORDER' as const, stock: 100, releaseAt: past };
     expect(computeAvailability({ ...preorder, preorderClosesAt: future }, now)).toBe(

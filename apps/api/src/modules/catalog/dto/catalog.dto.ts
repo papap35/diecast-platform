@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { PageMeta, PaginationQuery } from '../../../common/http/pagination.dto.js';
 import { SUPPORTED_LOCALES, type Locale } from '../../../common/i18n/locale.js';
-import { SaleType } from '../../../generated/prisma/enums.js';
+import { MemberTier, SaleType } from '../../../generated/prisma/enums.js';
 import { Availability } from '../availability.js';
 
 export const PRODUCT_SORTS = ['newest', 'price_asc', 'price_desc', 'release', 'featured'] as const;
@@ -62,6 +62,10 @@ export class ProductSummaryDto {
   saleType!: SaleType;
   /** 開賣（或預購開放）時間 */
   releaseAt!: Date | null;
+  /** 優先購：達此等級的會員可在 earlyAccessAt 起提前購買 */
+  @ApiProperty({ enum: MemberTier, enumName: 'MemberTier', nullable: true })
+  earlyAccessTier!: MemberTier | null;
+  earlyAccessAt!: Date | null;
   @ApiProperty({ enum: Availability, enumName: 'Availability' })
   availability!: Availability;
   /** 低庫存時顯示剩餘數量，其餘情況為 null（不公開實際庫存） */

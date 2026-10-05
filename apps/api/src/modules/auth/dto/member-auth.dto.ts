@@ -9,6 +9,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { SUPPORTED_LOCALES, type Locale } from '../../../common/i18n/locale.js';
+import { MemberTier } from '../../../generated/prisma/enums.js';
 import { TokenPairDto } from './token.dto.js';
 
 export class RegisterDto {
@@ -55,6 +56,9 @@ export class MemberProfileDto {
   @ApiProperty({ enum: SUPPORTED_LOCALES })
   locale!: string;
   marketingOptIn!: boolean;
+  /** 會員等級（決定優先購資格與免運優惠） */
+  @ApiProperty({ enum: MemberTier, enumName: 'MemberTier' })
+  tier!: MemberTier;
   createdAt!: Date;
 }
 

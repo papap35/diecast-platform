@@ -9,7 +9,13 @@ import { PrismaClient } from '../src/generated/prisma/client.js';
 import { hashPassword } from '../src/common/security/password.js';
 import { Permission } from '../src/modules/auth/permissions.js';
 import { BRANDS, CATEGORIES, PRODUCTS, type SeedProduct } from './seed/catalog-data.js';
-import { seedDemoFulfilment, seedDemoOrders } from './seed/demo-orders.js';
+import { seedDemoMemberExtras, seedEvents } from './seed/collector-data.js';
+import {
+  seedDemoFulfilment,
+  seedDemoMemberOrders,
+  seedDemoOrders,
+  syncTiers,
+} from './seed/demo-orders.js';
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
@@ -25,11 +31,19 @@ export const DEMO_ACCOUNTS = {
   member: { email: 'demo@paddock64.dev', password: 'Paddock64!demo', name: '示範會員' },
 } as const;
 
-/** 以整點對齊，讓限量發售時間看起來像真的排程（台灣時間晚上 8 點附近） */
+/**
+ * 種子資料的相對時間。一天以上的開賣時間對齊台灣時間晚上 8 點（實際發售常見的時段），
+ * 一天內的（例如「剛開賣」）只對齊整點。
+ */
 function relativeTime(now: Date, hours: number): Date {
-  const date = new Date(now.getTime() + hours * HOUR);
-  date.setUTCMinutes(0, 0, 0);
-  return date;
+  const target = new Date(now.getTime() + hours * HOUR);
+  if (Math.abs(hours) < 24) {
+    target.setUTCMinutes(0, 0, 0);
+    return target;
+  }
+  const taipei = new Date(target.getTime() + 8 * HOUR);
+  taipei.setUTCHours(20, 0, 0, 0);
+  return new Date(taipei.getTime() - 8 * HOUR);
 }
 
 async function seedRoles() {
@@ -249,6 +263,14 @@ function productData(
       product.expectedShipInDays !== undefined
         ? new Date(now.getTime() + product.expectedShipInDays * DAY)
         : null,
+    earlyAccessTier: product.earlyAccess?.tier ?? null,
+    earlyAccessAt:
+      product.earlyAccess && product.releaseInHours !== undefined
+        ? new Date(
+            relativeTime(now, product.releaseInHours).getTime() -
+              product.earlyAccess.minutesBefore * 60_000,
+          )
+        : null,
     purchaseLimit: product.purchaseLimit ?? null,
     isFeatured: product.isFeatured ?? false,
     specs: product.specs,
@@ -263,7 +285,11 @@ async function main() {
   const categoryIds = await seedCategories();
   await seedProducts(brandIds, categoryIds);
   const orders = await seedDemoOrders(prisma);
-  await seedDemoFulfilment(prisma);
+  await seedDemoMemberOrders(prisma, DEMO_ACCOUNTS.member.email);
+  await seedDemoFulfilment(prisma, DEMO_ACCOUNTS.member.email);
+  await syncTiers(prisma);
+  await seedEvents(prisma);
+  await seedDemoMemberExtras(prisma, DEMO_ACCOUNTS.member.email);
 
   console.log(`✔ 示範資料建立完成${orders ? `（新增 ${orders} 筆示範訂單）` : ''}`);
   console.log(`  後台：${DEMO_ACCOUNTS.superAdmin.email} / ${DEMO_ACCOUNTS.superAdmin.password}`);

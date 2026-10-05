@@ -51,24 +51,35 @@ enum MemberStatus {
 }
 
 model Member {
-  id             String       @id @default(uuid(7)) @db.Uuid
-  email          String       @unique
+  id             String            @id @default(uuid(7)) @db.Uuid
+  email          String            @unique
   passwordHash   String
   name           String
   phone          String?
-  locale         String       @default("zh-TW")
-  status         MemberStatus @default(ACTIVE)
-  marketingOptIn Boolean      @default(false)
+  locale         String            @default("zh-TW")
+  status         MemberStatus      @default(ACTIVE)
+  marketingOptIn Boolean           @default(false)
   /// 累計有效消費金額（新台幣），用於會員等級計算
-  totalSpent     Int          @default(0)
+  totalSpent     Int               @default(0)
+  /// 會員等級，依累計消費自動升降級
+  tier           MemberTier        @default(ROOKIE)
+  tierUpdatedAt  DateTime?
+  /// 公開車庫網址代稱（/garage/{handle}）
+  garageHandle   String?           @unique
+  garagePublic   Boolean           @default(false)
   lastLoginAt    DateTime?
   deletedAt      DateTime?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
   cart           Cart?
   orders         Order[]
+  wishlist       WishlistItem[]
+  reminders      ReleaseReminder[]
+  garage         GarageItem[]
+  notifications  Notification[]
 
   @@index([createdAt])
+  @@index([tier])
 }
 
 enum AuthSubject {
@@ -179,6 +190,11 @@ model Product {
   releaseAt        DateTime?
   preorderClosesAt DateTime?
   expectedShipAt   DateTime?
+  /// 會員等級優先購：達 earlyAccessTier 的會員可在 earlyAccessAt（早於 releaseAt）起購買
+  earlyAccessTier  MemberTier?
+  earlyAccessAt    DateTime?
+  /// 庫存從 0 補回有貨的時間，用來通知把商品加入願望清單的會員
+  restockedAt      DateTime?
   /// 每位會員限購數量（含已成立訂單）
   purchaseLimit    Int?
   isFeatured       Boolean              @default(false)
@@ -189,6 +205,10 @@ model Product {
   cartItems        CartItem[]
   orderItems       OrderItem[]
   stockMovements   StockMovement[]
+  wishlistedBy     WishlistItem[]
+  reminders        ReleaseReminder[]
+  garageItems      GarageItem[]
+  events           Event[]
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
 
@@ -343,19 +363,20 @@ model Order {
 }
 
 model OrderItem {
-  id        String   @id @default(uuid(7)) @db.Uuid
-  orderId   String   @db.Uuid
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String   @db.Uuid
-  product   Product  @relation(fields: [productId], references: [id])
-  sku       String
+  id         String      @id @default(uuid(7)) @db.Uuid
+  orderId    String      @db.Uuid
+  order      Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String      @db.Uuid
+  product    Product     @relation(fields: [productId], references: [id])
+  sku        String
   /// 下單當下的商品名稱快照（依訂單語系）
-  name      String
-  imageUrl  String?
-  saleType  SaleType
-  unitPrice Int
-  quantity  Int
-  lineTotal Int
+  name       String
+  imageUrl   String?
+  saleType   SaleType
+  unitPrice  Int
+  quantity   Int
+  lineTotal  Int
+  garageItem GarageItem?
 
   @@index([orderId])
   @@index([productId])
@@ -497,4 +518,180 @@ model Invoice {
   updatedAt     DateTime            @updatedAt
 
   @@index([status, nextAttemptAt])
+}
+
+// ─────────────────────────────────────────────
+// 收藏玩家功能：會員等級、願望清單、發售提醒、我的車庫、通知、活動
+// ─────────────────────────────────────────────
+
+/// 會員等級（依累計消費）：新手車手 → 正式車手 → 冠軍車手 → 傳奇車手
+enum MemberTier {
+  ROOKIE
+  DRIVER
+  CHAMPION
+  LEGEND
+}
+
+/// 願望清單；商品補貨時通知
+model WishlistItem {
+  memberId   String    @db.Uuid
+  member     Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  productId  String    @db.Uuid
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  /// 最近一次補貨通知時間
+  notifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@id([memberId, productId])
+  @@index([productId])
+}
+
+/// 發售提醒：開賣（符合優先購資格時為優先購開始）前通知
+model ReleaseReminder {
+  memberId   String    @db.Uuid
+  member     Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  productId  String    @db.Uuid
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  notifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@id([memberId, productId])
+  @@index([notifiedAt])
+}
+
+enum GarageCondition {
+  /// 未拆封
+  SEALED
+  /// 已拆封、近全新
+  OPENED
+  /// 展示中
+  DISPLAYED
+  /// 有使用痕跡
+  PLAYWORN
+}
+
+/// 我的車庫：收藏的車款。本站訂單完成取件後自動入庫，也可手動登錄其他來源的車款
+model GarageItem {
+  id          String          @id @default(uuid(7)) @db.Uuid
+  memberId    String          @db.Uuid
+  member      Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  productId   String?         @db.Uuid
+  product     Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  /// 由訂單自動入庫的來源品項（訂單退貨時一併移除）
+  orderItemId String?         @unique @db.Uuid
+  orderItem   OrderItem?      @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  /// 名稱、品牌與比例：本站商品為入庫時的快照（商品下架後仍可顯示），其他來源由會員填寫
+  name        String
+  brandName   String?
+  scale       String?
+  condition   GarageCondition @default(SEALED)
+  quantity    Int             @default(1)
+  /// 購入價（新台幣），只有本人看得到
+  pricePaid   Int?
+  acquiredAt  DateTime?
+  note        String?
+  isFavorite  Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([memberId, createdAt])
+}
+
+enum NotificationType {
+  ORDER_PAID
+  ORDER_SHIPPED
+  ORDER_ARRIVED
+  ORDER_CANCELLED
+  ORDER_REFUNDED
+  RELEASE_REMINDER
+  WISHLIST_RESTOCK
+  TIER_UPGRADED
+}
+
+/// 站內通知（標題與內容依會員語系產生）
+model Notification {
+  id        String           @id @default(uuid(7)) @db.Uuid
+  memberId  String           @db.Uuid
+  member    Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  /// 前台路徑（不含語系），例如 /account/orders/P64…
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([memberId, createdAt])
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+/// Email 外寄匣：與業務資料同一交易寫入，由排程寄出（交易成功才寄、寄信失敗不影響交易）
+model EmailMessage {
+  id             String      @id @default(uuid(7)) @db.Uuid
+  to             String
+  subject        String
+  text           String
+  notificationId String?     @db.Uuid
+  status         EmailStatus @default(PENDING)
+  attempts       Int         @default(0)
+  lastError      String?
+  sentAt         DateTime?
+  createdAt      DateTime    @default(now())
+
+  @@index([status, createdAt])
+}
+
+enum EventType {
+  /// 模型車展
+  EXHIBITION
+  /// 車聚、交流會
+  MEETUP
+  /// 新品發售活動
+  LAUNCH
+  /// 線上活動（直播開箱等）
+  ONLINE
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// 活動（車展、車聚、發售活動），與發售行事曆一起呈現
+model Event {
+  id            String             @id @default(uuid(7)) @db.Uuid
+  slug          String             @unique
+  type          EventType
+  status        ContentStatus      @default(DRAFT)
+  startsAt      DateTime
+  endsAt        DateTime?
+  venue         String?
+  address       String?
+  /// 外部報名或活動頁連結
+  url           String?
+  coverImageUrl String?
+  /// 相關商品（例如發售活動的限量車款）
+  productId     String?            @db.Uuid
+  product       Product?           @relation(fields: [productId], references: [id], onDelete: SetNull)
+  translations  EventTranslation[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([status, startsAt])
+}
+
+model EventTranslation {
+  eventId String @db.Uuid
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  locale  String
+  title   String
+  summary String
+  body    String
+
+  @@id([eventId, locale])
 }

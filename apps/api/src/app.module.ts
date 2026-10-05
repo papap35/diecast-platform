@@ -9,13 +9,18 @@ import { AdminModule } from './modules/admin/admin.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CartModule } from './modules/cart/cart.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
+import { EventsModule } from './modules/events/events.module.js';
+import { GarageModule } from './modules/garage/garage.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 import { InventoryModule } from './modules/inventory/inventory.module.js';
 import { InvoicesModule } from './modules/invoices/invoices.module.js';
 import { LogisticsModule } from './modules/logistics/logistics.module.js';
 import { MembersModule } from './modules/members/members.module.js';
+import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import { OrdersModule } from './modules/orders/orders.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
+import { RemindersModule } from './modules/reminders/reminders.module.js';
+import { WishlistModule } from './modules/wishlist/wishlist.module.js';
 
 @Module({
   imports: [
@@ -36,6 +41,11 @@ import { PaymentsModule } from './modules/payments/payments.module.js';
     PaymentsModule,
     LogisticsModule,
     InvoicesModule,
+    NotificationsModule,
+    WishlistModule,
+    RemindersModule,
+    GarageModule,
+    EventsModule,
     AdminModule,
     HealthModule,
   ],

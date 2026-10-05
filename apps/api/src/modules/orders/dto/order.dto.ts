@@ -282,6 +282,8 @@ export class OrderDto {
   shipment!: OrderShipmentDto | null;
   /** 電子發票（付款成功後開立） */
   invoice!: OrderInvoiceDto | null;
+  /** 預購訂單的預計出貨時間（現貨訂單為 null） */
+  expectedShipAt!: Date | null;
   /** 是否可以（重新）付款 */
   canPay!: boolean;
   /** 會員是否可自行取消 */

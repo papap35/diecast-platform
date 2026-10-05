@@ -325,6 +325,33 @@
         ]
       }
     },
+    "/v1/me/membership": {
+      "get": {
+        "operationId": "Me_membership",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "會員等級、累計消費、距離下一級的差額與各等級權益",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/v1/me/password": {
       "post": {
         "operationId": "Me_changePassword",
@@ -645,7 +672,12 @@
             }
           }
         },
-        "summary": "商品列表：關鍵字搜尋、品牌／分類／比例／販售方式／狀態／價格篩選、排序、分頁",
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "商品列表：關鍵字搜尋、品牌／分類／比例／販售方式／狀態／價格篩選、排序、分頁。\n帶會員權杖時，販售狀態會反映該會員的優先購資格。",
         "tags": [
           "Catalog"
         ]
@@ -689,7 +721,12 @@
             }
           }
         },
-        "summary": "商品詳情",
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "商品詳情（帶會員權杖時反映優先購資格）",
         "tags": [
           "Catalog"
         ]
@@ -1712,6 +1749,119 @@
         ]
       }
     },
+    "/v1/me/notifications": {
+      "get": {
+        "operationId": "Notifications_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "站內通知（新到舊），附未讀數",
+        "tags": [
+          "Me / Notifications"
+        ]
+      }
+    },
+    "/v1/me/notifications/unread-count": {
+      "get": {
+        "operationId": "Notifications_unreadCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCountDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "未讀數（頁首鈴鐺用）",
+        "tags": [
+          "Me / Notifications"
+        ]
+      }
+    },
+    "/v1/me/notifications/read": {
+      "post": {
+        "operationId": "Notifications_markRead",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkReadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarkReadResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "標示為已讀；不帶 ids 表示全部",
+        "tags": [
+          "Me / Notifications"
+        ]
+      }
+    },
     "/v1/orders/{orderNo}/payments": {
       "post": {
         "operationId": "Payments_start",
@@ -1929,6 +2079,635 @@
         "summary": "物流狀態通知，必須回應 `1|OK`，否則綠界會重送",
         "tags": [
           "Logistics / Callbacks"
+        ]
+      }
+    },
+    "/v1/me/wishlist": {
+      "get": {
+        "operationId": "Wishlist_list",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "願望清單（新到舊）；售完的商品補貨時會通知",
+        "tags": [
+          "Me / Wishlist"
+        ]
+      }
+    },
+    "/v1/me/wishlist/ids": {
+      "get": {
+        "operationId": "Wishlist_ids",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductIdListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "已加入的商品 id",
+        "tags": [
+          "Me / Wishlist"
+        ]
+      }
+    },
+    "/v1/me/wishlist/{productId}": {
+      "put": {
+        "operationId": "Wishlist_add",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "加入願望清單（重複加入不會出錯）",
+        "tags": [
+          "Me / Wishlist"
+        ]
+      },
+      "delete": {
+        "operationId": "Wishlist_remove",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "tags": [
+          "Me / Wishlist"
+        ]
+      }
+    },
+    "/v1/me/reminders": {
+      "get": {
+        "operationId": "Reminders_list",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "尚未開賣的發售提醒（依通知時間排序）",
+        "tags": [
+          "Me / Reminders"
+        ]
+      }
+    },
+    "/v1/me/reminders/ids": {
+      "get": {
+        "operationId": "Reminders_ids",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductIdListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "已設定提醒的商品 id",
+        "tags": [
+          "Me / Reminders"
+        ]
+      }
+    },
+    "/v1/me/reminders/{productId}": {
+      "put": {
+        "operationId": "Reminders_add",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "設定發售提醒：開賣（或你的優先購開始）前 15 分鐘通知",
+        "tags": [
+          "Me / Reminders"
+        ]
+      },
+      "delete": {
+        "operationId": "Reminders_remove",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "tags": [
+          "Me / Reminders"
+        ]
+      }
+    },
+    "/v1/me/garage": {
+      "get": {
+        "operationId": "Garage_get",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GarageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "我的車庫：收藏清單、統計與公開設定",
+        "tags": [
+          "Me / Garage"
+        ]
+      },
+      "post": {
+        "operationId": "Garage_create",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGarageItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GarageItemDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "登錄一台收藏（本站商品或其他來源）",
+        "tags": [
+          "Me / Garage"
+        ]
+      }
+    },
+    "/v1/me/garage/settings": {
+      "put": {
+        "operationId": "Garage_updateSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGarageSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GarageSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "summary": "公開設定：開啟後任何人都能以 /garage/{handle} 瀏覽（不含購入價與備註）",
+        "tags": [
+          "Me / Garage"
+        ]
+      }
+    },
+    "/v1/me/garage/{id}": {
+      "patch": {
+        "operationId": "Garage_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGarageItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GarageItemDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "tags": [
+          "Me / Garage"
+        ]
+      },
+      "delete": {
+        "operationId": "Garage_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "member": []
+          }
+        ],
+        "tags": [
+          "Me / Garage"
+        ]
+      }
+    },
+    "/v1/garages/{handle}": {
+      "get": {
+        "operationId": "PublicGarage_get",
+        "parameters": [
+          {
+            "name": "handle",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicGarageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "公開車庫",
+        "tags": [
+          "Garages"
+        ]
+      }
+    },
+    "/v1/events": {
+      "get": {
+        "operationId": "Events_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/EventType"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "結束時間在此之後（預設：現在，只列尚未結束的活動）",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "開始時間在此之前",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "活動列表（尚未結束、依開始時間排序），可依期間與類型篩選",
+        "tags": [
+          "Events"
+        ]
+      }
+    },
+    "/v1/events/{slug}": {
+      "get": {
+        "operationId": "Events_get",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Events"
         ]
       }
     },
@@ -2520,6 +3299,16 @@
           "name"
         ]
       },
+      "MemberTier": {
+        "type": "string",
+        "enum": [
+          "ROOKIE",
+          "DRIVER",
+          "CHAMPION",
+          "LEGEND"
+        ],
+        "description": "會員等級（決定優先購資格與免運優惠）"
+      },
       "MemberProfileDto": {
         "type": "object",
         "properties": {
@@ -2529,6 +3318,14 @@
               "zh-TW",
               "en",
               "zh-CN"
+            ]
+          },
+          "tier": {
+            "description": "會員等級（決定優先購資格與免運優惠）",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
             ]
           },
           "id": {
@@ -2554,6 +3351,7 @@
         },
         "required": [
           "locale",
+          "tier",
           "id",
           "email",
           "name",
@@ -2711,6 +3509,108 @@
         "required": [
           "admin",
           "tokens"
+        ]
+      },
+      "NextTierDto": {
+        "type": "object",
+        "properties": {
+          "tier": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
+          "threshold": {
+            "type": "number"
+          },
+          "remaining": {
+            "type": "number",
+            "description": "距離升級還差的消費金額"
+          }
+        },
+        "required": [
+          "tier",
+          "threshold",
+          "remaining"
+        ]
+      },
+      "TierInfoDto": {
+        "type": "object",
+        "properties": {
+          "tier": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
+          "threshold": {
+            "type": "number",
+            "description": "累計消費門檻（新台幣）"
+          },
+          "homeFreeShipping": {
+            "type": "number",
+            "description": "宅配免運門檻（0 表示一律免運）"
+          },
+          "cvsFreeShipping": {
+            "type": "number",
+            "description": "超商取貨免運門檻（0 表示一律免運）"
+          },
+          "earlyAccess": {
+            "type": "boolean",
+            "description": "可參加限量車款優先購（各商品另行設定開放的等級）"
+          }
+        },
+        "required": [
+          "tier",
+          "threshold",
+          "homeFreeShipping",
+          "cvsFreeShipping",
+          "earlyAccess"
+        ]
+      },
+      "MembershipDto": {
+        "type": "object",
+        "properties": {
+          "tier": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
+          "totalSpent": {
+            "type": "number",
+            "description": "累計有效消費（已付款且未退款的訂單）"
+          },
+          "tierUpdatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "next": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NextTierDto"
+              }
+            ]
+          },
+          "tiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TierInfoDto"
+            }
+          }
+        },
+        "required": [
+          "tier",
+          "totalSpent",
+          "tierUpdatedAt",
+          "next",
+          "tiers"
         ]
       },
       "UpdateProfileDto": {
@@ -2931,6 +3831,15 @@
               }
             ]
           },
+          "earlyAccessTier": {
+            "nullable": true,
+            "description": "優先購：達此等級的會員可在 earlyAccessAt 起提前購買",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
           "availability": {
             "allOf": [
               {
@@ -2978,6 +3887,11 @@
             "nullable": true,
             "description": "開賣（或預購開放）時間"
           },
+          "earlyAccessAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
           "remaining": {
             "type": "number",
             "nullable": true,
@@ -2993,6 +3907,7 @@
         },
         "required": [
           "saleType",
+          "earlyAccessTier",
           "availability",
           "id",
           "slug",
@@ -3005,6 +3920,7 @@
           "price",
           "compareAtPrice",
           "releaseAt",
+          "earlyAccessAt",
           "remaining",
           "imageUrl",
           "isFeatured"
@@ -3074,6 +3990,15 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "earlyAccessTier": {
+            "nullable": true,
+            "description": "優先購：達此等級的會員可在 earlyAccessAt 起提前購買",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
               }
             ]
           },
@@ -3156,6 +4081,11 @@
             "nullable": true,
             "description": "開賣（或預購開放）時間"
           },
+          "earlyAccessAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
           "remaining": {
             "type": "number",
             "nullable": true,
@@ -3171,6 +4101,7 @@
         },
         "required": [
           "saleType",
+          "earlyAccessTier",
           "availability",
           "specs",
           "description",
@@ -3189,6 +4120,7 @@
           "price",
           "compareAtPrice",
           "releaseAt",
+          "earlyAccessAt",
           "remaining",
           "imageUrl",
           "isFeatured"
@@ -3375,6 +4307,14 @@
               }
             ]
           },
+          "earlyAccessTier": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
           "specs": {
             "type": "object",
             "additionalProperties": {
@@ -3431,6 +4371,11 @@
             "type": "string",
             "nullable": true
           },
+          "earlyAccessAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
           "purchaseLimit": {
             "type": "number",
             "nullable": true
@@ -3466,6 +4411,7 @@
         "required": [
           "status",
           "saleType",
+          "earlyAccessTier",
           "specs",
           "availability",
           "id",
@@ -3480,6 +4426,7 @@
           "releaseAt",
           "preorderClosesAt",
           "expectedShipAt",
+          "earlyAccessAt",
           "purchaseLimit",
           "isFeatured",
           "translations",
@@ -3556,6 +4503,15 @@
               }
             ]
           },
+          "earlyAccessTier": {
+            "nullable": true,
+            "description": "優先購開放的最低會員等級（需同時設定 earlyAccessAt）",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
           "specs": {
             "type": "object",
             "additionalProperties": {
@@ -3613,6 +4569,12 @@
             "type": "string",
             "nullable": true
           },
+          "earlyAccessAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "優先購開始時間（需早於 releaseAt）"
+          },
           "purchaseLimit": {
             "type": "number",
             "nullable": true,
@@ -3668,6 +4630,15 @@
               }
             ]
           },
+          "earlyAccessTier": {
+            "nullable": true,
+            "description": "優先購開放的最低會員等級（需同時設定 earlyAccessAt）",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
           "specs": {
             "type": "object",
             "additionalProperties": {
@@ -3719,6 +4690,12 @@
             "format": "date-time",
             "type": "string",
             "nullable": true
+          },
+          "earlyAccessAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "優先購開始時間（需早於 releaseAt）"
           },
           "purchaseLimit": {
             "type": "number",
@@ -4210,7 +5187,7 @@
           },
           "freeThreshold": {
             "type": "number",
-            "description": "免運門檻"
+            "description": "免運門檻（依會員等級，0 表示一律免運）"
           }
         },
         "required": [
@@ -4236,9 +5213,14 @@
           },
           "hasIssues": {
             "type": "boolean",
-            "description": "是否有商品需要調整才能結帳"
+            "description": "是否有商品需要調整才能結帳（含預購與現貨混在一起）"
+          },
+          "preorderMixed": {
+            "type": "boolean",
+            "description": "預購商品與現貨同時在購物車：需分開結帳"
           },
           "shippingOptions": {
+            "description": "免運門檻已套用會員等級優惠",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ShippingOptionDto"
@@ -4250,6 +5232,7 @@
           "itemCount",
           "subtotal",
           "hasIssues",
+          "preorderMixed",
           "shippingOptions"
         ]
       },
@@ -4849,6 +5832,12 @@
               }
             ]
           },
+          "expectedShipAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "預購訂單的預計出貨時間（現貨訂單為 null）"
+          },
           "canPay": {
             "type": "boolean",
             "description": "是否可以（重新）付款"
@@ -4896,6 +5885,7 @@
           "payments",
           "shipment",
           "invoice",
+          "expectedShipAt",
           "canPay",
           "canCancel"
         ]
@@ -4967,6 +5957,121 @@
         "required": [
           "data",
           "meta"
+        ]
+      },
+      "NotificationType": {
+        "type": "string",
+        "enum": [
+          "ORDER_PAID",
+          "ORDER_SHIPPED",
+          "ORDER_ARRIVED",
+          "ORDER_CANCELLED",
+          "ORDER_REFUNDED",
+          "RELEASE_REMINDER",
+          "WISHLIST_RESTOCK",
+          "TIER_UPGRADED"
+        ]
+      },
+      "NotificationDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NotificationType"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string",
+            "nullable": true,
+            "description": "前台路徑（不含語系），例如 /account/orders/P64…"
+          },
+          "readAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "title",
+          "body",
+          "link",
+          "readAt",
+          "createdAt"
+        ]
+      },
+      "NotificationListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotificationDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          },
+          "unreadCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "meta",
+          "unreadCount"
+        ]
+      },
+      "UnreadCountDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "count"
+        ]
+      },
+      "MarkReadDto": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "description": "要標示為已讀的通知；省略表示全部",
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "MarkReadResultDto": {
+        "type": "object",
+        "properties": {
+          "updated": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "updated"
         ]
       },
       "StartPaymentDto": {
@@ -5107,6 +6212,584 @@
           "storeId",
           "storeName",
           "storeAddress"
+        ]
+      },
+      "WishlistItemDto": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/ProductSummaryDto"
+          },
+          "addedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product",
+          "addedAt"
+        ]
+      },
+      "WishlistDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WishlistItemDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ProductIdListDto": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "ReminderDto": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/ProductSummaryDto"
+          },
+          "remindAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "通知時間：開賣（符合優先購資格時為優先購開始）前 15 分鐘"
+          },
+          "notifiedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "product",
+          "remindAt",
+          "notifiedAt"
+        ]
+      },
+      "ReminderListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReminderDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "GarageCondition": {
+        "type": "string",
+        "enum": [
+          "SEALED",
+          "OPENED",
+          "DISPLAYED",
+          "PLAYWORN"
+        ]
+      },
+      "GarageItemDto": {
+        "type": "object",
+        "properties": {
+          "condition": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GarageCondition"
+              }
+            ]
+          },
+          "source": {
+            "description": "ORDER：本站訂單完成後自動入庫；MANUAL：會員自行登錄",
+            "enum": [
+              "ORDER",
+              "MANUAL"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true,
+            "description": "本站商品（可連到商品頁）；手動登錄的其他來源車款為 null"
+          },
+          "productSlug": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "本站商品依語系顯示目前名稱，其餘為登錄時的名稱"
+          },
+          "brandName": {
+            "type": "string",
+            "nullable": true
+          },
+          "scale": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "pricePaid": {
+            "type": "number",
+            "nullable": true,
+            "description": "購入價（只有本人看得到；公開車庫不會回傳）"
+          },
+          "acquiredAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "isFavorite": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "condition",
+          "source",
+          "id",
+          "productId",
+          "productSlug",
+          "name",
+          "brandName",
+          "scale",
+          "imageUrl",
+          "quantity",
+          "pricePaid",
+          "acquiredAt",
+          "note",
+          "isFavorite",
+          "createdAt"
+        ]
+      },
+      "CountByDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "label",
+          "count"
+        ]
+      },
+      "GarageStatsDto": {
+        "type": "object",
+        "properties": {
+          "models": {
+            "type": "number",
+            "description": "車款數（筆數）"
+          },
+          "cars": {
+            "type": "number",
+            "description": "總台數（含重複收藏）"
+          },
+          "brands": {
+            "description": "依品牌（台數多到少，前 8 名）",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountByDto"
+            }
+          },
+          "scales": {
+            "description": "依比例",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountByDto"
+            }
+          }
+        },
+        "required": [
+          "models",
+          "cars",
+          "brands",
+          "scales"
+        ]
+      },
+      "GarageSettingsDto": {
+        "type": "object",
+        "properties": {
+          "public": {
+            "type": "boolean"
+          },
+          "handle": {
+            "type": "string",
+            "nullable": true,
+            "description": "公開車庫網址：/garage/{handle}"
+          }
+        },
+        "required": [
+          "public",
+          "handle"
+        ]
+      },
+      "GarageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GarageItemDto"
+            }
+          },
+          "stats": {
+            "$ref": "#/components/schemas/GarageStatsDto"
+          },
+          "totalPaid": {
+            "type": "number",
+            "description": "購入總額（只有本人看得到）"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/GarageSettingsDto"
+          }
+        },
+        "required": [
+          "items",
+          "stats",
+          "totalPaid",
+          "settings"
+        ]
+      },
+      "CreateGarageItemDto": {
+        "type": "object",
+        "properties": {
+          "condition": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GarageCondition"
+              }
+            ]
+          },
+          "productId": {
+            "type": "string",
+            "description": "收藏本站商品；與 name 擇一",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "其他來源車款的名稱（未指定 productId 時必填）",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "brandName": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "scale": {
+            "type": "string",
+            "description": "比例，例如 1:64",
+            "pattern": "^1:\\d{1,3}$"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "pricePaid": {
+            "type": "number",
+            "description": "購入價（新台幣）",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "acquiredAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "isFavorite": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateGarageSettingsDto": {
+        "type": "object",
+        "properties": {
+          "public": {
+            "type": "boolean"
+          },
+          "handle": {
+            "type": "string",
+            "description": "3–20 個小寫英數字或連字號，公開時必填",
+            "pattern": "^[a-z0-9](?:[a-z0-9-]{1,18}[a-z0-9])$"
+          }
+        },
+        "required": [
+          "public"
+        ]
+      },
+      "UpdateGarageItemDto": {
+        "type": "object",
+        "properties": {
+          "condition": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GarageCondition"
+              }
+            ]
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "pricePaid": {
+            "type": "number",
+            "nullable": true,
+            "description": "設為 null 清除",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "acquiredAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          },
+          "isFavorite": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PublicGarageDto": {
+        "type": "object",
+        "properties": {
+          "tier": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
+          "handle": {
+            "type": "string"
+          },
+          "items": {
+            "description": "公開頁不含購入價與備註",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GarageItemDto"
+            }
+          },
+          "stats": {
+            "$ref": "#/components/schemas/GarageStatsDto"
+          }
+        },
+        "required": [
+          "tier",
+          "handle",
+          "items",
+          "stats"
+        ]
+      },
+      "EventType": {
+        "type": "string",
+        "enum": [
+          "EXHIBITION",
+          "MEETUP",
+          "LAUNCH",
+          "ONLINE"
+        ]
+      },
+      "EventSummaryDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventType"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "venue": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "nullable": true,
+            "description": "外部報名或活動頁"
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "slug",
+          "title",
+          "summary",
+          "startsAt",
+          "endsAt",
+          "venue",
+          "address",
+          "url",
+          "coverImageUrl"
+        ]
+      },
+      "EventListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventSummaryDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "EventDetailDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventType"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "venue": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "nullable": true,
+            "description": "外部報名或活動頁"
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "body": {
+            "type": "string",
+            "description": "活動說明（純文字，段落以空行分隔）"
+          },
+          "product": {
+            "nullable": true,
+            "description": "相關商品（例如發售活動的限量車款）",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductSummaryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "slug",
+          "title",
+          "summary",
+          "startsAt",
+          "endsAt",
+          "venue",
+          "address",
+          "url",
+          "coverImageUrl",
+          "body",
+          "product"
         ]
       },
       "DashboardKpisDto": {
@@ -5807,6 +7490,12 @@
               "$ref": "#/components/schemas/OrderPaymentDto"
             }
           },
+          "expectedShipAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "預購訂單的預計出貨時間（現貨訂單為 null）"
+          },
           "canPay": {
             "type": "boolean",
             "description": "是否可以（重新）付款"
@@ -5858,6 +7547,7 @@
           "createdAt",
           "items",
           "payments",
+          "expectedShipAt",
           "canPay",
           "canCancel"
         ]

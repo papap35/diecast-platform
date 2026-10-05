@@ -36,6 +36,8 @@ export interface SeedProduct {
   saleType?: 'REGULAR' | 'PRE_ORDER' | 'LIMITED';
   /** 相對種子執行時間的小時數 */
   releaseInHours?: number;
+  /** 會員等級優先購：開賣前幾分鐘開放給指定等級以上 */
+  earlyAccess?: { tier: 'DRIVER' | 'CHAMPION' | 'LEGEND'; minutesBefore: number };
   preorderClosesInDays?: number;
   expectedShipInDays?: number;
   purchaseLimit?: number;
@@ -591,6 +593,7 @@ export const PRODUCTS: SeedProduct[] = [
     stock: 300,
     saleType: 'LIMITED',
     releaseInHours: 50,
+    earlyAccess: { tier: 'DRIVER', minutesBefore: 60 },
     purchaseLimit: 2,
     isFeatured: true,
     specs: { ...DIECAST_64, edition: '300 pcs', features: 'Chrome plating' },
@@ -821,6 +824,7 @@ export const PRODUCTS: SeedProduct[] = [
     stock: 500,
     saleType: 'LIMITED',
     releaseInHours: 146,
+    earlyAccess: { tier: 'CHAMPION', minutesBefore: 30 },
     purchaseLimit: 1,
     specs: { ...RESIN_43, edition: '500 pcs', features: 'Numbered plinth' },
     art: {

@@ -156,6 +156,23 @@ export interface paths {
         patch: operations["Me_update"];
         trace?: never;
     };
+    "/v1/me/membership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 會員等級、累計消費、距離下一級的差額與各等級權益 */
+        get: operations["Me_membership"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/password": {
         parameters: {
             query?: never;
@@ -247,7 +264,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 商品列表：關鍵字搜尋、品牌／分類／比例／販售方式／狀態／價格篩選、排序、分頁 */
+        /**
+         * 商品列表：關鍵字搜尋、品牌／分類／比例／販售方式／狀態／價格篩選、排序、分頁。
+         *     帶會員權杖時，販售狀態會反映該會員的優先購資格。
+         */
         get: operations["Catalog_listProducts"];
         put?: never;
         post?: never;
@@ -264,7 +284,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 商品詳情 */
+        /** 商品詳情（帶會員權杖時反映優先購資格） */
         get: operations["Catalog_getProduct"];
         put?: never;
         post?: never;
@@ -511,6 +531,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 站內通知（新到舊），附未讀數 */
+        get: operations["Notifications_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 未讀數（頁首鈴鐺用） */
+        get: operations["Notifications_unreadCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 標示為已讀；不帶 ids 表示全部 */
+        post: operations["Notifications_markRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/orders/{orderNo}/payments": {
         parameters: {
             query?: never;
@@ -630,6 +701,209 @@ export interface paths {
         put?: never;
         /** 物流狀態通知，必須回應 `1|OK`，否則綠界會重送 */
         post: operations["EcpayLogisticsCallback_notify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/wishlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 願望清單（新到舊）；售完的商品補貨時會通知 */
+        get: operations["Wishlist_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/wishlist/ids": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 已加入的商品 id */
+        get: operations["Wishlist_ids"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/wishlist/{productId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 加入願望清單（重複加入不會出錯） */
+        put: operations["Wishlist_add"];
+        post?: never;
+        delete: operations["Wishlist_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 尚未開賣的發售提醒（依通知時間排序） */
+        get: operations["Reminders_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/reminders/ids": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 已設定提醒的商品 id */
+        get: operations["Reminders_ids"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/reminders/{productId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 設定發售提醒：開賣（或你的優先購開始）前 15 分鐘通知 */
+        put: operations["Reminders_add"];
+        post?: never;
+        delete: operations["Reminders_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/garage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 我的車庫：收藏清單、統計與公開設定 */
+        get: operations["Garage_get"];
+        put?: never;
+        /** 登錄一台收藏（本站商品或其他來源） */
+        post: operations["Garage_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/garage/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 公開設定：開啟後任何人都能以 /garage/{handle} 瀏覽（不含購入價與備註） */
+        put: operations["Garage_updateSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/garage/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["Garage_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["Garage_update"];
+        trace?: never;
+    };
+    "/v1/garages/{handle}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 公開車庫 */
+        get: operations["PublicGarage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 活動列表（尚未結束、依開始時間排序），可依期間與類型篩選 */
+        get: operations["Events_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/events/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Events_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -851,9 +1125,16 @@ export interface components {
             /** @description 是否同意收到新品與活動電子報 */
             marketingOptIn?: boolean;
         };
+        /**
+         * @description 會員等級（決定優先購資格與免運優惠）
+         * @enum {string}
+         */
+        MemberTier: "ROOKIE" | "DRIVER" | "CHAMPION" | "LEGEND";
         MemberProfileDto: {
             /** @enum {string} */
             locale: "zh-TW" | "en" | "zh-CN";
+            /** @description 會員等級（決定優先購資格與免運優惠） */
+            tier: components["schemas"]["MemberTier"];
             id: string;
             email: string;
             name: string;
@@ -903,6 +1184,32 @@ export interface components {
         AdminAuthResultDto: {
             admin: components["schemas"]["AdminProfileDto"];
             tokens: components["schemas"]["TokenPairDto"];
+        };
+        NextTierDto: {
+            tier: components["schemas"]["MemberTier"];
+            threshold: number;
+            /** @description 距離升級還差的消費金額 */
+            remaining: number;
+        };
+        TierInfoDto: {
+            tier: components["schemas"]["MemberTier"];
+            /** @description 累計消費門檻（新台幣） */
+            threshold: number;
+            /** @description 宅配免運門檻（0 表示一律免運） */
+            homeFreeShipping: number;
+            /** @description 超商取貨免運門檻（0 表示一律免運） */
+            cvsFreeShipping: number;
+            /** @description 可參加限量車款優先購（各商品另行設定開放的等級） */
+            earlyAccess: boolean;
+        };
+        MembershipDto: {
+            tier: components["schemas"]["MemberTier"];
+            /** @description 累計有效消費（已付款且未退款的訂單） */
+            totalSpent: number;
+            /** Format: date-time */
+            tierUpdatedAt: string | null;
+            next: components["schemas"]["NextTierDto"] | null;
+            tiers: components["schemas"]["TierInfoDto"][];
         };
         UpdateProfileDto: {
             /** @enum {string} */
@@ -959,6 +1266,8 @@ export interface components {
         };
         ProductSummaryDto: {
             saleType: components["schemas"]["SaleType"];
+            /** @description 優先購：達此等級的會員可在 earlyAccessAt 起提前購買 */
+            earlyAccessTier: components["schemas"]["MemberTier"] | null;
             availability: components["schemas"]["Availability"];
             id: string;
             slug: string;
@@ -977,6 +1286,8 @@ export interface components {
              * @description 開賣（或預購開放）時間
              */
             releaseAt: string | null;
+            /** Format: date-time */
+            earlyAccessAt: string | null;
             /** @description 低庫存時顯示剩餘數量，其餘情況為 null（不公開實際庫存） */
             remaining: number | null;
             imageUrl: string | null;
@@ -998,6 +1309,8 @@ export interface components {
         };
         ProductDetailDto: {
             saleType: components["schemas"]["SaleType"];
+            /** @description 優先購：達此等級的會員可在 earlyAccessAt 起提前購買 */
+            earlyAccessTier: components["schemas"]["MemberTier"] | null;
             availability: components["schemas"]["Availability"];
             /** @description 規格表，例如材質、輪胎、包裝 */
             specs: {
@@ -1031,6 +1344,8 @@ export interface components {
              * @description 開賣（或預購開放）時間
              */
             releaseAt: string | null;
+            /** Format: date-time */
+            earlyAccessAt: string | null;
             /** @description 低庫存時顯示剩餘數量，其餘情況為 null（不公開實際庫存） */
             remaining: number | null;
             imageUrl: string | null;
@@ -1080,6 +1395,7 @@ export interface components {
         AdminProductDto: {
             status: components["schemas"]["ProductStatus"];
             saleType: components["schemas"]["SaleType"];
+            earlyAccessTier: components["schemas"]["MemberTier"] | null;
             specs: {
                 [key: string]: string;
             };
@@ -1099,6 +1415,8 @@ export interface components {
             preorderClosesAt: string | null;
             /** Format: date-time */
             expectedShipAt: string | null;
+            /** Format: date-time */
+            earlyAccessAt: string | null;
             purchaseLimit: number | null;
             isFeatured: boolean;
             translations: components["schemas"]["ProductTranslationDto"][];
@@ -1125,6 +1443,8 @@ export interface components {
         CreateProductDto: {
             status: components["schemas"]["ProductStatus"];
             saleType: components["schemas"]["SaleType"];
+            /** @description 優先購開放的最低會員等級（需同時設定 earlyAccessAt） */
+            earlyAccessTier?: components["schemas"]["MemberTier"] | null;
             specs?: {
                 [key: string]: string;
             };
@@ -1146,6 +1466,11 @@ export interface components {
             preorderClosesAt?: string | null;
             /** Format: date-time */
             expectedShipAt?: string | null;
+            /**
+             * Format: date-time
+             * @description 優先購開始時間（需早於 releaseAt）
+             */
+            earlyAccessAt?: string | null;
             purchaseLimit?: number | null;
             isFeatured?: boolean;
             /** @description 至少需要繁體中文（zh-TW） */
@@ -1155,6 +1480,8 @@ export interface components {
         UpdateProductDto: {
             status?: components["schemas"]["ProductStatus"];
             saleType?: components["schemas"]["SaleType"];
+            /** @description 優先購開放的最低會員等級（需同時設定 earlyAccessAt） */
+            earlyAccessTier?: components["schemas"]["MemberTier"] | null;
             specs?: {
                 [key: string]: string;
             };
@@ -1174,6 +1501,11 @@ export interface components {
             preorderClosesAt?: string | null;
             /** Format: date-time */
             expectedShipAt?: string | null;
+            /**
+             * Format: date-time
+             * @description 優先購開始時間（需早於 releaseAt）
+             */
+            earlyAccessAt?: string | null;
             purchaseLimit?: number | null;
             isFeatured?: boolean;
             /** @description 至少需要繁體中文（zh-TW） */
@@ -1297,15 +1629,18 @@ export interface components {
             method: components["schemas"]["ShippingMethod"];
             /** @description 依目前小計計算的運費 */
             fee: number;
-            /** @description 免運門檻 */
+            /** @description 免運門檻（依會員等級，0 表示一律免運） */
             freeThreshold: number;
         };
         CartDto: {
             items: components["schemas"]["CartItemDto"][];
             itemCount: number;
             subtotal: number;
-            /** @description 是否有商品需要調整才能結帳 */
+            /** @description 是否有商品需要調整才能結帳（含預購與現貨混在一起） */
             hasIssues: boolean;
+            /** @description 預購商品與現貨同時在購物車：需分開結帳 */
+            preorderMixed: boolean;
+            /** @description 免運門檻已套用會員等級優惠 */
             shippingOptions: components["schemas"]["ShippingOptionDto"][];
         };
         SetCartItemDto: {
@@ -1464,6 +1799,11 @@ export interface components {
             shipment: components["schemas"]["OrderShipmentDto"] | null;
             /** @description 電子發票（付款成功後開立） */
             invoice: components["schemas"]["OrderInvoiceDto"] | null;
+            /**
+             * Format: date-time
+             * @description 預購訂單的預計出貨時間（現貨訂單為 null）
+             */
+            expectedShipAt: string | null;
             /** @description 是否可以（重新）付款 */
             canPay: boolean;
             /** @description 會員是否可自行取消 */
@@ -1485,6 +1825,35 @@ export interface components {
         OrderListDto: {
             data: components["schemas"]["OrderSummaryDto"][];
             meta: components["schemas"]["PageMeta"];
+        };
+        /** @enum {string} */
+        NotificationType: "ORDER_PAID" | "ORDER_SHIPPED" | "ORDER_ARRIVED" | "ORDER_CANCELLED" | "ORDER_REFUNDED" | "RELEASE_REMINDER" | "WISHLIST_RESTOCK" | "TIER_UPGRADED";
+        NotificationDto: {
+            type: components["schemas"]["NotificationType"];
+            id: string;
+            title: string;
+            body: string;
+            /** @description 前台路徑（不含語系），例如 /account/orders/P64… */
+            link: string | null;
+            /** Format: date-time */
+            readAt: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        NotificationListDto: {
+            data: components["schemas"]["NotificationDto"][];
+            meta: components["schemas"]["PageMeta"];
+            unreadCount: number;
+        };
+        UnreadCountDto: {
+            count: number;
+        };
+        MarkReadDto: {
+            /** @description 要標示為已讀的通知；省略表示全部 */
+            ids?: string[];
+        };
+        MarkReadResultDto: {
+            updated: number;
         };
         StartPaymentDto: {
             /**
@@ -1540,6 +1909,168 @@ export interface components {
             storeId: string;
             storeName: string;
             storeAddress: string;
+        };
+        WishlistItemDto: {
+            product: components["schemas"]["ProductSummaryDto"];
+            /** Format: date-time */
+            addedAt: string;
+        };
+        WishlistDto: {
+            data: components["schemas"]["WishlistItemDto"][];
+        };
+        ProductIdListDto: {
+            ids: string[];
+        };
+        ReminderDto: {
+            product: components["schemas"]["ProductSummaryDto"];
+            /**
+             * Format: date-time
+             * @description 通知時間：開賣（符合優先購資格時為優先購開始）前 15 分鐘
+             */
+            remindAt: string;
+            /** Format: date-time */
+            notifiedAt: string | null;
+        };
+        ReminderListDto: {
+            data: components["schemas"]["ReminderDto"][];
+        };
+        /** @enum {string} */
+        GarageCondition: "SEALED" | "OPENED" | "DISPLAYED" | "PLAYWORN";
+        GarageItemDto: {
+            condition: components["schemas"]["GarageCondition"];
+            /**
+             * @description ORDER：本站訂單完成後自動入庫；MANUAL：會員自行登錄
+             * @enum {string}
+             */
+            source: "ORDER" | "MANUAL";
+            id: string;
+            /** @description 本站商品（可連到商品頁）；手動登錄的其他來源車款為 null */
+            productId: string | null;
+            productSlug: string | null;
+            /** @description 本站商品依語系顯示目前名稱，其餘為登錄時的名稱 */
+            name: string;
+            brandName: string | null;
+            scale: string | null;
+            imageUrl: string | null;
+            quantity: number;
+            /** @description 購入價（只有本人看得到；公開車庫不會回傳） */
+            pricePaid: number | null;
+            /** Format: date-time */
+            acquiredAt: string | null;
+            note: string | null;
+            isFavorite: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CountByDto: {
+            label: string;
+            count: number;
+        };
+        GarageStatsDto: {
+            /** @description 車款數（筆數） */
+            models: number;
+            /** @description 總台數（含重複收藏） */
+            cars: number;
+            /** @description 依品牌（台數多到少，前 8 名） */
+            brands: components["schemas"]["CountByDto"][];
+            /** @description 依比例 */
+            scales: components["schemas"]["CountByDto"][];
+        };
+        GarageSettingsDto: {
+            public: boolean;
+            /** @description 公開車庫網址：/garage/{handle} */
+            handle: string | null;
+        };
+        GarageDto: {
+            items: components["schemas"]["GarageItemDto"][];
+            stats: components["schemas"]["GarageStatsDto"];
+            /** @description 購入總額（只有本人看得到） */
+            totalPaid: number;
+            settings: components["schemas"]["GarageSettingsDto"];
+        };
+        CreateGarageItemDto: {
+            condition?: components["schemas"]["GarageCondition"];
+            /**
+             * Format: uuid
+             * @description 收藏本站商品；與 name 擇一
+             */
+            productId?: string;
+            /** @description 其他來源車款的名稱（未指定 productId 時必填） */
+            name?: string;
+            brandName?: string;
+            /** @description 比例，例如 1:64 */
+            scale?: string;
+            quantity?: number;
+            /** @description 購入價（新台幣） */
+            pricePaid?: number;
+            /** Format: date-time */
+            acquiredAt?: string;
+            note?: string;
+            isFavorite?: boolean;
+        };
+        UpdateGarageSettingsDto: {
+            public: boolean;
+            /** @description 3–20 個小寫英數字或連字號，公開時必填 */
+            handle?: string;
+        };
+        UpdateGarageItemDto: {
+            condition?: components["schemas"]["GarageCondition"];
+            quantity?: number;
+            /** @description 設為 null 清除 */
+            pricePaid?: number | null;
+            /** Format: date-time */
+            acquiredAt?: string | null;
+            note?: string | null;
+            isFavorite?: boolean;
+        };
+        PublicGarageDto: {
+            tier: components["schemas"]["MemberTier"];
+            handle: string;
+            /** @description 公開頁不含購入價與備註 */
+            items: components["schemas"]["GarageItemDto"][];
+            stats: components["schemas"]["GarageStatsDto"];
+        };
+        /** @enum {string} */
+        EventType: "EXHIBITION" | "MEETUP" | "LAUNCH" | "ONLINE";
+        EventSummaryDto: {
+            type: components["schemas"]["EventType"];
+            id: string;
+            slug: string;
+            title: string;
+            summary: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string | null;
+            venue: string | null;
+            address: string | null;
+            /** @description 外部報名或活動頁 */
+            url: string | null;
+            coverImageUrl: string | null;
+        };
+        EventListDto: {
+            data: components["schemas"]["EventSummaryDto"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        EventDetailDto: {
+            type: components["schemas"]["EventType"];
+            id: string;
+            slug: string;
+            title: string;
+            summary: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string | null;
+            venue: string | null;
+            address: string | null;
+            /** @description 外部報名或活動頁 */
+            url: string | null;
+            coverImageUrl: string | null;
+            /** @description 活動說明（純文字，段落以空行分隔） */
+            body: string;
+            /** @description 相關商品（例如發售活動的限量車款） */
+            product: components["schemas"]["ProductSummaryDto"] | null;
         };
         DashboardKpisDto: {
             /** @description 今日（台灣時間）已付款營收 */
@@ -1732,6 +2263,11 @@ export interface components {
             createdAt: string;
             items: components["schemas"]["OrderItemDto"][];
             payments: components["schemas"]["OrderPaymentDto"][];
+            /**
+             * Format: date-time
+             * @description 預購訂單的預計出貨時間（現貨訂單為 null）
+             */
+            expectedShipAt: string | null;
             /** @description 是否可以（重新）付款 */
             canPay: boolean;
             /** @description 會員是否可自行取消 */
@@ -2036,6 +2572,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberProfileDto"];
+                };
+            };
+        };
+    };
+    Me_membership: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipDto"];
                 };
             };
         };
@@ -2749,6 +3304,70 @@ export interface operations {
             };
         };
     };
+    Notifications_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationListDto"];
+                };
+            };
+        };
+    };
+    Notifications_unreadCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadCountDto"];
+                };
+            };
+        };
+    };
+    Notifications_markRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkReadDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarkReadResultDto"];
+                };
+            };
+        };
+    };
     Payments_start: {
         parameters: {
             query?: {
@@ -2890,6 +3509,351 @@ export interface operations {
                 };
                 content: {
                     "application/json": string;
+                };
+            };
+        };
+    };
+    Wishlist_list: {
+        parameters: {
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WishlistDto"];
+                };
+            };
+        };
+    };
+    Wishlist_ids: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductIdListDto"];
+                };
+            };
+        };
+    };
+    Wishlist_add: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Wishlist_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Reminders_list: {
+        parameters: {
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderListDto"];
+                };
+            };
+        };
+    };
+    Reminders_ids: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductIdListDto"];
+                };
+            };
+        };
+    };
+    Reminders_add: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Reminders_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Garage_get: {
+        parameters: {
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GarageDto"];
+                };
+            };
+        };
+    };
+    Garage_create: {
+        parameters: {
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGarageItemDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GarageItemDto"];
+                };
+            };
+        };
+    };
+    Garage_updateSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGarageSettingsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GarageSettingsDto"];
+                };
+            };
+        };
+    };
+    Garage_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Garage_update: {
+        parameters: {
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGarageItemDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GarageItemDto"];
+                };
+            };
+        };
+    };
+    PublicGarage_get: {
+        parameters: {
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicGarageDto"];
+                };
+            };
+        };
+    };
+    Events_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                locale?: "zh-TW" | "en" | "zh-CN";
+                type?: components["schemas"]["EventType"];
+                /** @description 結束時間在此之後（預設：現在，只列尚未結束的活動） */
+                from?: string;
+                /** @description 開始時間在此之前 */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventListDto"];
+                };
+            };
+        };
+    };
+    Events_get: {
+        parameters: {
+            query?: {
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventDetailDto"];
                 };
             };
         };

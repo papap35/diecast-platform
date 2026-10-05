@@ -4,7 +4,7 @@ import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import { toPublicUrl } from '../../common/http/media.js';
 import { pageMeta, skipTake } from '../../common/http/pagination.dto.js';
 import { type Locale, pickTranslation } from '../../common/i18n/locale.js';
-import type { Prisma } from '../../generated/prisma/client.js';
+import type { MemberTier, Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { Availability, computeAvailability, LOW_STOCK_THRESHOLD } from './availability.js';
 import type {
@@ -120,8 +120,13 @@ export class CatalogService {
     return groups.map((g) => ({ scale: g.scale, productCount: g._count._all }));
   }
 
-  async listProducts(query: ProductListQueryDto, locale: Locale): Promise<ProductListDto> {
+  async listProducts(
+    query: ProductListQueryDto,
+    locale: Locale,
+    memberId?: string,
+  ): Promise<ProductListDto> {
     const where = await this.buildWhere(query);
+    const tier = await this.memberTier(memberId);
     const [total, products] = await this.prisma.$transaction([
       this.prisma.product.count({ where }),
       this.prisma.product.findMany({
@@ -132,21 +137,21 @@ export class CatalogService {
       }),
     ]);
     return {
-      data: products.map((product) => this.toSummary(product, locale)),
+      data: products.map((product) => this.toSummary(product, locale, new Date(), tier)),
       meta: pageMeta(query.page, query.pageSize, total),
     };
   }
 
-  async getProduct(slug: string, locale: Locale): Promise<ProductDetailDto> {
-    const product = await this.prisma.product.findFirst({
-      where: { slug, status: 'ACTIVE' },
-      include: productDetailInclude,
-    });
+  async getProduct(slug: string, locale: Locale, memberId?: string): Promise<ProductDetailDto> {
+    const [product, tier] = await Promise.all([
+      this.prisma.product.findFirst({ where: { slug, status: 'ACTIVE' }, include: productDetailInclude }),
+      this.memberTier(memberId),
+    ]);
     if (!product) throw AppException.notFound(ErrorCode.PRODUCT_NOT_FOUND, '找不到這個商品');
 
     const t = pickTranslation(product.translations, locale);
     return {
-      ...this.toSummary(product, locale),
+      ...this.toSummary(product, locale, new Date(), tier),
       description: t?.description ?? '',
       specs: (product.specs as Record<string, string> | null) ?? {},
       images: product.images.map((image) => ({ url: this.mediaUrl(image.url), alt: image.alt })),
@@ -156,10 +161,25 @@ export class CatalogService {
     };
   }
 
-  toSummary(product: ProductWithSummary, locale: Locale, now = new Date()): ProductSummaryDto {
+  /** 登入會員的等級（決定優先購資格）；未登入為 undefined */
+  async memberTier(memberId?: string): Promise<MemberTier | undefined> {
+    if (!memberId) return undefined;
+    const member = await this.prisma.member.findUnique({
+      where: { id: memberId },
+      select: { tier: true, status: true },
+    });
+    return member?.status === 'ACTIVE' ? member.tier : undefined;
+  }
+
+  toSummary(
+    product: ProductWithSummary,
+    locale: Locale,
+    now = new Date(),
+    tier?: MemberTier,
+  ): ProductSummaryDto {
     const t = pickTranslation(product.translations, locale);
     const categoryT = pickTranslation(product.category.translations, locale);
-    const availability = computeAvailability(product, now);
+    const availability = computeAvailability(product, now, tier);
     const image = product.images[0];
     return {
       id: product.id,
@@ -178,6 +198,8 @@ export class CatalogService {
       compareAtPrice: product.compareAtPrice,
       saleType: product.saleType,
       releaseAt: product.releaseAt,
+      earlyAccessTier: product.earlyAccessTier,
+      earlyAccessAt: product.earlyAccessAt,
       availability,
       remaining:
         availability === Availability.LOW_STOCK ||

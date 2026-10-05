@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import type { Prisma, StockMovementReason } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
+import { DropGateService } from './drop-gate.service.js';
 
 export interface MovementContext {
   reason: StockMovementReason;
@@ -19,7 +20,10 @@ type Tx = Prisma.TransactionClient;
  */
 @Injectable()
 export class InventoryService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly gate: DropGateService,
+  ) {}
 
   /** 原子扣減；庫存不足時回傳 null，由呼叫端決定如何處理（通常整筆交易回滾） */
   async decrement(
@@ -38,6 +42,7 @@ export class InventoryService {
     return row.stock;
   }
 
+  /** 回補庫存；從 0 補回有貨時記下補貨時間（通知把商品加入願望清單的會員） */
   async increment(
     tx: Tx,
     productId: string,
@@ -45,7 +50,8 @@ export class InventoryService {
     ctx: MovementContext,
   ): Promise<number> {
     const rows = await tx.$queryRaw<{ stock: number }[]>`
-      UPDATE "Product" SET "stock" = "stock" + ${quantity}, "updatedAt" = now()
+      UPDATE "Product" SET "stock" = "stock" + ${quantity}, "updatedAt" = now(),
+        "restockedAt" = CASE WHEN "stock" <= 0 AND ${quantity} > 0 THEN now() ELSE "restockedAt" END
       WHERE "id" = ${productId}::uuid
       RETURNING "stock"`;
     const row = rows[0];
@@ -56,7 +62,7 @@ export class InventoryService {
 
   /** 後台手動調整庫存（以增減量表示，避免覆寫掉同時間成立的訂單扣量） */
   async adjust(productId: string, delta: number, actorId: string, note?: string): Promise<number> {
-    return this.prisma.$transaction(async (tx) => {
+    const stock = await this.prisma.$transaction(async (tx) => {
       const ctx: MovementContext = { reason: 'ADMIN_ADJUSTMENT', actorId, note };
       if (delta >= 0) return this.increment(tx, productId, delta, ctx);
       const stock = await this.decrement(tx, productId, -delta, ctx);
@@ -65,6 +71,8 @@ export class InventoryService {
       }
       return stock;
     });
+    await this.gate.invalidate([productId]);
+    return stock;
   }
 
   private async record(

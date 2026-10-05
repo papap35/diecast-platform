@@ -1,4 +1,4 @@
-import type { OrderStatus, ShippingMethod } from '../../generated/prisma/client.js';
+import type { MemberTier, OrderStatus, ShippingMethod } from '../../generated/prisma/client.js';
 
 export interface ShippingRate {
   fee: number;
@@ -15,9 +15,19 @@ export const SHIPPING_RATES: Record<ShippingMethod, ShippingRate> = {
   CVS_OKMART: { fee: 60, freeThreshold: 1000 },
 };
 
-export function calculateShippingFee(method: ShippingMethod, subtotal: number): number {
-  const rate = SHIPPING_RATES[method];
-  return subtotal >= rate.freeThreshold ? 0 : rate.fee;
+/** 會員等級的免運優惠：冠軍車手門檻打六折，傳奇車手全站免運 */
+export function freeShippingThreshold(method: ShippingMethod, tier: MemberTier = 'ROOKIE'): number {
+  if (tier === 'LEGEND') return 0;
+  const base = SHIPPING_RATES[method].freeThreshold;
+  return tier === 'CHAMPION' ? Math.round(base * 0.6) : base;
+}
+
+export function calculateShippingFee(
+  method: ShippingMethod,
+  subtotal: number,
+  tier: MemberTier = 'ROOKIE',
+): number {
+  return subtotal >= freeShippingThreshold(method, tier) ? 0 : SHIPPING_RATES[method].fee;
 }
 
 export function isConvenienceStore(method: ShippingMethod): boolean {

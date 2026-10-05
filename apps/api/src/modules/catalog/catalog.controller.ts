@@ -2,6 +2,8 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiLocaleQuery, ReqLocale } from '../../common/i18n/locale.decorator.js';
 import type { Locale } from '../../common/i18n/locale.js';
+import type { MemberPrincipal } from '../auth/auth.types.js';
+import { CurrentMember, OptionalMemberAuth } from '../auth/decorators.js';
 import { CatalogService } from './catalog.service.js';
 import {
   BrandDto,
@@ -43,19 +45,29 @@ export class CatalogController {
     return this.catalog.listScales();
   }
 
-  /** 商品列表：關鍵字搜尋、品牌／分類／比例／販售方式／狀態／價格篩選、排序、分頁 */
+  /**
+   * 商品列表：關鍵字搜尋、品牌／分類／比例／販售方式／狀態／價格篩選、排序、分頁。
+   * 帶會員權杖時，販售狀態會反映該會員的優先購資格。
+   */
   @Get('products')
+  @OptionalMemberAuth()
   listProducts(
     @Query() query: ProductListQueryDto,
     @ReqLocale() locale: Locale,
+    @CurrentMember() member?: MemberPrincipal,
   ): Promise<ProductListDto> {
-    return this.catalog.listProducts(query, locale);
+    return this.catalog.listProducts(query, locale, member?.id);
   }
 
-  /** 商品詳情 */
+  /** 商品詳情（帶會員權杖時反映優先購資格） */
   @Get('products/:slug')
+  @OptionalMemberAuth()
   @ApiLocaleQuery()
-  getProduct(@Param('slug') slug: string, @ReqLocale() locale: Locale): Promise<ProductDetailDto> {
-    return this.catalog.getProduct(slug, locale);
+  getProduct(
+    @Param('slug') slug: string,
+    @ReqLocale() locale: Locale,
+    @CurrentMember() member?: MemberPrincipal,
+  ): Promise<ProductDetailDto> {
+    return this.catalog.getProduct(slug, locale, member?.id);
   }
 }

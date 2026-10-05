@@ -20,7 +20,12 @@ import {
 } from 'class-validator';
 import { PageMeta, PaginationQuery } from '../../../common/http/pagination.dto.js';
 import { SUPPORTED_LOCALES } from '../../../common/i18n/locale.js';
-import { ProductStatus, SaleType, StockMovementReason } from '../../../generated/prisma/enums.js';
+import {
+  MemberTier,
+  ProductStatus,
+  SaleType,
+  StockMovementReason,
+} from '../../../generated/prisma/enums.js';
 import { Availability } from '../availability.js';
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -120,6 +125,18 @@ export class CreateProductDto {
   @Type(() => Date)
   @IsDate()
   expectedShipAt?: Date | null;
+
+  /** 優先購開放的最低會員等級（需同時設定 earlyAccessAt） */
+  @ApiPropertyOptional({ enum: MemberTier, enumName: 'MemberTier', nullable: true })
+  @IsOptional()
+  @IsIn(Object.values(MemberTier))
+  earlyAccessTier?: MemberTier | null;
+
+  /** 優先購開始時間（需早於 releaseAt） */
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  earlyAccessAt?: Date | null;
 
   @IsOptional()
   @IsInt()
@@ -271,6 +288,9 @@ export class AdminProductDto {
   releaseAt!: Date | null;
   preorderClosesAt!: Date | null;
   expectedShipAt!: Date | null;
+  @ApiProperty({ enum: MemberTier, enumName: 'MemberTier', nullable: true })
+  earlyAccessTier!: MemberTier | null;
+  earlyAccessAt!: Date | null;
   purchaseLimit!: number | null;
   isFeatured!: boolean;
   @ApiProperty({ type: 'object', additionalProperties: { type: 'string' } })

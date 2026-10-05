@@ -10,6 +10,14 @@ describe('calculateShippingFee', () => {
     expect(calculateShippingFee('CVS_711', 999)).toBe(60);
     expect(calculateShippingFee('CVS_FAMILY', 1000)).toBe(0);
   });
+
+  it('冠軍車手免運門檻打六折，傳奇車手全站免運', () => {
+    expect(calculateShippingFee('CVS_711', 599, 'CHAMPION')).toBe(60);
+    expect(calculateShippingFee('CVS_711', 600, 'CHAMPION')).toBe(0);
+    expect(calculateShippingFee('HOME_DELIVERY', 899, 'CHAMPION')).toBe(120);
+    expect(calculateShippingFee('HOME_DELIVERY', 1, 'LEGEND')).toBe(0);
+    expect(calculateShippingFee('CVS_711', 999, 'DRIVER')).toBe(60);
+  });
 });
 
 describe('訂單狀態機', () => {

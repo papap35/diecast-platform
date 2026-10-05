@@ -53,6 +53,11 @@ const envSchema = z.object({
   ECPAY_INVOICE_HASH_KEY: z.string().default(''),
   ECPAY_INVOICE_HASH_IV: z.string().default(''),
 
+  /** Email：log 只寫入紀錄（開發、示範）；resend 透過 Resend HTTP API 寄出 */
+  EMAIL_PROVIDER: z.enum(['log', 'resend']).default('log'),
+  RESEND_API_KEY: z.string().default(''),
+  EMAIL_FROM: z.string().default('Paddock 64 <noreply@paddock64.dev>'),
+
   SWAGGER_ENABLED: z
     .enum(['true', 'false'])
     .default('true')
