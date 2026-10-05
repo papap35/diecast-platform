@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-canvas: #f4f4f2;
+  --color-surface: #ffffff;
+  --color-ink: #16161a;
+  --color-ink-2: #3d3d45;
+  --color-mute: #6b6b74;
+  --color-faint: #9b9ba3;
+  --color-line: #e7e5e0;
+  --color-line-strong: #d4d1c9;
+  --color-accent: #d7261e;
+  --color-accent-dark: #a91c15;
+  --color-accent-soft: #fdecea;
+  --color-gold: #9a6f0e;
+  --color-gold-soft: #fbf3dd;
+  --color-ok: #15803d;
+  --color-ok-soft: #e8f5ec;
+  --color-warn: #b45309;
+  --color-warn-soft: #fdf1e3;
+  --color-info: #1d4ed8;
+  --color-info-soft: #e8eefc;
+  /* 圖表色（dataviz 預設色盤 slot 1，已通過對比度驗證） */
+  --color-series-1: #2a78d6;
+  --color-grid: #ebeae6;
+
+  --font-sans: var(--font-body), 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  --font-display: var(--font-display-latin), var(--font-body), system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-series-1;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl bg-surface ring-1 ring-line;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .table-base {
+    @apply w-full text-left text-sm;
+  }
+
+  .table-base th {
+    @apply border-b border-line px-4 py-2.5 text-xs font-semibold whitespace-nowrap text-mute;
+  }
+
+  .table-base td {
+    @apply border-b border-line px-4 py-3 align-middle;
+  }
+
+  .table-base tbody tr:last-child td {
+    @apply border-b-0;
+  }
+}
