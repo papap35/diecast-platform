@@ -188,6 +188,7 @@ model Product {
   images           ProductImage[]
   cartItems        CartItem[]
   orderItems       OrderItem[]
+  stockMovements   StockMovement[]
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
 
@@ -217,6 +218,29 @@ model ProductImage {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId, sortOrder])
+}
+
+enum StockMovementReason {
+  ADMIN_ADJUSTMENT
+  ORDER_PLACED
+  ORDER_CANCELLED
+  ORDER_EXPIRED
+}
+
+/// 庫存異動帳：每一次增減都留下紀錄與異動後餘額，方便對帳與追查超賣問題
+model StockMovement {
+  id        String              @id @default(uuid(7)) @db.Uuid
+  productId String              @db.Uuid
+  product   Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  delta     Int
+  balance   Int
+  reason    StockMovementReason
+  orderId   String?             @db.Uuid
+  actorId   String?             @db.Uuid
+  note      String?
+  createdAt DateTime            @default(now())
+
+  @@index([productId, createdAt])
 }
 
 // ─────────────────────────────────────────────
@@ -357,6 +381,8 @@ model Payment {
   providerTradeNo String?
   amount          Int
   method          String?
+  /// 付款完成後導回的前台網址（Web 或 App deep link）
+  returnUrl       String?
   rawNotify       Json?
   paidAt          DateTime?
   failedReason    String?

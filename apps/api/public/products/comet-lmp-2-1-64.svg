@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img">
+  <defs>
+    <linearGradient id="pl64002-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6f6f4"/>
+      <stop offset="1" stop-color="#e4e3df"/>
+    </linearGradient>
+    <radialGradient id="pl64002-shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pl64002-shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.55"/>
+      <stop offset="0.45" stop-color="#fff" stop-opacity="0.08"/>
+      <stop offset="0.6" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.28"/>
+    </linearGradient>
+    <linearGradient id="pl64002-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b3440"/>
+      <stop offset="0.55" stop-color="#11161d"/>
+      <stop offset="1" stop-color="#3a4553"/>
+    </linearGradient>
+    <radialGradient id="pl64002-rim" cx="0.4" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#e4e6e8"/>
+      <stop offset="1" stop-color="#97999d"/>
+    </radialGradient>
+    <radialGradient id="pl64002-spot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pl64002-plinth" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a3c42"/>
+      <stop offset="1" stop-color="#26272b"/>
+    </linearGradient>
+    <clipPath id="pl64002-clip"><path d="M 30 330 L 28 280 C 30 254 50 238 92 234 L 300 226
+      C 380 218 430 176 492 158 C 532 148 584 148 620 160 C 664 176 700 214 760 230
+      L 940 256 C 974 264 992 282 992 304 L 986 330 L 884 330 A 76 76 0 0 0 732 330 L 282 330 A 76 76 0 0 0 130 330 Z"/></clipPath>
+  </defs>
+  <rect width="1200" height="900" fill="url(#pl64002-bg)"/>
+  <ellipse cx="600" cy="430" rx="560" ry="330" fill="url(#pl64002-spot)"/>
+  <path d="M 120 664 L 1080 664 L 1120 724 L 80 724 Z" fill="url(#pl64002-plinth)"/>
+  <rect x="80" y="724" width="1040" height="26" fill="#1b1c20"/>
+  <path d="M 120 664 L 1080 664 L 1086 672 L 114 672 Z" fill="#ffffff" opacity="0.18"/>
+  <ellipse cx="600" cy="664" rx="520" ry="22" fill="url(#pl64002-shadow)"/>
+  <g transform="translate(80 266) scale(1.04)">
+    <path d="M 28 180 L 186 174 L 188 194 L 32 200 Z M 70 198 L 84 198 L 84 236 L 70 236 Z M 150 196 L 164 196 L 164 230 L 150 230 Z" fill="#062250"/>
+    
+    <circle cx="206" cy="330" r="75" fill="#0f0f12"/><circle cx="808" cy="330" r="75" fill="#0f0f12"/>
+    <path d="M 30 330 L 28 280 C 30 254 50 238 92 234 L 300 226
+      C 380 218 430 176 492 158 C 532 148 584 148 620 160 C 664 176 700 214 760 230
+      L 940 256 C 974 264 992 282 992 304 L 986 330 L 884 330 A 76 76 0 0 0 732 330 L 282 330 A 76 76 0 0 0 130 330 Z" fill="#0b3d91"/>
+    <g clip-path="url(#pl64002-clip)">
+      <path d="M 250 400 L 510 232 L 610 232 L 350 400 Z" fill="#ffffff"/>
+        <path d="M 750 400 L 910 222 L 970 222 L 810 400 Z" fill="#ffffff" opacity="0.85"/>
+        <circle cx="580" cy="292" r="38" fill="#ffffff" stroke="#111" stroke-width="4"/>
+               <text x="580" y="306" font-family="Arial Black, Arial, sans-serif" font-size="40" font-weight="900" text-anchor="middle" fill="#111">2</text>
+      <rect x="0" y="0" width="1000" height="400" fill="url(#pl64002-shine)"/>
+      <line x1="470" y1="212" x2="478" y2="330" stroke="#07285e" stroke-width="3" opacity="0.6"/>
+      <line x1="690" y1="212" x2="684" y2="330" stroke="#07285e" stroke-width="3" opacity="0.6"/>
+    </g>
+    <path d="M 470 210 C 500 186 532 170 566 168 L 618 170 C 646 182 668 200 686 218 Z" fill="url(#pl64002-glass)"/>
+    <g clip-path="url(#pl64002-clip)"></g>
+    <path d="M 470 210 C 500 186 532 170 566 168 L 618 170 C 646 182 668 200 686 218 Z" fill="none" stroke="#0b0d10" stroke-width="5" stroke-linejoin="round"/>
+    <ellipse cx="958" cy="276" rx="26" ry="12" fill="#fff6d8" stroke="#07285e" stroke-width="3"/>
+    <rect x="26" y="252" width="22" height="20" rx="4" fill="#d3262f"/>
+    <g>
+    <circle cx="206" cy="322" r="64" fill="#17171a"/>
+    <circle cx="206" cy="322" r="55.04" fill="#232327"/>
+    <circle cx="206" cy="322" r="39.68" fill="url(#pl64002-rim)"/>
+    <line x1="206" y1="322" x2="236.7" y2="322.0" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="206" y1="322" x2="215.5" y2="351.2" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="206" y1="322" x2="181.1" y2="340.1" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="206" y1="322" x2="181.1" y2="303.9" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="206" y1="322" x2="215.5" y2="292.8" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/>
+    <circle cx="206" cy="322" r="8.96" fill="#d7d9dd"/>
+  </g>
+    <g>
+    <circle cx="808" cy="322" r="64" fill="#17171a"/>
+    <circle cx="808" cy="322" r="55.04" fill="#232327"/>
+    <circle cx="808" cy="322" r="39.68" fill="url(#pl64002-rim)"/>
+    <line x1="808" y1="322" x2="838.7" y2="322.0" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="808" y1="322" x2="817.5" y2="351.2" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="808" y1="322" x2="783.1" y2="340.1" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="808" y1="322" x2="783.1" y2="303.9" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="808" y1="322" x2="817.5" y2="292.8" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/>
+    <circle cx="808" cy="322" r="8.96" fill="#d7d9dd"/>
+  </g>
+  </g>
+</svg>

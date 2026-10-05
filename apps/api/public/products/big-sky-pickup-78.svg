@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img">
+  <defs>
+    <linearGradient id="ax64201-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6f6f4"/>
+      <stop offset="1" stop-color="#e4e3df"/>
+    </linearGradient>
+    <radialGradient id="ax64201-shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ax64201-shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.55"/>
+      <stop offset="0.45" stop-color="#fff" stop-opacity="0.08"/>
+      <stop offset="0.6" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.28"/>
+    </linearGradient>
+    <linearGradient id="ax64201-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b3440"/>
+      <stop offset="0.55" stop-color="#11161d"/>
+      <stop offset="1" stop-color="#3a4553"/>
+    </linearGradient>
+    <radialGradient id="ax64201-rim" cx="0.4" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#e4e6e8"/>
+      <stop offset="1" stop-color="#97999d"/>
+    </radialGradient>
+    <radialGradient id="ax64201-spot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ax64201-plinth" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a3c42"/>
+      <stop offset="1" stop-color="#26272b"/>
+    </linearGradient>
+    <clipPath id="ax64201-clip"><path d="M 40 330 L 40 222 L 420 222 L 424 128 C 426 104 444 92 470 92 L 600 92
+      C 636 94 664 120 690 170 L 714 214 L 900 230 C 936 236 956 256 956 286 L 952 330
+      L 866 330 A 76 76 0 0 0 714 330 L 290 330 A 76 76 0 0 0 138 330 Z"/></clipPath>
+  </defs>
+  <rect width="1200" height="900" fill="url(#ax64201-bg)"/>
+  <ellipse cx="600" cy="430" rx="560" ry="330" fill="url(#ax64201-spot)"/>
+  <path d="M 120 664 L 1080 664 L 1120 724 L 80 724 Z" fill="url(#ax64201-plinth)"/>
+  <rect x="80" y="724" width="1040" height="26" fill="#1b1c20"/>
+  <path d="M 120 664 L 1080 664 L 1086 672 L 114 672 Z" fill="#ffffff" opacity="0.18"/>
+  <ellipse cx="600" cy="664" rx="520" ry="22" fill="url(#ax64201-shadow)"/>
+  <g transform="translate(80 266) scale(1.04)">
+    
+    
+    <circle cx="214" cy="330" r="75" fill="#0f0f12"/><circle cx="790" cy="330" r="75" fill="#0f0f12"/>
+    <path d="M 40 330 L 40 222 L 420 222 L 424 128 C 426 104 444 92 470 92 L 600 92
+      C 636 94 664 120 690 170 L 714 214 L 900 230 C 936 236 956 256 956 286 L 952 330
+      L 866 330 A 76 76 0 0 0 714 330 L 290 330 A 76 76 0 0 0 138 330 Z" fill="#2f5d8a"/>
+    <g clip-path="url(#ax64201-clip)">
+      <rect x="0" y="256" width="1000" height="200" fill="#efe6cf"/>
+        <rect x="0" y="252" width="1000" height="4" fill="#f5f0e2"/>
+      <rect x="0" y="0" width="1000" height="400" fill="url(#ax64201-shine)"/>
+      <line x1="470" y1="196" x2="478" y2="330" stroke="#1f3c5a" stroke-width="3" opacity="0.6"/>
+      <line x1="700" y1="196" x2="694" y2="330" stroke="#1f3c5a" stroke-width="3" opacity="0.6"/>
+    </g>
+    <path d="M 446 196 L 446 128 C 448 114 458 110 474 110 L 596 110 C 622 112 642 134 662 172 L 676 196 Z" fill="url(#ax64201-glass)"/>
+    <g clip-path="url(#ax64201-clip)"></g>
+    <path d="M 446 196 L 446 128 C 448 114 458 110 474 110 L 596 110 C 622 112 642 134 662 172 L 676 196 Z" fill="none" stroke="#0b0d10" stroke-width="5" stroke-linejoin="round"/>
+    <ellipse cx="926" cy="258" rx="26" ry="12" fill="#fff6d8" stroke="#1f3c5a" stroke-width="3"/>
+    <rect x="38" y="236" width="22" height="20" rx="4" fill="#d3262f"/>
+    <g>
+    <circle cx="214" cy="322" r="64" fill="#17171a"/>
+    <circle cx="214" cy="322" r="55.04" fill="#232327"/>
+    <circle cx="214" cy="322" r="39.68" fill="url(#ax64201-rim)"/>
+    <line x1="214" y1="322" x2="244.7" y2="322.0" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="214" y1="322" x2="223.5" y2="351.2" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="214" y1="322" x2="189.1" y2="340.1" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="214" y1="322" x2="189.1" y2="303.9" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="214" y1="322" x2="223.5" y2="292.8" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/>
+    <circle cx="214" cy="322" r="8.96" fill="#d7d9dd"/>
+  </g>
+    <g>
+    <circle cx="790" cy="322" r="64" fill="#17171a"/>
+    <circle cx="790" cy="322" r="55.04" fill="#232327"/>
+    <circle cx="790" cy="322" r="39.68" fill="url(#ax64201-rim)"/>
+    <line x1="790" y1="322" x2="820.7" y2="322.0" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="790" y1="322" x2="799.5" y2="351.2" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="790" y1="322" x2="765.1" y2="340.1" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="790" y1="322" x2="765.1" y2="303.9" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/><line x1="790" y1="322" x2="799.5" y2="292.8" stroke="#838588" stroke-width="8.3" stroke-linecap="round"/>
+    <circle cx="790" cy="322" r="8.96" fill="#d7d9dd"/>
+  </g>
+  </g>
+</svg>

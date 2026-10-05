@@ -19,12 +19,14 @@ export async function createTestApp(): Promise<TestContext> {
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
   const app = moduleRef.createNestApplication({ logger: ['error'] });
   configureApp(app);
-  await app.init();
+  // 先在隨機埠啟動，避免 supertest 每個請求都重新 listen（大量併發測試時會觸發 MaxListeners 警告）
+  await app.listen(0);
+  const server = app.getHttpServer();
   return {
     app,
     prisma: app.get(PrismaService),
     redis: app.get(RedisService),
-    http: () => request(app.getHttpServer()),
+    http: () => request(server),
   };
 }
 

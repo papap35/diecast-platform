@@ -20,7 +20,8 @@
     "db:reset": "prisma migrate reset --force",
     "db:seed": "tsx prisma/seed.ts",
     "openapi": "nest build && node dist/scripts/generate-openapi.js",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "art": "tsx prisma/seed/generate-art.ts"
   },
   "dependencies": {
     "@nestjs/common": "^12.1.2",

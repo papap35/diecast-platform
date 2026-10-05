@@ -2,11 +2,15 @@ import type { INestApplication } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule, type OpenAPIObject } from '@nestjs/swagger';
 import helmet from 'helmet';
+import { fileURLToPath } from 'node:url';
 import { APP_CONFIG, type AppConfig } from './config/config.module.js';
 import { HttpExceptionFilter } from './common/errors/http-exception.filter.js';
 import { createValidationPipe } from './common/errors/validation.js';
 
 export const API_PREFIX = 'v1';
+
+/** 內建示範圖片（商品插圖、品牌徽章）位於 apps/api/public，以 /static 路徑提供 */
+const PUBLIC_DIR = fileURLToPath(new URL('../public', import.meta.url));
 
 const DEV_ORIGINS = ['http://localhost:3000', 'http://localhost:3001'];
 
@@ -16,8 +20,10 @@ export function configureApp(app: INestApplication): AppConfig {
   const express = app as NestExpressApplication;
 
   express.set('trust proxy', 1);
+  express.disable('x-powered-by');
   app.setGlobalPrefix(API_PREFIX);
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+  express.useStaticAssets(PUBLIC_DIR, { prefix: '/static/', maxAge: '7d' });
   app.enableCors({
     origin: config.CORS_ORIGINS.length ? config.CORS_ORIGINS : DEV_ORIGINS,
     credentials: true,
