@@ -383,7 +383,8 @@
     "COUPON_MIN_SUBTOTAL": "未达这张优惠券的使用门槛",
     "COUPON_NOT_APPLICABLE": "购物车中没有适用的商品（限量商品不适用），或这笔订单已经免运",
     "COUPON_ALREADY_USED": "你已经使用过这张优惠券",
-    "COUPON_USED_UP": "这张优惠券已经被领完了"
+    "COUPON_USED_UP": "这张优惠券已经被领完了",
+    "UNSUBSCRIBE_INVALID": "退订链接无效，请从电子报中的链接重新打开"
   },
   "footer": {
     "tagline": "为模型车收藏家打造的线上车库。",
@@ -519,5 +520,14 @@
     "externalLink": "活动页面",
     "relatedProduct": "活动车款",
     "back": "所有活动"
+  },
+  "unsubscribe": {
+    "title": "取消订阅电子报",
+    "confirm": "确定不再收到 Paddock 64 的新品与限量发售电子报吗？订单与付款等交易通知不受影响。",
+    "submit": "确认取消订阅",
+    "done": "已取消订阅，之后不会再收到电子报。",
+    "resubscribe": "想再收到的话，可以到",
+    "account": "会员中心重新订阅",
+    "missing": "链接不完整，请从电子报中的链接重新打开。"
   }
 }

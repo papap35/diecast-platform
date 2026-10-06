@@ -383,7 +383,8 @@
     "COUPON_MIN_SUBTOTAL": "Your order doesn't meet this coupon's minimum spend",
     "COUPON_NOT_APPLICABLE": "Nothing in your cart qualifies (limited drops are excluded), or shipping is already free",
     "COUPON_ALREADY_USED": "You've already used this coupon",
-    "COUPON_USED_UP": "This coupon has been fully redeemed"
+    "COUPON_USED_UP": "This coupon has been fully redeemed",
+    "UNSUBSCRIBE_INVALID": "This unsubscribe link isn't valid. Please open it again from the newsletter"
   },
   "footer": {
     "tagline": "An online garage built for diecast collectors.",
@@ -519,5 +520,14 @@
     "externalLink": "Event page",
     "relatedProduct": "Featured car",
     "back": "All events"
+  },
+  "unsubscribe": {
+    "title": "Unsubscribe from newsletters",
+    "confirm": "Stop receiving Paddock 64 newsletters about new arrivals and drops? Order and payment emails aren't affected.",
+    "submit": "Unsubscribe",
+    "done": "You've been unsubscribed and won't receive newsletters any more.",
+    "resubscribe": "Changed your mind? You can",
+    "account": "resubscribe from your account",
+    "missing": "This link is incomplete. Please open it again from the newsletter."
   }
 }
