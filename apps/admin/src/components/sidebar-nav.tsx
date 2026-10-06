@@ -3,7 +3,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
-import { BoxIcon, FolderIcon, GridIcon, ReceiptIcon, TagIcon, UsersIcon } from './icons';
+import {
+  BoxIcon,
+  ClockIcon,
+  FolderIcon,
+  GridIcon,
+  ReceiptIcon,
+  ShieldIcon,
+  TagIcon,
+  UserIcon,
+  UsersIcon,
+} from './icons';
 
 const ICONS = {
   grid: GridIcon,
@@ -12,6 +22,9 @@ const ICONS = {
   folder: FolderIcon,
   receipt: ReceiptIcon,
   users: UsersIcon,
+  user: UserIcon,
+  shield: ShieldIcon,
+  clock: ClockIcon,
 };
 
 export interface NavGroup {

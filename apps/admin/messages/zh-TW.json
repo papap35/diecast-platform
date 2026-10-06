@@ -14,7 +14,13 @@
     "storefront": "前往前台",
     "apiDocs": "API 文件",
     "logout": "登出",
-    "language": "語言"
+    "language": "語言",
+    "system": "系統",
+    "admins": "管理員",
+    "roles": "角色與權限",
+    "auditLogs": "操作紀錄",
+    "changePassword": "修改密碼",
+    "menu": "選單"
   },
   "login": {
     "title": "營運後台登入",
@@ -28,7 +34,8 @@
       "super_admin": "超級管理員",
       "operator": "營運人員",
       "customer_service": "客服人員"
-    }
+    },
+    "passwordChanged": "密碼已更新，請用新密碼重新登入"
   },
   "common": {
     "save": "儲存",
@@ -55,7 +62,8 @@
     "createdAt": "建立時間",
     "updatedAt": "更新時間",
     "status": "狀態",
-    "readOnly": "你的角色只有檢視權限"
+    "readOnly": "你的角色只有檢視權限",
+    "noAccess": "你的角色沒有這個頁面的權限，需要時請洽系統管理員。"
   },
   "dashboard": {
     "title": "儀表板",
@@ -377,6 +385,153 @@
     "UNAUTHORIZED": "請重新登入",
     "SHIPMENT_NOT_ALLOWED": "這筆訂單目前不能建立物流單",
     "PROVIDER_ERROR": "第三方服務回傳錯誤",
-    "INVOICE_NOT_RETRYABLE": "這張發票沒有待處理的工作"
+    "INVOICE_NOT_RETRYABLE": "這張發票沒有待處理的工作",
+    "EMAIL_TAKEN": "這個 Email 已經是管理員",
+    "CANNOT_MODIFY_SELF": "不能停用自己、變更自己的角色或拿掉自己的管理權限",
+    "LAST_SUPER_ADMIN": "至少要保留一位啟用中的超級管理員",
+    "ROLE_KEY_TAKEN": "角色代碼已被使用",
+    "ROLE_IN_USE": "系統內建角色或仍有管理員使用的角色不能刪除",
+    "ROLE_LOCKED": "超級管理員擁有全部權限，不可修改",
+    "PASSWORD_MISMATCH": "兩次輸入的新密碼不一致",
+    "TOKEN_INVALID": "登入已失效，請重新登入"
+  },
+  "admins": {
+    "title": "管理員",
+    "subtitle": "後台帳號與角色。停用或重設密碼會立即登出對方所有裝置。",
+    "new": "新增管理員",
+    "create": "建立帳號",
+    "email": "Email",
+    "name": "名稱",
+    "role": "角色",
+    "active": "啟用",
+    "inactive": "已停用",
+    "lastLogin": "最後登入",
+    "you": "（你）",
+    "selfHint": "不能變更自己的角色或停用自己",
+    "initialPassword": "初始密碼",
+    "initialPasswordHint": "至少 10 個字元，請另外告知對方並請他登入後修改",
+    "resetPassword": "重設密碼",
+    "resetPasswordHint": "重設後對方所有裝置都會被登出，需要用新密碼重新登入。",
+    "newPassword": "新密碼",
+    "passwordReset": "密碼已重設，對方已被登出",
+    "viewActivity": "查看這位管理員的操作紀錄"
+  },
+  "roles": {
+    "title": "角色與權限",
+    "subtitle": "調整角色權限會立即對所有使用這個角色的管理員生效。",
+    "new": "新增角色",
+    "create": "建立角色",
+    "key": "角色代碼",
+    "keyHint": "3～30 個小寫英文、數字或底線，建立後不能修改",
+    "name": "名稱",
+    "description": "說明",
+    "permissions": "權限",
+    "admins": "管理員數",
+    "system": "內建",
+    "allPermissions": "全部權限",
+    "permissionCount": "{count} 項權限",
+    "lockedHint": "超級管理員擁有全部權限，不可修改。",
+    "ownRoleHint": "這是你目前的角色，不能拿掉「管理員與權限」。",
+    "deleteConfirm": "確定要刪除這個角色嗎？",
+    "groups": {
+      "dashboard": "儀表板",
+      "catalog": "商品目錄",
+      "sales": "訂單與會員",
+      "marketing": "內容、行銷與報表",
+      "system": "系統",
+      "other": "其他"
+    },
+    "labels": {
+      "dashboard:read": "檢視儀表板",
+      "product:read": "檢視商品",
+      "product:write": "新增、編輯商品與調整庫存",
+      "catalog:write": "管理品牌與分類",
+      "order:read": "檢視訂單",
+      "order:write": "處理訂單（狀態、物流、發票）",
+      "member:read": "檢視會員",
+      "member:write": "停用與恢復會員",
+      "content:write": "管理活動、首頁橫幅與公告",
+      "marketing:write": "管理優惠券與電子報",
+      "report:read": "檢視報表與匯出資料",
+      "settings:write": "修改系統設定",
+      "admin:manage": "管理管理員、角色與操作紀錄（等同最高權限）"
+    }
+  },
+  "auditLogs": {
+    "title": "操作紀錄",
+    "subtitle": "後台每一筆成功的寫入與登入都會記錄，密碼等敏感欄位已遮蔽。",
+    "time": "時間",
+    "admin": "管理員",
+    "action": "動作",
+    "target": "對象",
+    "details": "內容",
+    "from": "起日",
+    "to": "迄日",
+    "showDetails": "查看送出的內容",
+    "deletedAdmin": "（已刪除的帳號）",
+    "groups": {
+      "auth": "登入與密碼",
+      "admin": "管理員",
+      "role": "角色",
+      "product": "商品",
+      "brand": "品牌",
+      "category": "分類",
+      "order": "訂單",
+      "member": "會員"
+    },
+    "actions": {
+      "auth": {
+        "login": "登入",
+        "login_failed": "登入失敗",
+        "password": "修改密碼"
+      },
+      "admin": {
+        "create": "新增管理員",
+        "update": "修改管理員",
+        "reset_password": "重設管理員密碼"
+      },
+      "role": {
+        "create": "新增角色",
+        "update": "修改角色",
+        "delete": "刪除角色"
+      },
+      "product": {
+        "create": "新增商品",
+        "update": "編輯商品",
+        "archive": "封存商品",
+        "stock": "調整庫存"
+      },
+      "brand": {
+        "create": "新增品牌",
+        "update": "編輯品牌",
+        "delete": "刪除品牌"
+      },
+      "category": {
+        "create": "新增分類",
+        "update": "編輯分類",
+        "delete": "刪除分類"
+      },
+      "order": {
+        "status": "變更訂單狀態",
+        "note": "新增訂單備註",
+        "shipment": "建立物流單",
+        "shipment_simulate": "模擬物流狀態",
+        "invoice_retry": "重新開立發票"
+      },
+      "member": {
+        "status": "變更會員狀態"
+      }
+    }
+  },
+  "account": {
+    "title": "修改密碼",
+    "subtitle": "修改後所有裝置都需要用新密碼重新登入。",
+    "currentPassword": "目前的密碼",
+    "newPassword": "新密碼",
+    "newPasswordHint": "至少 10 個字元",
+    "confirmPassword": "再輸入一次新密碼",
+    "mismatch": "兩次輸入的新密碼不一致",
+    "logoutNotice": "送出後會自動登出。",
+    "submit": "更新密碼"
   }
 }

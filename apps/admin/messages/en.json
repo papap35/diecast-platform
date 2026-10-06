@@ -14,7 +14,13 @@
     "storefront": "Open storefront",
     "apiDocs": "API docs",
     "logout": "Log out",
-    "language": "Language"
+    "language": "Language",
+    "system": "System",
+    "admins": "Admins",
+    "roles": "Roles & permissions",
+    "auditLogs": "Audit log",
+    "changePassword": "Change password",
+    "menu": "Menu"
   },
   "login": {
     "title": "Admin sign in",
@@ -28,7 +34,8 @@
       "super_admin": "Super admin",
       "operator": "Operator",
       "customer_service": "Customer service"
-    }
+    },
+    "passwordChanged": "Password updated. Please sign in with your new password."
   },
   "common": {
     "save": "Save",
@@ -55,7 +62,8 @@
     "createdAt": "Created",
     "updatedAt": "Updated",
     "status": "Status",
-    "readOnly": "Your role has read-only access"
+    "readOnly": "Your role has read-only access",
+    "noAccess": "Your role can't access this page. Ask a system administrator if you need it."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -377,6 +385,153 @@
     "UNAUTHORIZED": "Please sign in again",
     "SHIPMENT_NOT_ALLOWED": "A shipment can’t be created for this order now",
     "PROVIDER_ERROR": "The provider returned an error",
-    "INVOICE_NOT_RETRYABLE": "Nothing to retry for this invoice"
+    "INVOICE_NOT_RETRYABLE": "Nothing to retry for this invoice",
+    "EMAIL_TAKEN": "This email already belongs to an admin",
+    "CANNOT_MODIFY_SELF": "You can't deactivate yourself, change your own role, or remove your own admin access",
+    "LAST_SUPER_ADMIN": "At least one active super admin is required",
+    "ROLE_KEY_TAKEN": "This role key is already in use",
+    "ROLE_IN_USE": "Built-in roles and roles that are still assigned can't be deleted",
+    "ROLE_LOCKED": "The super admin role has every permission and can't be edited",
+    "PASSWORD_MISMATCH": "The new passwords don't match",
+    "TOKEN_INVALID": "Your session has expired. Please sign in again"
+  },
+  "admins": {
+    "title": "Admins",
+    "subtitle": "Back-office accounts and roles. Deactivating or resetting a password signs that admin out everywhere.",
+    "new": "New admin",
+    "create": "Create account",
+    "email": "Email",
+    "name": "Name",
+    "role": "Role",
+    "active": "Active",
+    "inactive": "Deactivated",
+    "lastLogin": "Last sign-in",
+    "you": "(you)",
+    "selfHint": "You can't change your own role or deactivate yourself",
+    "initialPassword": "Initial password",
+    "initialPasswordHint": "At least 10 characters. Share it separately and ask them to change it after signing in",
+    "resetPassword": "Reset password",
+    "resetPasswordHint": "They'll be signed out on every device and must sign in with the new password.",
+    "newPassword": "New password",
+    "passwordReset": "Password reset. They've been signed out",
+    "viewActivity": "View this admin's activity"
+  },
+  "roles": {
+    "title": "Roles & permissions",
+    "subtitle": "Permission changes apply immediately to every admin with the role.",
+    "new": "New role",
+    "create": "Create role",
+    "key": "Role key",
+    "keyHint": "3–30 lowercase letters, digits or underscores. Can't be changed later",
+    "name": "Name",
+    "description": "Description",
+    "permissions": "Permissions",
+    "admins": "Admins",
+    "system": "Built-in",
+    "allPermissions": "All permissions",
+    "permissionCount": "{count, plural, one {# permission} other {# permissions}}",
+    "lockedHint": "The super admin role has every permission and can't be edited.",
+    "ownRoleHint": "This is your current role, so \"Admins & roles\" can't be removed.",
+    "deleteConfirm": "Delete this role?",
+    "groups": {
+      "dashboard": "Dashboard",
+      "catalog": "Catalog",
+      "sales": "Orders & members",
+      "marketing": "Content, marketing & reports",
+      "system": "System",
+      "other": "Other"
+    },
+    "labels": {
+      "dashboard:read": "View dashboard",
+      "product:read": "View products",
+      "product:write": "Create and edit products, adjust stock",
+      "catalog:write": "Manage brands and categories",
+      "order:read": "View orders",
+      "order:write": "Process orders (status, shipping, invoices)",
+      "member:read": "View members",
+      "member:write": "Suspend and restore members",
+      "content:write": "Manage events, home banners and announcements",
+      "marketing:write": "Manage coupons and newsletters",
+      "report:read": "View reports and export data",
+      "settings:write": "Change system settings",
+      "admin:manage": "Manage admins, roles and the audit log (full access)"
+    }
+  },
+  "auditLogs": {
+    "title": "Audit log",
+    "subtitle": "Every successful change and sign-in in the back office. Passwords and other secrets are redacted.",
+    "time": "Time",
+    "admin": "Admin",
+    "action": "Action",
+    "target": "Target",
+    "details": "Details",
+    "from": "From",
+    "to": "To",
+    "showDetails": "Show submitted data",
+    "deletedAdmin": "(deleted account)",
+    "groups": {
+      "auth": "Sign-in & password",
+      "admin": "Admins",
+      "role": "Roles",
+      "product": "Products",
+      "brand": "Brands",
+      "category": "Categories",
+      "order": "Orders",
+      "member": "Members"
+    },
+    "actions": {
+      "auth": {
+        "login": "Signed in",
+        "login_failed": "Failed sign-in",
+        "password": "Changed password"
+      },
+      "admin": {
+        "create": "Created admin",
+        "update": "Updated admin",
+        "reset_password": "Reset admin password"
+      },
+      "role": {
+        "create": "Created role",
+        "update": "Updated role",
+        "delete": "Deleted role"
+      },
+      "product": {
+        "create": "Created product",
+        "update": "Edited product",
+        "archive": "Archived product",
+        "stock": "Adjusted stock"
+      },
+      "brand": {
+        "create": "Created brand",
+        "update": "Edited brand",
+        "delete": "Deleted brand"
+      },
+      "category": {
+        "create": "Created category",
+        "update": "Edited category",
+        "delete": "Deleted category"
+      },
+      "order": {
+        "status": "Changed order status",
+        "note": "Added order note",
+        "shipment": "Created shipment",
+        "shipment_simulate": "Simulated shipment status",
+        "invoice_retry": "Retried invoice"
+      },
+      "member": {
+        "status": "Changed member status"
+      }
+    }
+  },
+  "account": {
+    "title": "Change password",
+    "subtitle": "You'll need to sign in again with the new password on every device.",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "newPasswordHint": "At least 10 characters",
+    "confirmPassword": "Confirm new password",
+    "mismatch": "The new passwords don't match",
+    "logoutNotice": "You'll be signed out after submitting.",
+    "submit": "Update password"
   }
 }

@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { logoutAction } from '@/app/actions/auth';
 import { ExternalIcon } from '@/components/icons';
@@ -41,16 +42,37 @@ export default async function ConsoleLayout({ children }: LayoutProps<'/'>) {
           : []),
       ],
     },
+    {
+      label: t('system'),
+      items: can(admin, 'admin:manage')
+        ? [
+            { href: '/admins', label: t('admins'), icon: 'user' },
+            { href: '/roles', label: t('roles'), icon: 'shield' },
+            { href: '/audit-logs', label: t('auditLogs'), icon: 'clock' },
+          ]
+        : [],
+    },
   ];
   const groups = allGroups.filter((group) => group.items.length > 0);
 
   return (
     <div className="lg:grid lg:min-h-screen lg:grid-cols-[15rem_1fr]">
-      <aside className="flex flex-col gap-8 bg-ink px-4 py-6 text-white lg:sticky lg:top-0 lg:h-screen">
+      <aside className="flex flex-col gap-8 bg-ink px-4 py-6 text-white lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
         <div className="px-2">
           <Logo inverted />
         </div>
-        <SidebarNav groups={groups} />
+        {/* 手機版收合選單，桌機版常駐 */}
+        <details className="group lg:hidden">
+          <summary className="cursor-pointer list-none rounded-lg bg-white/10 px-3 py-2 text-sm font-semibold">
+            {t('menu')}
+          </summary>
+          <div className="pt-4">
+            <SidebarNav groups={groups} />
+          </div>
+        </details>
+        <div className="hidden lg:block">
+          <SidebarNav groups={groups} />
+        </div>
         <div className="mt-auto hidden flex-col gap-1 text-sm lg:flex">
           <a
             href={STOREFRONT_URL}
@@ -79,6 +101,12 @@ export default async function ConsoleLayout({ children }: LayoutProps<'/'>) {
             <span className="font-semibold">{admin.name}</span>
             <Badge tone="neutral">{admin.role.name}</Badge>
           </div>
+          <Link
+            href="/account/password"
+            className="rounded-lg px-3 py-1.5 text-sm text-mute hover:bg-black/5 hover:text-ink"
+          >
+            {t('changePassword')}
+          </Link>
           <form action={logoutAction}>
             <button
               type="submit"

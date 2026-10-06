@@ -14,7 +14,13 @@
     "storefront": "前往前台",
     "apiDocs": "API 文档",
     "logout": "注销",
-    "language": "语言"
+    "language": "语言",
+    "system": "系统",
+    "admins": "管理员",
+    "roles": "角色与权限",
+    "auditLogs": "操作纪录",
+    "changePassword": "修改密码",
+    "menu": "菜单"
   },
   "login": {
     "title": "营运后台登录",
@@ -28,7 +34,8 @@
       "super_admin": "超级管理员",
       "operator": "营运人员",
       "customer_service": "客服人员"
-    }
+    },
+    "passwordChanged": "密码已更新，请用新密码重新登录"
   },
   "common": {
     "save": "保存",
@@ -55,7 +62,8 @@
     "createdAt": "创建时间",
     "updatedAt": "更新时间",
     "status": "状态",
-    "readOnly": "你的角色只有查看权限"
+    "readOnly": "你的角色只有查看权限",
+    "noAccess": "你的角色没有这个页面的权限，需要时请洽系统管理员。"
   },
   "dashboard": {
     "title": "仪表板",
@@ -377,6 +385,153 @@
     "UNAUTHORIZED": "请重新登录",
     "SHIPMENT_NOT_ALLOWED": "这笔订单目前不能创建物流单",
     "PROVIDER_ERROR": "第三方服务回传错误",
-    "INVOICE_NOT_RETRYABLE": "这张发票没有待处理的工作"
+    "INVOICE_NOT_RETRYABLE": "这张发票没有待处理的工作",
+    "EMAIL_TAKEN": "这个 Email 已经是管理员",
+    "CANNOT_MODIFY_SELF": "不能停用自己、变更自己的角色或拿掉自己的管理权限",
+    "LAST_SUPER_ADMIN": "至少要保留一位激活中的超级管理员",
+    "ROLE_KEY_TAKEN": "角色代码已被使用",
+    "ROLE_IN_USE": "系统内置角色或仍有管理员使用的角色不能删除",
+    "ROLE_LOCKED": "超级管理员拥有全部权限，不可修改",
+    "PASSWORD_MISMATCH": "两次输入的新密码不一致",
+    "TOKEN_INVALID": "登录已失效，请重新登录"
+  },
+  "admins": {
+    "title": "管理员",
+    "subtitle": "后台帐号与角色。停用或重设密码会立即注销对方所有设备。",
+    "new": "添加管理员",
+    "create": "创建帐号",
+    "email": "Email",
+    "name": "名称",
+    "role": "角色",
+    "active": "激活",
+    "inactive": "已停用",
+    "lastLogin": "最后登录",
+    "you": "（你）",
+    "selfHint": "不能变更自己的角色或停用自己",
+    "initialPassword": "初始密码",
+    "initialPasswordHint": "至少 10 个字符，请另外告知对方并请他登录后修改",
+    "resetPassword": "重设密码",
+    "resetPasswordHint": "重设后对方所有设备都会被注销，需要用新密码重新登录。",
+    "newPassword": "新密码",
+    "passwordReset": "密码已重设，对方已被注销",
+    "viewActivity": "查看这位管理员的操作纪录"
+  },
+  "roles": {
+    "title": "角色与权限",
+    "subtitle": "调整角色权限会立即对所有使用这个角色的管理员生效。",
+    "new": "添加角色",
+    "create": "创建角色",
+    "key": "角色代码",
+    "keyHint": "3～30 个小写英文、数字或底线，创建后不能修改",
+    "name": "名称",
+    "description": "说明",
+    "permissions": "权限",
+    "admins": "管理员数",
+    "system": "内置",
+    "allPermissions": "全部权限",
+    "permissionCount": "{count} 项权限",
+    "lockedHint": "超级管理员拥有全部权限，不可修改。",
+    "ownRoleHint": "这是你目前的角色，不能拿掉「管理员与权限」。",
+    "deleteConfirm": "确定要删除这个角色吗？",
+    "groups": {
+      "dashboard": "仪表板",
+      "catalog": "商品目录",
+      "sales": "订单与会员",
+      "marketing": "内容、行销与报表",
+      "system": "系统",
+      "other": "其他"
+    },
+    "labels": {
+      "dashboard:read": "查看仪表板",
+      "product:read": "查看商品",
+      "product:write": "添加、编辑商品与调整库存",
+      "catalog:write": "管理品牌与分类",
+      "order:read": "查看订单",
+      "order:write": "处理订单（状态、物流、发票）",
+      "member:read": "查看会员",
+      "member:write": "停用与恢复会员",
+      "content:write": "管理活动、首页横幅与公告",
+      "marketing:write": "管理优惠券与电子报",
+      "report:read": "查看报表与导出数据",
+      "settings:write": "修改系统设置",
+      "admin:manage": "管理管理员、角色与操作纪录（等同最高权限）"
+    }
+  },
+  "auditLogs": {
+    "title": "操作纪录",
+    "subtitle": "后台每一笔成功的写入与登录都会记录，密码等敏感字段已屏蔽。",
+    "time": "时间",
+    "admin": "管理员",
+    "action": "动作",
+    "target": "对象",
+    "details": "内容",
+    "from": "起日",
+    "to": "迄日",
+    "showDetails": "查看送出的内容",
+    "deletedAdmin": "（已删除的帐号）",
+    "groups": {
+      "auth": "登录与密码",
+      "admin": "管理员",
+      "role": "角色",
+      "product": "商品",
+      "brand": "品牌",
+      "category": "分类",
+      "order": "订单",
+      "member": "会员"
+    },
+    "actions": {
+      "auth": {
+        "login": "登录",
+        "login_failed": "登录失败",
+        "password": "修改密码"
+      },
+      "admin": {
+        "create": "添加管理员",
+        "update": "修改管理员",
+        "reset_password": "重设管理员密码"
+      },
+      "role": {
+        "create": "添加角色",
+        "update": "修改角色",
+        "delete": "删除角色"
+      },
+      "product": {
+        "create": "添加商品",
+        "update": "编辑商品",
+        "archive": "封存商品",
+        "stock": "调整库存"
+      },
+      "brand": {
+        "create": "添加品牌",
+        "update": "编辑品牌",
+        "delete": "删除品牌"
+      },
+      "category": {
+        "create": "添加分类",
+        "update": "编辑分类",
+        "delete": "删除分类"
+      },
+      "order": {
+        "status": "变更订单状态",
+        "note": "添加订单备注",
+        "shipment": "创建物流单",
+        "shipment_simulate": "仿真物流状态",
+        "invoice_retry": "重新开立发票"
+      },
+      "member": {
+        "status": "变更会员状态"
+      }
+    }
+  },
+  "account": {
+    "title": "修改密码",
+    "subtitle": "修改后所有设备都需要用新密码重新登录。",
+    "currentPassword": "目前的密码",
+    "newPassword": "新密码",
+    "newPasswordHint": "至少 10 个字符",
+    "confirmPassword": "再输入一次新密码",
+    "mismatch": "两次输入的新密码不一致",
+    "logoutNotice": "送出后会自动注销。",
+    "submit": "更新密码"
   }
 }
