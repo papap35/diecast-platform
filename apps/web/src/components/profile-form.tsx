@@ -2,22 +2,27 @@
 
 import type { Schemas } from '@paddock64/api-client';
 import { useTranslations } from 'next-intl';
-import { useActionState } from 'react';
 import { type ProfileFormState, updateProfileAction } from '@/app/actions/account';
+import { useFormAction } from '@/lib/use-form-action';
 import { Button } from './ui/button';
 import { Field, Input, Select } from './ui/field';
 
 export function ProfileForm({ profile }: { profile: Schemas['MemberProfileDto'] }) {
   const t = useTranslations('account');
   const te = useTranslations('errors');
-  const [state, formAction, pending] = useActionState<ProfileFormState, FormData>(
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction<ProfileFormState>(
     updateProfileAction,
     {},
   );
   const fields = state.error?.fields ?? {};
 
   return (
-    <form action={formAction} className="grid gap-4 sm:grid-cols-2">
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      className="grid gap-4 sm:grid-cols-2"
+    >
       <Field label={t('name')} name="name" error={fields.name}>
         <Input id="name" name="name" defaultValue={profile.name} required />
       </Field>

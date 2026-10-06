@@ -3,7 +3,7 @@
 import type { Schemas } from '@paddock64/api-client';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
-import { useActionState, useState } from 'react';
+import { startTransition, useActionState, useState } from 'react';
 import {
   type CheckoutState,
   type CvsMapState,
@@ -15,6 +15,7 @@ import { cn } from '@/lib/cn';
 import { type AppliedCoupon, CouponField } from './coupon-field';
 import { formatPrice } from '@/lib/format';
 import { TW_CITIES } from '@/lib/taiwan';
+import { useFormAction } from '@/lib/use-form-action';
 import { GatewayRedirect } from './gateway-redirect';
 import { Button } from './ui/button';
 import { Field, Input, Select } from './ui/field';
@@ -56,7 +57,7 @@ export function CheckoutForm({
   const tc = useTranslations('cart');
   const to = useTranslations('orders');
   const locale = useLocale();
-  const [state, formAction, pending] = useActionState<CheckoutState, FormData>(
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction<CheckoutState>(
     placeOrderAction,
     {},
   );
@@ -95,7 +96,13 @@ export function CheckoutForm({
         : null;
 
   return (
-    <form action={formAction} className="grid gap-8 lg:grid-cols-[1fr_24rem]" noValidate>
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      className="grid gap-8 lg:grid-cols-[1fr_24rem]"
+      noValidate
+    >
       <input type="hidden" name="locale" value={locale} />
       {buyNow ? (
         <>
@@ -154,11 +161,13 @@ export function CheckoutForm({
                 ) : (
                   <p className="text-sm font-medium text-ink-2">{t('storeRequired')}</p>
                 )}
-                {/* 送出整張表單到選店 action：已填寫的資料會先暫存，回來時帶回 */}
+                {/* 整張表單送到選店 action：已填寫的資料會先暫存，回來時帶回 */}
                 <Button
-                  type="submit"
-                  formAction={mapAction}
-                  formNoValidate
+                  type="button"
+                  onClick={(event) => {
+                    const form = event.currentTarget.form;
+                    if (form) startTransition(() => mapAction(new FormData(form)));
+                  }}
                   variant={selected ? 'secondary' : 'primary'}
                   size="sm"
                   disabled={mapPending || !!mapState.instruction}

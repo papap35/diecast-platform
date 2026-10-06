@@ -3,7 +3,7 @@
 import type { Schemas } from '@paddock64/api-client';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useActionState, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import {
   cancelCampaignAction,
   type CouponFormState,
@@ -13,6 +13,7 @@ import {
   testCampaignAction,
 } from '@/app/actions/marketing';
 import type { ActionError } from '@/lib/action-result';
+import { useFormAction } from '@/lib/use-form-action';
 import { LocaleTabs } from './locale-tabs';
 import { Button } from './ui/button';
 import { Field, Input, Select, Textarea } from './ui/field';
@@ -25,7 +26,7 @@ export function CampaignForm({ campaign }: { campaign?: Campaign }) {
   const tc = useTranslations('common');
   const tContent = useTranslations('content');
   const te = useTranslations('errors');
-  const [state, formAction, pending] = useActionState<CouponFormState, FormData>(
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction<CouponFormState>(
     saveCampaignAction,
     {},
   );
@@ -34,7 +35,12 @@ export function CampaignForm({ campaign }: { campaign?: Campaign }) {
   const translation = (locale: string) => campaign?.translations.find((tr) => tr.locale === locale);
 
   return (
-    <form action={formAction} className="card flex flex-col gap-4 p-5">
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      className="card flex flex-col gap-4 p-5"
+    >
       <fieldset disabled={pending || !editable} className="contents">
         {campaign ? <input type="hidden" name="id" value={campaign.id} /> : null}
         {state.error ? (

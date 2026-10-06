@@ -3,7 +3,7 @@
 import type { Schemas } from '@paddock64/api-client';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useActionState, useTransition } from 'react';
+import { useTransition } from 'react';
 import {
   changePasswordAction,
   deleteRoleAction,
@@ -14,6 +14,7 @@ import {
 } from '@/app/actions/system';
 import { Button } from './ui/button';
 import { Checkbox, Field, Input, Select, Textarea } from './ui/field';
+import { useFormAction } from '@/lib/use-form-action';
 
 type AdminUser = Schemas['AdminUserDto'];
 type Role = Schemas['RoleDto'];
@@ -55,12 +56,18 @@ export function AdminUserForm({
 }) {
   const t = useTranslations('admins');
   const tc = useTranslations('common');
-  const [state, formAction, pending] = useActionState(saveAdminUserAction, {});
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction(saveAdminUserAction, {});
   const fields = state.error?.fields ?? {};
   const accessEditable = !isSelf;
 
   return (
-    <form action={formAction} key={admin?.id ?? 'new'} className="card flex flex-col gap-4 p-5">
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      key={admin?.id ?? 'new'}
+      className="card flex flex-col gap-4 p-5"
+    >
       <h2 className="text-sm font-semibold">{admin ? `${tc('edit')}：${admin.name}` : t('new')}</h2>
       <fieldset disabled={pending} className="contents">
         {admin ? <input type="hidden" name="id" value={admin.id} /> : null}
@@ -136,12 +143,19 @@ export function AdminUserForm({
 
 export function ResetPasswordForm({ admin }: { admin: AdminUser }) {
   const t = useTranslations('admins');
-  const [state, formAction, pending] = useActionState(
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction(
     resetAdminPasswordAction.bind(null, admin.id),
     {},
+    { resetOnSuccess: true },
   );
   return (
-    <form action={formAction} key={admin.id} className="card flex flex-col gap-3 p-5">
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      key={admin.id}
+      className="card flex flex-col gap-3 p-5"
+    >
       <h2 className="text-sm font-semibold">{t('resetPassword')}</h2>
       <p className="text-xs text-mute">{t('resetPasswordHint')}</p>
       {state.saved ? (
@@ -182,7 +196,7 @@ export function RoleForm({
   const t = useTranslations('roles');
   const tc = useTranslations('common');
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(saveRoleAction, {});
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction(saveRoleAction, {});
   const [deleting, startDelete] = useTransition();
   const fields = state.error?.fields ?? {};
   const locked = role?.isLocked ?? false;
@@ -191,7 +205,13 @@ export function RoleForm({
   const others = permissions.filter((permission) => !known.has(permission));
 
   return (
-    <form action={formAction} key={role?.id ?? 'new'} className="card flex flex-col gap-4 p-5">
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      key={role?.id ?? 'new'}
+      className="card flex flex-col gap-4 p-5"
+    >
       <h2 className="text-sm font-semibold">{role ? `${tc('edit')}：${role.name}` : t('new')}</h2>
       {locked ? (
         <p className="rounded-lg bg-canvas px-3 py-2 text-xs text-mute">{t('lockedHint')}</p>
@@ -285,10 +305,15 @@ export function RoleForm({
 
 export function ChangePasswordForm() {
   const t = useTranslations('account');
-  const [state, formAction, pending] = useActionState(changePasswordAction, {});
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction(changePasswordAction, {});
   const fields = state.error?.fields ?? {};
   return (
-    <form action={formAction} className="card flex max-w-md flex-col gap-4 p-5">
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      className="card flex max-w-md flex-col gap-4 p-5"
+    >
       <FormFeedback state={state} />
       <Field label={t('currentPassword')} name="currentPassword">
         <Input

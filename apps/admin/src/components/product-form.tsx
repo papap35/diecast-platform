@@ -2,10 +2,11 @@
 
 import type { Schemas } from '@paddock64/api-client';
 import { useTranslations } from 'next-intl';
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 import { type ProductFormState } from '@/app/actions/catalog';
 import { cn } from '@/lib/cn';
 import { toTaipeiInput } from '@/lib/format';
+import { useFormAction } from '@/lib/use-form-action';
 import { PlusIcon } from './icons';
 import { Button } from './ui/button';
 import { Checkbox, Field, Input, Select, Textarea } from './ui/field';
@@ -41,7 +42,7 @@ export function ProductForm({
   const t = useTranslations('products');
   const tc = useTranslations('common');
   const te = useTranslations('errors');
-  const [state, formAction, pending] = useActionState(action, {});
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction(action, {});
   const [tab, setTab] = useState<(typeof LOCALES)[number]['code']>('zh-TW');
   const [images, setImages] = useState(
     product?.images.map((image) => ({
@@ -58,7 +59,7 @@ export function ProductForm({
     category.translations.find((tr) => tr.locale === 'zh-TW')?.name ?? category.slug;
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form ref={formRef} action={formAction} onSubmit={onSubmit} className="flex flex-col gap-5">
       <fieldset disabled={!canWrite || pending} className="contents">
         {state.error ? (
           <p role="alert" className="rounded-xl bg-accent-soft px-4 py-3 text-sm text-accent">

@@ -3,7 +3,7 @@
 import type { Schemas } from '@paddock64/api-client';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useActionState, useTransition } from 'react';
+import { useTransition } from 'react';
 import {
   deleteBrandAction,
   deleteCategoryAction,
@@ -13,6 +13,7 @@ import {
 } from '@/app/actions/catalog';
 import { Button } from './ui/button';
 import { Checkbox, Field, Input, Select, Textarea } from './ui/field';
+import { useFormAction } from '@/lib/use-form-action';
 
 type Brand = Schemas['AdminBrandDto'];
 type Category = Schemas['AdminCategoryDto'];
@@ -36,12 +37,22 @@ export function BrandForm({ brand, canWrite }: { brand?: Brand; canWrite: boolea
   const t = useTranslations('brands');
   const tc = useTranslations('common');
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(saveBrandAction, {});
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction(
+    saveBrandAction,
+    {},
+    { resetOnSuccess: !brand },
+  );
   const [deleting, startDelete] = useTransition();
   const fields = state.error?.fields ?? {};
 
   return (
-    <form action={formAction} key={brand?.id ?? 'new'} className="card flex flex-col gap-4 p-5">
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      key={brand?.id ?? 'new'}
+      className="card flex flex-col gap-4 p-5"
+    >
       <h2 className="text-sm font-semibold">{brand ? `${tc('edit')}：${brand.name}` : t('new')}</h2>
       <fieldset disabled={!canWrite || pending} className="contents">
         {brand ? <input type="hidden" name="id" value={brand.id} /> : null}
@@ -121,14 +132,24 @@ export function CategoryForm({
   const t = useTranslations('categories');
   const tc = useTranslations('common');
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(saveCategoryAction, {});
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction(
+    saveCategoryAction,
+    {},
+    { resetOnSuccess: !category },
+  );
   const [deleting, startDelete] = useTransition();
   const fields = state.error?.fields ?? {};
   const name = (locale: string) =>
     category?.translations.find((tr) => tr.locale === locale)?.name ?? '';
 
   return (
-    <form action={formAction} key={category?.id ?? 'new'} className="card flex flex-col gap-4 p-5">
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={onSubmit}
+      key={category?.id ?? 'new'}
+      className="card flex flex-col gap-4 p-5"
+    >
       <h2 className="text-sm font-semibold">
         {category ? `${tc('edit')}：${name('zh-TW')}` : t('new')}
       </h2>

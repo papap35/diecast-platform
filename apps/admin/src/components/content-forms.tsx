@@ -3,7 +3,7 @@
 import type { Schemas } from '@paddock64/api-client';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { type FormEvent, type ReactNode, useActionState, useState, useTransition } from 'react';
+import { type FormEvent, type ReactNode, useState, useTransition } from 'react';
 import {
   type ContentFormState,
   deleteBannerAction,
@@ -14,6 +14,7 @@ import {
 import { BANNER_THEMES as THEMES, THEME_COLORS } from '@/lib/banner-themes';
 import { cn } from '@/lib/cn';
 import { toTaipeiInput } from '@/lib/format';
+import { useFormAction } from '@/lib/use-form-action';
 import { LocaleTabs } from './locale-tabs';
 import { Button } from './ui/button';
 import { Field, Input, Select, Textarea } from './ui/field';
@@ -62,12 +63,12 @@ export function EventForm({
   const t = useTranslations('events');
   const tc = useTranslations('common');
   const tContent = useTranslations('content');
-  const [state, formAction, pending] = useActionState(saveEventAction, {});
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction(saveEventAction, {});
   const fields = state.error?.fields ?? {};
   const translation = (locale: string) => event?.translations.find((tr) => tr.locale === locale);
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form ref={formRef} action={formAction} onSubmit={onSubmit} className="flex flex-col gap-5">
       <fieldset disabled={pending} className="contents">
         {event ? <input type="hidden" name="id" value={event.id} /> : null}
         <Feedback state={state} />
@@ -273,7 +274,7 @@ export function BannerForm({ banner, apiBaseUrl }: { banner?: AdminBanner; apiBa
   const t = useTranslations('banners');
   const tc = useTranslations('common');
   const tContent = useTranslations('content');
-  const [state, formAction, pending] = useActionState(saveBannerAction, {});
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction(saveBannerAction, {});
   const fields = state.error?.fields ?? {};
   const translation = (locale: string) => banner?.translations.find((tr) => tr.locale === locale);
   const [preview, setPreview] = useState<PreviewState>({
@@ -292,7 +293,9 @@ export function BannerForm({ banner, apiBaseUrl }: { banner?: AdminBanner; apiBa
 
   return (
     <form
+      ref={formRef}
       action={formAction}
+      onSubmit={onSubmit}
       onChange={onChange}
       key={banner?.id ?? 'new'}
       className="card flex flex-col gap-4 p-5"

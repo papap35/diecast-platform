@@ -3,7 +3,7 @@
 import type { Schemas } from '@paddock64/api-client';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useActionState, useState, useTransition } from 'react';
+import { type ReactNode, useState, useTransition } from 'react';
 import {
   type CouponFormState,
   deleteCouponAction,
@@ -11,6 +11,7 @@ import {
 } from '@/app/actions/marketing';
 import { benefitParams } from '@/lib/coupons';
 import { toTaipeiInput } from '@/lib/format';
+import { useFormAction } from '@/lib/use-form-action';
 import { Button } from './ui/button';
 import { Checkbox, Field, Input, Select } from './ui/field';
 
@@ -34,7 +35,7 @@ export function CouponForm({ coupon }: { coupon?: Coupon }) {
   const tc = useTranslations('common');
   const te = useTranslations('errors');
   const router = useRouter();
-  const [state, formAction, pending] = useActionState<CouponFormState, FormData>(
+  const { state, formAction, onSubmit, pending, formRef } = useFormAction<CouponFormState>(
     saveCouponAction,
     {},
   );
@@ -46,7 +47,7 @@ export function CouponForm({ coupon }: { coupon?: Coupon }) {
   const used = (coupon?.usedCount ?? 0) > 0 || (coupon?.redemptions.length ?? 0) > 0;
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form ref={formRef} action={formAction} onSubmit={onSubmit} className="flex flex-col gap-5">
       <fieldset disabled={pending} className="contents">
         {coupon ? <input type="hidden" name="id" value={coupon.id} /> : null}
         {state.error ? (
