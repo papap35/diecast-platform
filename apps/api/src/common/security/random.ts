@@ -26,3 +26,16 @@ export function randomCode(length: number): string {
 export function randomDigits(length: number): string {
   return Array.from({ length }, () => randomInt(10)).join('');
 }
+
+/**
+ * RFC 9562 UUIDv7（前 48 位元是毫秒時間戳，依時間排序）。
+ * 與 Prisma 的 @default(uuid(7)) 同格式，給原生 SQL 寫入時自行帶 id 用。
+ */
+export function uuidv7(now = Date.now()): string {
+  const bytes = randomBytes(16);
+  bytes.writeUIntBE(now, 0, 6);
+  bytes[6] = (bytes[6]! & 0x0f) | 0x70;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = bytes.toString('hex');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}

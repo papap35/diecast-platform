@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { ConfigModule } from './config/config.module.js';
+import { APP_CONFIG, type AppConfig, ConfigModule } from './config/config.module.js';
 import { PrismaModule } from './infra/prisma/prisma.module.js';
 import { RedisModule } from './infra/redis/redis.module.js';
 import { AdminModule } from './modules/admin/admin.module.js';
@@ -28,9 +28,12 @@ import { WishlistModule } from './modules/wishlist/wishlist.module.js';
     PrismaModule,
     RedisModule,
     ScheduleModule.forRoot(),
-    ThrottlerModule.forRoot({
-      throttlers: [{ ttl: 60_000, limit: 300 }],
-      skipIf: () => process.env.NODE_ENV === 'test',
+    ThrottlerModule.forRootAsync({
+      inject: [APP_CONFIG],
+      useFactory: (config: AppConfig) => ({
+        throttlers: [{ ttl: 60_000, limit: config.RATE_LIMIT_PER_MINUTE }],
+        skipIf: () => config.NODE_ENV === 'test',
+      }),
     }),
     AuthModule,
     InventoryModule,

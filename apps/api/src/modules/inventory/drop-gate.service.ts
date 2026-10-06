@@ -1,9 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
+import type { SaleType } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { RedisService } from '../../infra/redis/redis.service.js';
 
 /** 閘門名額與資料庫重新同步的週期 */
 const GATE_TTL_SECONDS = 60;
+/** 商品販售類型的記憶體快取時間 */
+const SALE_TYPE_TTL_MS = 30_000;
 
 const RESERVE = `
 local stock = redis.call('GET', KEYS[1])
@@ -26,14 +30,40 @@ return -1`;
 @Injectable()
 export class DropGateService {
   private readonly logger = new Logger(DropGateService.name);
+  private readonly saleTypeCache = new Map<string, { saleType: SaleType; expiresAt: number }>();
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
+
+  /**
+   * 商品的販售類型（記憶體快取 30 秒）。開賣瞬間同一個商品湧入大量請求，
+   * 售完的請求只經過 Redis 與這個快取，完全不碰資料庫；交易內仍以資料庫的最新資料再驗證一次。
+   */
+  async saleTypes(productIds: string[]): Promise<Map<string, SaleType | null>> {
+    const now = Date.now();
+    const missing = productIds.filter((id) => (this.saleTypeCache.get(id)?.expiresAt ?? 0) <= now);
+    if (missing.length) {
+      const rows = await this.prisma.product.findMany({
+        where: { id: { in: missing } },
+        select: { id: true, saleType: true },
+      });
+      const found = new Map(rows.map((row) => [row.id, row.saleType]));
+      for (const id of missing) {
+        const saleType = found.get(id);
+        // 只快取存在的商品：亂填的商品 ID 不會讓快取無限成長
+        if (saleType) this.saleTypeCache.set(id, { saleType, expiresAt: now + SALE_TYPE_TTL_MS });
+        else this.saleTypeCache.delete(id);
+      }
+    }
+    return new Map(productIds.map((id) => [id, this.saleTypeCache.get(id)?.saleType ?? null]));
+  }
 
   /** 預扣名額；false 表示一定買不到（售完），true 表示可以進資料庫交易 */
   async reserve(productId: string, quantity: number): Promise<boolean> {
+    if (!this.config.DROP_GATE_ENABLED) return true;
     const key = gateKey(productId);
     try {
       let result = (await this.redis.eval(RESERVE, 1, key, quantity)) as number;
@@ -54,6 +84,7 @@ export class DropGateService {
 
   /** 交易失敗時歸還預扣的名額 */
   async release(productId: string, quantity: number): Promise<void> {
+    if (!this.config.DROP_GATE_ENABLED) return;
     await this.redis.eval(RELEASE, 1, gateKey(productId), quantity).catch(() => undefined);
   }
 

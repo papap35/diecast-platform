@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
+import { uuidv7 } from '../../common/security/random.js';
 import type { Prisma, StockMovementReason } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { DropGateService } from './drop-gate.service.js';
@@ -17,6 +18,7 @@ type Tx = Prisma.TransactionClient;
  * 庫存的唯一入口。
  * 扣庫存用「條件式 UPDATE」：WHERE stock >= qty，資料庫逐列上鎖，
  * 同時上千個請求搶同一件商品也不會扣成負數（另有 CHECK 約束作為最後防線）。
+ * 同一筆交易要動多件商品時，呼叫端依商品 ID 排序上鎖，避免兩筆交易互相等待（deadlock）。
  */
 @Injectable()
 export class InventoryService {
@@ -32,14 +34,7 @@ export class InventoryService {
     quantity: number,
     ctx: MovementContext,
   ): Promise<number | null> {
-    const rows = await tx.$queryRaw<{ stock: number }[]>`
-      UPDATE "Product" SET "stock" = "stock" - ${quantity}, "updatedAt" = now()
-      WHERE "id" = ${productId}::uuid AND "stock" >= ${quantity}
-      RETURNING "stock"`;
-    const row = rows[0];
-    if (!row) return null;
-    await this.record(tx, productId, -quantity, row.stock, ctx);
-    return row.stock;
+    return this.move(tx, productId, -quantity, ctx);
   }
 
   /** 回補庫存；從 0 補回有貨時記下補貨時間（通知把商品加入願望清單的會員） */
@@ -49,15 +44,9 @@ export class InventoryService {
     quantity: number,
     ctx: MovementContext,
   ): Promise<number> {
-    const rows = await tx.$queryRaw<{ stock: number }[]>`
-      UPDATE "Product" SET "stock" = "stock" + ${quantity}, "updatedAt" = now(),
-        "restockedAt" = CASE WHEN "stock" <= 0 AND ${quantity} > 0 THEN now() ELSE "restockedAt" END
-      WHERE "id" = ${productId}::uuid
-      RETURNING "stock"`;
-    const row = rows[0];
-    if (!row) throw AppException.notFound(ErrorCode.PRODUCT_NOT_FOUND, '找不到這個商品');
-    await this.record(tx, productId, quantity, row.stock, ctx);
-    return row.stock;
+    const stock = await this.move(tx, productId, quantity, ctx);
+    if (stock === null) throw AppException.notFound(ErrorCode.PRODUCT_NOT_FOUND, '找不到這個商品');
+    return stock;
   }
 
   /** 後台手動調整庫存（以增減量表示，避免覆寫掉同時間成立的訂單扣量） */
@@ -75,23 +64,32 @@ export class InventoryService {
     return stock;
   }
 
-  private async record(
+  /**
+   * 改庫存並寫異動紀錄，合成一句 SQL。
+   * UPDATE 會鎖住商品那一列直到 COMMIT，開賣時所有搶購者排隊等同一把鎖；
+   * 持鎖期間每少一次 API 與資料庫的來回，排在後面的人就少等一段（見 docs/load-testing.md）。
+   */
+  private async move(
     tx: Tx,
     productId: string,
     delta: number,
-    balance: number,
     ctx: MovementContext,
-  ) {
-    await tx.stockMovement.create({
-      data: {
-        productId,
-        delta,
-        balance,
-        reason: ctx.reason,
-        orderId: ctx.orderId,
-        actorId: ctx.actorId,
-        note: ctx.note,
-      },
-    });
+  ): Promise<number | null> {
+    const rows = await tx.$queryRaw<{ stock: number }[]>`
+      WITH updated AS (
+        UPDATE "Product" SET
+          "stock" = "stock" + ${delta}::int,
+          "updatedAt" = now(),
+          "restockedAt" = CASE WHEN "stock" <= 0 AND ${delta}::int > 0 THEN now() ELSE "restockedAt" END
+        WHERE "id" = ${productId}::uuid AND "stock" + ${delta}::int >= 0
+        RETURNING "id", "stock"
+      ), movement AS (
+        INSERT INTO "StockMovement" ("id", "productId", "delta", "balance", "reason", "orderId", "actorId", "note")
+        SELECT ${uuidv7()}::uuid, "id", ${delta}::int, "stock", ${ctx.reason}::"StockMovementReason",
+          ${ctx.orderId ?? null}::uuid, ${ctx.actorId ?? null}::uuid, ${ctx.note ?? null}::text
+        FROM updated
+      )
+      SELECT "stock" FROM updated`;
+    return rows[0]?.stock ?? null;
   }
 }

@@ -1,3 +1,4 @@
+import { InventoryService } from '../src/modules/inventory/inventory.service.js';
 import { createProduct, CVS_CHECKOUT, registerMember } from './fixtures.js';
 import { createTestApp, resetDatabase, type TestContext } from './utils.js';
 
@@ -131,8 +132,39 @@ describe('購物流程 (e2e)', () => {
         where: { productId: product.id },
       });
       expect(movements).toEqual([
-        expect.objectContaining({ delta: -2, balance: 3, reason: 'ORDER_PLACED' }),
+        expect.objectContaining({
+          delta: -2,
+          balance: 3,
+          reason: 'ORDER_PLACED',
+          orderId: res.body.id,
+          actorId: member.id,
+        }),
       ]);
+    });
+
+    it('多件商品依商品 ID 順序扣庫存，兩筆訂單同時買同樣幾件商品不會互等（deadlock）', async () => {
+      const a = await createProduct(ctx.prisma);
+      const b = await createProduct(ctx.prisma);
+      const [first, second] = [a.id, b.id].sort();
+      const member = await registerMember(ctx);
+      const decrement = vi.spyOn(ctx.app.get(InventoryService), 'decrement');
+      try {
+        await ctx
+          .http()
+          .post('/v1/orders')
+          .set(member.auth)
+          .send({
+            ...CVS_CHECKOUT,
+            items: [
+              { productId: second, quantity: 1 },
+              { productId: first, quantity: 1 },
+            ],
+          })
+          .expect(201);
+        expect(decrement.mock.calls.map((call) => call[1])).toEqual([first, second]);
+      } finally {
+        decrement.mockRestore();
+      }
     });
 
     it('購物車是空的時候回傳 CART_EMPTY', async () => {

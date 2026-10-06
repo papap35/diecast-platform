@@ -15,6 +15,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
 
   DATABASE_URL: z.string().min(1),
+  /** 資料庫連線池大小（每個 API 執行個體） */
+  DATABASE_POOL_SIZE: z.coerce.number().int().positive().default(10),
   REDIS_URL: z.string().min(1).default('redis://localhost:6379'),
 
   JWT_SECRET: z.string().min(32, 'JWT_SECRET 至少需要 32 個字元'),
@@ -26,6 +28,14 @@ const envSchema = z.object({
   /** API 對外網址，金流與物流的回呼（callback）會用到 */
   API_PUBLIC_URL: z.url().default('http://localhost:4000'),
   WEB_BASE_URL: z.url().default('http://localhost:3000'),
+
+  /** 每個 IP 每分鐘的請求上限（全域限流） */
+  RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(300),
+  /** 限量發售的 Redis 預檢閘門（壓力測試比較用，正式環境保持開啟） */
+  DROP_GATE_ENABLED: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((value) => value === 'true'),
 
   ORDER_PAYMENT_TIMEOUT_MINUTES: z.coerce.number().int().positive().default(30),
   LIMITED_PAYMENT_TIMEOUT_MINUTES: z.coerce.number().int().positive().default(10),

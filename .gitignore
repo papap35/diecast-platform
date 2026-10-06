@@ -25,3 +25,6 @@ apps/api/src/generated/
 .vercel
 .turbo
 uploads/
+
+# 壓力測試產生的資料（含測試 token）
+apps/api/loadtest/.data/

@@ -84,10 +84,6 @@ export class OrdersService {
    */
   async checkout(memberId: string, dto: CheckoutDto, fallbackLocale: Locale): Promise<OrderDto> {
     const locale = dto.locale ?? fallbackLocale;
-    const member = await this.prisma.member.findUnique({ where: { id: memberId } });
-    if (!member || member.status !== 'ACTIVE') {
-      throw AppException.unauthorized(ErrorCode.ACCOUNT_DISABLED, '帳號已停用或不存在');
-    }
     const allowed = await consumeRateLimit(
       this.redis,
       `rl:checkout:${memberId}`,
@@ -108,25 +104,18 @@ export class OrdersService {
       throw AppException.badRequest(ErrorCode.CART_EMPTY, '購物車是空的');
     }
 
-    const saleTypes = await this.prisma.product.findMany({
-      where: { id: { in: requested.map((item) => item.productId) } },
-      select: { id: true, saleType: true },
-    });
-    const preorders = saleTypes.filter((product) => product.saleType === 'PRE_ORDER').length;
-    if (preorders > 0 && preorders < requested.length) {
-      throw AppException.badRequest(
-        ErrorCode.PREORDER_SEPARATE_CHECKOUT,
-        '預購商品需與現貨分開結帳',
-      );
-    }
-    const limitedIds = new Set(
-      saleTypes.filter((product) => product.saleType === 'LIMITED').map((product) => product.id),
-    );
+    // 開賣瞬間的快速路徑：售完的請求只經過 Redis 與記憶體快取就回應，不碰資料庫
+    const saleTypes = await this.gate.saleTypes(requested.map((item) => item.productId));
+    assertNotMixedPreorder([...saleTypes.values()]);
     const reserved = await this.reserveDropSlots(
-      requested.filter((item) => limitedIds.has(item.productId)),
+      requested.filter((item) => saleTypes.get(item.productId) === 'LIMITED'),
     );
 
     try {
+      const member = await this.prisma.member.findUnique({ where: { id: memberId } });
+      if (!member || member.status !== 'ACTIVE') {
+        throw AppException.unauthorized(ErrorCode.ACCOUNT_DISABLED, '帳號已停用或不存在');
+      }
       return await this.placeOrder(member, requested, dto, locale, fromCart);
     } catch (error) {
       await Promise.all(reserved.map((item) => this.gate.release(item.productId, item.quantity)));
@@ -172,6 +161,8 @@ export class OrdersService {
             include: { translations: true, images: { orderBy: { sortOrder: 'asc' }, take: 1 } },
           });
           const byId = new Map(products.map((product) => [product.id, product]));
+          // 以資料庫最新資料再檢查一次（交易外的檢查用的是快取）
+          assertNotMixedPreorder(products.map((product) => product.saleType));
           const purchased = await purchasedQuantities(tx, memberId, ids);
 
           const now = new Date();
@@ -249,7 +240,12 @@ export class OrdersService {
             include: orderDetailInclude,
           });
 
-          for (const line of lines) {
+          if (fromCart) {
+            await tx.cartItem.deleteMany({ where: { cart: { memberId }, productId: { in: ids } } });
+          }
+
+          // 扣庫存放在交易最後：商品那一列從 UPDATE 鎖到 COMMIT，越晚上鎖，開賣時排隊的人等越短
+          for (const line of inLockOrder(lines, (line) => line.product.id)) {
             const remaining = await this.inventory.decrement(tx, line.product.id, line.quantity, {
               reason: 'ORDER_PLACED',
               orderId: created.id,
@@ -266,13 +262,10 @@ export class OrdersService {
               });
             }
           }
-
-          if (fromCart) {
-            await tx.cartItem.deleteMany({ where: { cart: { memberId }, productId: { in: ids } } });
-          }
           return created;
         },
-        { timeout: 15_000 },
+        // 開賣尖峰時連線池可能排隊，等待連線的上限放寬到 10 秒（預設 2 秒會直接失敗）
+        { timeout: 15_000, maxWait: 10_000 },
       ),
     );
 
@@ -393,7 +386,7 @@ export class OrdersService {
     if (releasesStock(from, to)) {
       const reason =
         actor.type === 'SYSTEM' && to === 'CANCELLED' ? 'ORDER_EXPIRED' : 'ORDER_CANCELLED';
-      for (const item of order.items) {
+      for (const item of inLockOrder(order.items, (item) => item.productId)) {
         await this.inventory.increment(tx, item.productId, item.quantity, {
           reason,
           orderId: order.id,
@@ -625,12 +618,28 @@ export class OrdersService {
   }
 }
 
+/** 預購商品需與現貨分開結帳（預購要等到貨才出貨） */
+function assertNotMixedPreorder(saleTypes: (string | null)[]): void {
+  const preorders = saleTypes.filter((saleType) => saleType === 'PRE_ORDER').length;
+  if (preorders > 0 && preorders < saleTypes.length) {
+    throw AppException.badRequest(ErrorCode.PREORDER_SEPARATE_CHECKOUT, '預購商品需與現貨分開結帳');
+  }
+}
+
 /** 預購訂單的預計出貨時間：取各預購商品中最晚的一個 */
 function expectedShipAt(order: OrderWithDetail): Date | null {
   const dates = order.items
     .filter((item) => item.saleType === 'PRE_ORDER' && item.product.expectedShipAt)
     .map((item) => item.product.expectedShipAt!.getTime());
   return dates.length ? new Date(Math.max(...dates)) : null;
+}
+
+/** 多件商品固定依 ID 順序上鎖：兩筆交易不會各握一件、互等對方（deadlock） */
+function inLockOrder<T>(items: T[], productId: (item: T) => string): T[] {
+  return [...items].sort((a, b) => {
+    const [x, y] = [productId(a), productId(b)];
+    return x < y ? -1 : x > y ? 1 : 0;
+  });
 }
 
 function mergeItems(items: { productId: string; quantity: number }[]) {
