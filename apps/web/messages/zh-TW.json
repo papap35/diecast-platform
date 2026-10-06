@@ -241,7 +241,15 @@
     "storeMapHint": "將開啟超商電子地圖選擇門市，選好後會回到這一頁，已填寫的資料會保留。",
     "openingMap": "開啟電子地圖…",
     "storeCancelled": "已取消選擇門市",
-    "storeExpired": "選店已逾時，請重新選擇門市"
+    "storeExpired": "選店已逾時，請重新選擇門市",
+    "coupon": "優惠碼",
+    "couponPlaceholder": "輸入優惠碼",
+    "couponApply": "套用",
+    "couponApplying": "試算中…",
+    "couponRemove": "移除優惠碼",
+    "couponDiscount": "優惠券折抵",
+    "couponFreeShipping": "免運（優惠券）",
+    "couponMinSubtotal": "還差 {amount} 才能使用這張優惠券（限量商品不計入）"
   },
   "orders": {
     "title": "我的訂單",
@@ -302,7 +310,8 @@
       "ALLOWANCE_ISSUED": "已開立折讓單",
       "CANCELLED": "不需開立"
     },
-    "expectedShip": "預購・預計 {date} 出貨"
+    "expectedShip": "預購・預計 {date} 出貨",
+    "discount": "優惠券 {code}"
   },
   "account": {
     "title": "會員中心",
@@ -367,7 +376,14 @@
     "REMINDER_NOT_AVAILABLE": "這個商品已開賣，不需要提醒",
     "GARAGE_HANDLE_TAKEN": "這個網址代稱已經有人使用",
     "GARAGE_FULL": "車庫已滿（最多 500 筆）",
-    "WISHLIST_FULL": "願望清單已滿（最多 200 件）"
+    "WISHLIST_FULL": "願望清單已滿（最多 200 件）",
+    "COUPON_NOT_FOUND": "找不到這個優惠碼，請確認是否輸入正確",
+    "COUPON_UNAVAILABLE": "這張優惠券目前不能使用（已停用、尚未開始或已過期）",
+    "COUPON_TIER_REQUIRED": "你的會員等級還不能使用這張優惠券",
+    "COUPON_MIN_SUBTOTAL": "未達這張優惠券的使用門檻",
+    "COUPON_NOT_APPLICABLE": "購物車中沒有適用的商品（限量商品不適用），或這筆訂單已經免運",
+    "COUPON_ALREADY_USED": "你已經使用過這張優惠券",
+    "COUPON_USED_UP": "這張優惠券已經被領完了"
   },
   "footer": {
     "tagline": "為模型車收藏家打造的線上車庫。",

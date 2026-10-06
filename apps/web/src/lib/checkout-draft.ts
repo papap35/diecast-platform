@@ -13,6 +13,7 @@ const DRAFT_FIELDS = [
   'invoiceTaxId',
   'invoiceTitle',
   'note',
+  'couponCode',
 ] as const;
 
 export type CheckoutDraft = Partial<Record<(typeof DRAFT_FIELDS)[number], string>>;

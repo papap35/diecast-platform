@@ -12,6 +12,7 @@ import {
 } from '@/app/actions/checkout';
 import type { CheckoutDraft } from '@/lib/checkout-draft';
 import { cn } from '@/lib/cn';
+import { type AppliedCoupon, CouponField } from './coupon-field';
 import { formatPrice } from '@/lib/format';
 import { TW_CITIES } from '@/lib/taiwan';
 import { GatewayRedirect } from './gateway-redirect';
@@ -67,12 +68,16 @@ export function CheckoutForm({
   const [invoiceType, setInvoiceType] = useState<InvoiceType>(
     (draft.invoiceType as InvoiceType | undefined) ?? 'MEMBER_CARRIER',
   );
+  const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
 
   const isCvs = method !== 'HOME_DELIVERY';
   // 換成其他超商時，原本選的門市不適用
   const selected = isCvs && store?.method === method ? store : undefined;
   const option = cart.shippingOptions.find((o) => o.method === method);
-  const shippingFee = option?.fee ?? 0;
+  // 已套用優惠券時以 API 試算結果為準（折扣後金額決定是否免運）
+  const pricing = coupon?.method === method ? coupon.preview : null;
+  const shippingFee = pricing ? pricing.shippingFee : (option?.fee ?? 0);
+  const total = pricing ? pricing.total : cart.subtotal + shippingFee;
   const fields = state.error?.fields ?? {};
   const errorText = state.error
     ? te.has(state.error.code)
@@ -381,20 +386,37 @@ export function CheckoutForm({
             </li>
           ))}
         </ul>
+        <CouponField
+          method={method}
+          buyNow={buyNow}
+          applied={coupon}
+          onChange={setCoupon}
+          initialCode={draft.couponCode}
+        />
         <dl className="space-y-2 border-t border-line pt-4 text-sm">
           <div className="flex justify-between">
             <dt className="text-mute">{tc('subtotal')}</dt>
             <dd className="tabular">{formatPrice(cart.subtotal)}</dd>
           </div>
+          {pricing && pricing.discount > 0 ? (
+            <div className="flex justify-between text-ok">
+              <dt>{t('couponDiscount')}</dt>
+              <dd className="tabular">−{formatPrice(pricing.discount)}</dd>
+            </div>
+          ) : null}
           <div className="flex justify-between">
             <dt className="text-mute">{tc('shipping')}</dt>
             <dd className="tabular">
-              {shippingFee === 0 ? t('methodFree') : formatPrice(shippingFee)}
+              {pricing && pricing.shippingDiscount > 0
+                ? t('couponFreeShipping')
+                : shippingFee === 0
+                  ? t('methodFree')
+                  : formatPrice(shippingFee)}
             </dd>
           </div>
           <div className="flex justify-between border-t border-line pt-3 text-base font-bold">
             <dt>{t('total')}</dt>
-            <dd className="tabular">{formatPrice(cart.subtotal + shippingFee)}</dd>
+            <dd className="tabular">{formatPrice(total)}</dd>
           </div>
         </dl>
 

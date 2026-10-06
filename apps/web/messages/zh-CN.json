@@ -241,7 +241,15 @@
     "storeMapHint": "将打开超商电子地图选择门市，选好后会回到这一页，已填写的数据会保留。",
     "openingMap": "打开电子地图…",
     "storeCancelled": "已取消选择门市",
-    "storeExpired": "选店已逾时，请重新选择门市"
+    "storeExpired": "选店已逾时，请重新选择门市",
+    "coupon": "优惠码",
+    "couponPlaceholder": "输入优惠码",
+    "couponApply": "套用",
+    "couponApplying": "试算中…",
+    "couponRemove": "移除优惠码",
+    "couponDiscount": "优惠券折抵",
+    "couponFreeShipping": "免运（优惠券）",
+    "couponMinSubtotal": "还差 {amount} 才能使用这张优惠券（限量商品不计入）"
   },
   "orders": {
     "title": "我的订单",
@@ -302,7 +310,8 @@
       "ALLOWANCE_ISSUED": "已开立折让单",
       "CANCELLED": "不需开立"
     },
-    "expectedShip": "预购・预计 {date} 出货"
+    "expectedShip": "预购・预计 {date} 出货",
+    "discount": "优惠券 {code}"
   },
   "account": {
     "title": "会员中心",
@@ -367,7 +376,14 @@
     "REMINDER_NOT_AVAILABLE": "这个商品已开卖，不需要提醒",
     "GARAGE_HANDLE_TAKEN": "这个网址代称已经有人使用",
     "GARAGE_FULL": "车库已满（最多 500 笔）",
-    "WISHLIST_FULL": "愿望清单已满（最多 200 件）"
+    "WISHLIST_FULL": "愿望清单已满（最多 200 件）",
+    "COUPON_NOT_FOUND": "找不到这个优惠码，请确认是否输入正确",
+    "COUPON_UNAVAILABLE": "这张优惠券目前不能使用（已停用、尚未开始或已过期）",
+    "COUPON_TIER_REQUIRED": "你的会员等级还不能使用这张优惠券",
+    "COUPON_MIN_SUBTOTAL": "未达这张优惠券的使用门槛",
+    "COUPON_NOT_APPLICABLE": "购物车中没有适用的商品（限量商品不适用），或这笔订单已经免运",
+    "COUPON_ALREADY_USED": "你已经使用过这张优惠券",
+    "COUPON_USED_UP": "这张优惠券已经被领完了"
   },
   "footer": {
     "tagline": "为模型车收藏家打造的线上车库。",

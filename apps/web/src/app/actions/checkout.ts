@@ -63,6 +63,7 @@ export async function placeOrderAction(
     invoiceTaxId: text(formData, 'invoiceTaxId'),
     invoiceTitle: text(formData, 'invoiceTitle'),
     note: text(formData, 'note'),
+    couponCode: text(formData, 'couponCode'),
     locale,
     ...(buyNow ? { items: [{ productId: buyNow, quantity }] } : {}),
   };
@@ -141,4 +142,25 @@ export async function cancelOrderAction(orderNo: string, locale: AppLocale): Pro
   if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
   refresh();
   return { ok: true, data: undefined };
+}
+
+type CouponPreview = Schemas['CouponPreviewDto'];
+
+/** 結帳頁試算優惠碼（立即購買帶商品，否則以購物車計算） */
+export async function previewCouponAction(input: {
+  code: string;
+  shippingMethod: CheckoutBody['shippingMethod'];
+  buyNow?: { productId: string; quantity: number };
+}): Promise<ActionResult<CouponPreview>> {
+  if (!(await ensureAccessToken())) return { ok: false, error: UNAUTHORIZED };
+  const api = await actionApi();
+  const { data, error, response } = await api.POST('/v1/coupons/preview', {
+    body: {
+      code: input.code.trim(),
+      shippingMethod: input.shippingMethod,
+      ...(input.buyNow ? { items: [input.buyNow] } : {}),
+    },
+  });
+  if (!response.ok || !data) return { ok: false, error: toActionError(error, response.status) };
+  return { ok: true, data };
 }

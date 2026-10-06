@@ -130,3 +130,9 @@ export const TrophyIcon = (p: IconProps) => (
     <path d="M8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M8 20h8M9 17h6" />
   </svg>
 );
+export const TagIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M4 4h7l9 9-7 7-9-9V4Z" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+  </svg>
+);

@@ -121,6 +121,16 @@ export default async function OrderDetailPage({
         </ul>
         <dl className="mt-4 space-y-2 border-t border-line pt-4 text-sm">
           <Row label={tcart('subtotal')} value={formatPrice(order.subtotal)} />
+          {order.couponCode ? (
+            <Row
+              label={t('discount', { code: order.couponCode })}
+              value={
+                order.discountTotal > 0
+                  ? `−${formatPrice(order.discountTotal)}`
+                  : tc('couponFreeShipping')
+              }
+            />
+          ) : null}
           <Row
             label={tc('methods.' + order.shippingMethod)}
             value={order.shippingFee === 0 ? tc('methodFree') : formatPrice(order.shippingFee)}

@@ -241,7 +241,15 @@
     "storeMapHint": "You'll pick a store on the convenience-store map, then come back here with your details kept.",
     "openingMap": "Opening store map…",
     "storeCancelled": "Store selection cancelled",
-    "storeExpired": "Store selection expired. Please pick a store again."
+    "storeExpired": "Store selection expired. Please pick a store again.",
+    "coupon": "Coupon code",
+    "couponPlaceholder": "Enter a coupon code",
+    "couponApply": "Apply",
+    "couponApplying": "Checking…",
+    "couponRemove": "Remove coupon",
+    "couponDiscount": "Coupon discount",
+    "couponFreeShipping": "Free (coupon)",
+    "couponMinSubtotal": "Add {amount} more to use this coupon (limited drops don't count)"
   },
   "orders": {
     "title": "My orders",
@@ -302,7 +310,8 @@
       "ALLOWANCE_ISSUED": "Allowance issued",
       "CANCELLED": "Not required"
     },
-    "expectedShip": "Pre-order · expected to ship {date}"
+    "expectedShip": "Pre-order · expected to ship {date}",
+    "discount": "Coupon {code}"
   },
   "account": {
     "title": "Account",
@@ -367,7 +376,14 @@
     "REMINDER_NOT_AVAILABLE": "This item is already on sale",
     "GARAGE_HANDLE_TAKEN": "That handle is already taken",
     "GARAGE_FULL": "Your garage is full (500 items max)",
-    "WISHLIST_FULL": "Your wishlist is full (200 items max)"
+    "WISHLIST_FULL": "Your wishlist is full (200 items max)",
+    "COUPON_NOT_FOUND": "We couldn't find that coupon code",
+    "COUPON_UNAVAILABLE": "This coupon can't be used right now (disabled, not started yet or expired)",
+    "COUPON_TIER_REQUIRED": "Your membership level isn't eligible for this coupon yet",
+    "COUPON_MIN_SUBTOTAL": "Your order doesn't meet this coupon's minimum spend",
+    "COUPON_NOT_APPLICABLE": "Nothing in your cart qualifies (limited drops are excluded), or shipping is already free",
+    "COUPON_ALREADY_USED": "You've already used this coupon",
+    "COUPON_USED_UP": "This coupon has been fully redeemed"
   },
   "footer": {
     "tagline": "An online garage built for diecast collectors.",
