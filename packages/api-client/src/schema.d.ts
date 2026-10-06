@@ -616,6 +616,73 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/emails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 寄信紀錄（新到舊），附各狀態封數 */
+        get: operations["AdminEmails_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/emails/retry-failed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 全部寄送失敗的信重新排入寄送 */
+        post: operations["AdminEmails_retryFailed"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/emails/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminEmails_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/emails/{id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 寄送失敗的信重新排入寄送 */
+        post: operations["AdminEmails_retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/coupons/preview": {
         parameters: {
             query?: never;
@@ -2346,6 +2413,72 @@ export interface components {
         };
         MarkReadResultDto: {
             updated: number;
+        };
+        /** @enum {string} */
+        EmailStatus: "PENDING" | "SENT" | "FAILED";
+        /** @enum {string} */
+        EmailKind: "NOTIFICATION" | "CAMPAIGN" | "OTHER";
+        AdminEmailListItemDto: {
+            kind: components["schemas"]["EmailKind"];
+            status: components["schemas"]["EmailStatus"];
+            id: string;
+            to: string;
+            subject: string;
+            attempts: number;
+            /**
+             * Format: date-time
+             * @description 寄送失敗後的下次自動重試時間
+             */
+            nextAttemptAt: string | null;
+            lastError: string | null;
+            /** Format: date-time */
+            sentAt: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        EmailStatsDto: {
+            pending: number;
+            sent: number;
+            failed: number;
+        };
+        AdminEmailListDto: {
+            data: components["schemas"]["AdminEmailListItemDto"][];
+            meta: components["schemas"]["PageMeta"];
+            /** @description 全部信件的狀態統計（不受篩選影響） */
+            stats: components["schemas"]["EmailStatsDto"];
+        };
+        RetryEmailsResultDto: {
+            /** @description 重新排入寄送的封數 */
+            count: number;
+        };
+        EmailCampaignRefDto: {
+            id: string;
+            name: string;
+        };
+        AdminEmailDto: {
+            kind: components["schemas"]["EmailKind"];
+            status: components["schemas"]["EmailStatus"];
+            notificationType: components["schemas"]["NotificationType"] | null;
+            /** @description 純文字內容 */
+            text: string;
+            unsubscribeUrl: string | null;
+            campaign: components["schemas"]["EmailCampaignRefDto"] | null;
+            /** @description 收件人是會員時的會員 id（後台會員頁連結） */
+            memberId: string | null;
+            id: string;
+            to: string;
+            subject: string;
+            attempts: number;
+            /**
+             * Format: date-time
+             * @description 寄送失敗後的下次自動重試時間
+             */
+            nextAttemptAt: string | null;
+            lastError: string | null;
+            /** Format: date-time */
+            sentAt: string | null;
+            /** Format: date-time */
+            createdAt: string;
         };
         CouponPreviewRequestDto: {
             shippingMethod: components["schemas"]["ShippingMethod"];
@@ -4543,6 +4676,93 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MarkReadResultDto"];
+                };
+            };
+        };
+    };
+    AdminEmails_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                status?: components["schemas"]["EmailStatus"];
+                kind?: components["schemas"]["EmailKind"];
+                /** @description 收件人或主旨關鍵字 */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEmailListDto"];
+                };
+            };
+        };
+    };
+    AdminEmails_retryFailed: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetryEmailsResultDto"];
+                };
+            };
+        };
+    };
+    AdminEmails_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEmailDto"];
+                };
+            };
+        };
+    };
+    AdminEmails_retry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEmailDto"];
                 };
             };
         };

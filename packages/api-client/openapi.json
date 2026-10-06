@@ -1919,6 +1919,179 @@
         ]
       }
     },
+    "/v1/admin/emails": {
+      "get": {
+        "operationId": "AdminEmails_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/EmailStatus"
+            }
+          },
+          {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/EmailKind"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "收件人或主旨關鍵字",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEmailListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "寄信紀錄（新到舊），附各狀態封數",
+        "tags": [
+          "Admin / Emails"
+        ]
+      }
+    },
+    "/v1/admin/emails/retry-failed": {
+      "post": {
+        "operationId": "AdminEmails_retryFailed",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetryEmailsResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "全部寄送失敗的信重新排入寄送",
+        "tags": [
+          "Admin / Emails"
+        ]
+      }
+    },
+    "/v1/admin/emails/{id}": {
+      "get": {
+        "operationId": "AdminEmails_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEmailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Emails"
+        ]
+      }
+    },
+    "/v1/admin/emails/{id}/retry": {
+      "post": {
+        "operationId": "AdminEmails_retry",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEmailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "寄送失敗的信重新排入寄送",
+        "tags": [
+          "Admin / Emails"
+        ]
+      }
+    },
     "/v1/coupons/preview": {
       "post": {
         "operationId": "Coupons_preview",
@@ -7860,6 +8033,254 @@
         },
         "required": [
           "updated"
+        ]
+      },
+      "EmailStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "SENT",
+          "FAILED"
+        ]
+      },
+      "EmailKind": {
+        "type": "string",
+        "enum": [
+          "NOTIFICATION",
+          "CAMPAIGN",
+          "OTHER"
+        ]
+      },
+      "AdminEmailListItemDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailKind"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailStatus"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "attempts": {
+            "type": "number"
+          },
+          "nextAttemptAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "寄送失敗後的下次自動重試時間"
+          },
+          "lastError": {
+            "type": "string",
+            "nullable": true
+          },
+          "sentAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "status",
+          "id",
+          "to",
+          "subject",
+          "attempts",
+          "nextAttemptAt",
+          "lastError",
+          "sentAt",
+          "createdAt"
+        ]
+      },
+      "EmailStatsDto": {
+        "type": "object",
+        "properties": {
+          "pending": {
+            "type": "number"
+          },
+          "sent": {
+            "type": "number"
+          },
+          "failed": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "pending",
+          "sent",
+          "failed"
+        ]
+      },
+      "AdminEmailListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminEmailListItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          },
+          "stats": {
+            "description": "全部信件的狀態統計（不受篩選影響）",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailStatsDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta",
+          "stats"
+        ]
+      },
+      "RetryEmailsResultDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "description": "重新排入寄送的封數"
+          }
+        },
+        "required": [
+          "count"
+        ]
+      },
+      "EmailCampaignRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "AdminEmailDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailKind"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailStatus"
+              }
+            ]
+          },
+          "notificationType": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NotificationType"
+              }
+            ]
+          },
+          "text": {
+            "type": "string",
+            "description": "純文字內容"
+          },
+          "unsubscribeUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "campaign": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailCampaignRefDto"
+              }
+            ]
+          },
+          "memberId": {
+            "type": "string",
+            "nullable": true,
+            "description": "收件人是會員時的會員 id（後台會員頁連結）"
+          },
+          "id": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "attempts": {
+            "type": "number"
+          },
+          "nextAttemptAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "寄送失敗後的下次自動重試時間"
+          },
+          "lastError": {
+            "type": "string",
+            "nullable": true
+          },
+          "sentAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "status",
+          "notificationType",
+          "text",
+          "unsubscribeUrl",
+          "campaign",
+          "memberId",
+          "id",
+          "to",
+          "subject",
+          "attempts",
+          "nextAttemptAt",
+          "lastError",
+          "sentAt",
+          "createdAt"
         ]
       },
       "CouponPreviewRequestDto": {

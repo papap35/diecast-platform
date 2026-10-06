@@ -7,8 +7,17 @@ import { RedisService } from '../../infra/redis/redis.service.js';
 import { listUnsubscribeHeaders } from '../marketing/unsubscribe.js';
 
 export const MAX_EMAIL_ATTEMPTS = 5;
+/** 第 n 次失敗後等待的分鐘數：寄信服務短暫故障（約 1.5 小時內）會自動恢復 */
+const RETRY_DELAYS_MINUTES = [1, 5, 15, 60];
 
-/** Email 外寄匣：排程把待寄信件交給寄信服務，失敗重試，超過上限標記失敗 */
+/** 失敗後的下次重試時間；達到上限回傳 null（標記為失敗，由後台人工重寄） */
+export function nextEmailAttempt(attempts: number, now: Date = new Date()): Date | null {
+  if (attempts >= MAX_EMAIL_ATTEMPTS) return null;
+  const minutes = RETRY_DELAYS_MINUTES[Math.min(attempts, RETRY_DELAYS_MINUTES.length) - 1] ?? 1;
+  return new Date(now.getTime() + minutes * 60_000);
+}
+
+/** Email 外寄匣：排程把待寄信件交給寄信服務，失敗後間隔拉長重試，超過上限標記失敗 */
 @Injectable()
 export class EmailOutboxService {
   private readonly logger = new Logger(EmailOutboxService.name);
@@ -30,9 +39,12 @@ export class EmailOutboxService {
   }
 
   /** 寄出待寄信件，回傳成功封數 */
-  async sendPending(limit = 50): Promise<number> {
+  async sendPending(limit = 50, now: Date = new Date()): Promise<number> {
     const pending = await this.prisma.emailMessage.findMany({
-      where: { status: 'PENDING' },
+      where: {
+        status: 'PENDING',
+        OR: [{ nextAttemptAt: null }, { nextAttemptAt: { lte: now } }],
+      },
       orderBy: { createdAt: 'asc' },
       take: limit,
     });
@@ -42,17 +54,25 @@ export class EmailOutboxService {
         await this.deliver(message);
         await this.prisma.emailMessage.update({
           where: { id: message.id },
-          data: { status: 'SENT', sentAt: new Date(), attempts: { increment: 1 }, lastError: null },
+          data: {
+            status: 'SENT',
+            sentAt: new Date(),
+            attempts: { increment: 1 },
+            nextAttemptAt: null,
+            lastError: null,
+          },
         });
         sent += 1;
       } catch (error) {
         const attempts = message.attempts + 1;
+        const nextAttemptAt = nextEmailAttempt(attempts, now);
         await this.prisma.emailMessage.update({
           where: { id: message.id },
           data: {
             attempts,
+            nextAttemptAt,
             lastError: (error as Error).message.slice(0, 500),
-            status: attempts >= MAX_EMAIL_ATTEMPTS ? 'FAILED' : 'PENDING',
+            status: nextAttemptAt ? 'PENDING' : 'FAILED',
           },
         });
         this.logger.warn(

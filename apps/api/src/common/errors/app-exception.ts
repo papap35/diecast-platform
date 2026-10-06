@@ -78,6 +78,9 @@ export const ErrorCode = {
   CAMPAIGN_NOT_EDITABLE: 'CAMPAIGN_NOT_EDITABLE',
   /** 退訂連結無效 */
   UNSUBSCRIBE_INVALID: 'UNSUBSCRIBE_INVALID',
+
+  /** 只有寄送失敗的信可以重新排入寄送 */
+  EMAIL_NOT_RETRYABLE: 'EMAIL_NOT_RETRYABLE',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

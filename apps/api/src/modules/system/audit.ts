@@ -61,7 +61,17 @@ function sanitize(value: unknown, depth: number): unknown {
   );
 }
 
-const LABEL_KEYS = ['orderNo', 'email', 'sku', 'code', 'name', 'title', 'slug', 'key'] as const;
+const LABEL_KEYS = [
+  'orderNo',
+  'email',
+  'sku',
+  'code',
+  'name',
+  'title',
+  'slug',
+  'key',
+  'subject',
+] as const;
 
 /** 從回應或送出的內容找一個人看得懂的辨識文字（訂單編號、Email、SKU…） */
 export function labelOf(value: unknown): string | null {

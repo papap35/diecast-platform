@@ -679,6 +679,8 @@ model EmailMessage {
   unsubscribeUrl String?
   status         EmailStatus @default(PENDING)
   attempts       Int         @default(0)
+  /// 寄送失敗後的下次重試時間（間隔逐次拉長）；null 表示可以立即寄出
+  nextAttemptAt  DateTime?
   lastError      String?
   sentAt         DateTime?
   createdAt      DateTime    @default(now())
