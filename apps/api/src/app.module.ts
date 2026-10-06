@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module.js';
 import { CartModule } from './modules/cart/cart.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { ContentModule } from './modules/content/content.module.js';
+import { CouponsModule } from './modules/coupons/coupons.module.js';
 import { EventsModule } from './modules/events/events.module.js';
 import { GarageModule } from './modules/garage/garage.module.js';
 import { HealthModule } from './modules/health/health.module.js';
@@ -52,6 +53,7 @@ import { WishlistModule } from './modules/wishlist/wishlist.module.js';
     GarageModule,
     EventsModule,
     ContentModule,
+    CouponsModule,
     AdminModule,
     HealthModule,
     // 放最後：OpenAPI 文件依模組順序排列，系統管理排在其他後台 API 之後

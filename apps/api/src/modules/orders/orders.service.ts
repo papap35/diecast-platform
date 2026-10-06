@@ -17,6 +17,8 @@ import { consumeRateLimit } from '../../infra/redis/rate-limit.js';
 import { RedisService } from '../../infra/redis/redis.service.js';
 import { assertPurchasable, assertQuantityAllowed } from '../cart/cart.service.js';
 import { computeAvailability } from '../catalog/availability.js';
+import { priceOrder } from '../coupons/coupon-pricing.js';
+import { CouponsService } from '../coupons/coupons.service.js';
 import { parkOrderInGarage, removeOrderFromGarage } from '../garage/garage-lifecycle.js';
 import { DropGateService } from '../inventory/drop-gate.service.js';
 import { InventoryService } from '../inventory/inventory.service.js';
@@ -26,13 +28,7 @@ import type { NotificationParams } from '../notifications/notification-templates
 import { NotificationsService } from '../notifications/notifications.service.js';
 import type { CheckoutDto, OrderDto, OrderListDto, OrderListQueryDto } from './dto/order.dto.js';
 import { generateOrderNo } from './order-number.js';
-import {
-  calculateShippingFee,
-  canTransition,
-  isConvenienceStore,
-  releasesStock,
-  SPENT_STATUSES,
-} from './order-rules.js';
+import { canTransition, isConvenienceStore, releasesStock, SPENT_STATUSES } from './order-rules.js';
 import { purchasedQuantities } from './purchase-history.js';
 
 export const orderDetailInclude = {
@@ -72,6 +68,7 @@ export class OrdersService {
     private readonly gate: DropGateService,
     private readonly redis: RedisService,
     private readonly notifications: NotificationsService,
+    private readonly coupons: CouponsService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
@@ -181,8 +178,22 @@ export class OrdersService {
             };
           });
 
-          const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
-          const shippingFee = calculateShippingFee(dto.shippingMethod, subtotal, tier);
+          // 計價（含優惠券）：折扣只折商品並分攤到各列，運費依折扣後金額計算
+          const pricingLines = lines.map((line) => ({
+            saleType: line.product.saleType,
+            lineTotal: line.lineTotal,
+          }));
+          const coupon = dto.couponCode
+            ? await this.coupons.apply(
+                tx,
+                dto.couponCode,
+                { id: memberId, tier },
+                pricingLines,
+                dto.shippingMethod,
+                now,
+              )
+            : null;
+          const pricing = coupon?.pricing ?? priceOrder(pricingLines, dto.shippingMethod, tier);
           const hasLimited = lines.some((line) => line.product.saleType === 'LIMITED');
           const timeoutMinutes = hasLimited
             ? this.config.LIMITED_PAYMENT_TIMEOUT_MINUTES
@@ -194,9 +205,11 @@ export class OrdersService {
               orderNo: generateOrderNo(now),
               memberId,
               locale,
-              subtotal,
-              shippingFee,
-              total: subtotal + shippingFee,
+              subtotal: pricing.subtotal,
+              shippingFee: pricing.shippingFee,
+              discountTotal: pricing.discount,
+              total: pricing.total,
+              couponCode: coupon?.coupon.code ?? null,
               shippingMethod: dto.shippingMethod,
               recipientName: dto.recipientName.trim(),
               recipientPhone: dto.recipientPhone,
@@ -216,7 +229,7 @@ export class OrdersService {
               note: dto.note?.trim() || null,
               paymentDeadline: new Date(now.getTime() + timeoutMinutes * 60_000),
               items: {
-                create: lines.map((line) => ({
+                create: lines.map((line, index) => ({
                   productId: line.product.id,
                   sku: line.product.sku,
                   name: line.name,
@@ -225,6 +238,7 @@ export class OrdersService {
                   unitPrice: line.product.price,
                   quantity: line.quantity,
                   lineTotal: line.lineTotal,
+                  discount: pricing.lineDiscounts[index] ?? 0,
                 })),
               },
               events: {
@@ -240,6 +254,7 @@ export class OrdersService {
             include: orderDetailInclude,
           });
 
+          if (coupon) await this.coupons.redeem(tx, coupon, memberId, created.id);
           if (fromCart) {
             await tx.cartItem.deleteMany({ where: { cart: { memberId }, productId: { in: ids } } });
           }
@@ -383,6 +398,10 @@ export class OrdersService {
       throw AppException.conflict(ErrorCode.CONFLICT, '訂單狀態已被其他操作變更，請重新整理');
     }
 
+    // 未付款就取消或逾期：退回優惠券使用次數（先鎖優惠券再鎖庫存，與下單時的順序相同）
+    if (from === 'PENDING_PAYMENT' && to === 'CANCELLED') {
+      await this.coupons.release(tx, order.id);
+    }
     if (releasesStock(from, to)) {
       const reason =
         actor.type === 'SYSTEM' && to === 'CANCELLED' ? 'ORDER_EXPIRED' : 'ORDER_CANCELLED';
@@ -520,6 +539,7 @@ export class OrdersService {
       shippingFee: order.shippingFee,
       discountTotal: order.discountTotal,
       total: order.total,
+      couponCode: order.couponCode,
       shippingMethod: order.shippingMethod,
       recipientName: order.recipientName,
       recipientPhone: order.recipientPhone,
@@ -553,6 +573,7 @@ export class OrdersService {
         unitPrice: item.unitPrice,
         quantity: item.quantity,
         lineTotal: item.lineTotal,
+        discount: item.discount,
       })),
       payments: order.payments.map((payment) => ({
         provider: payment.provider,

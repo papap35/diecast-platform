@@ -616,6 +616,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/coupons/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 結帳前試算優惠碼：回傳折扣、運費與應付金額；不符合時回傳對應的錯誤代碼 */
+        post: operations["Coupons_preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/coupons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminCoupons_list"];
+        put?: never;
+        post: operations["AdminCoupons_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/coupons/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 優惠券與最近 50 筆使用紀錄 */
+        get: operations["AdminCoupons_get"];
+        put?: never;
+        post?: never;
+        delete: operations["AdminCoupons_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["AdminCoupons_update"];
+        trace?: never;
+    };
     "/v1/orders/{orderNo}/payments": {
         parameters: {
             query?: never;
@@ -1922,6 +1972,8 @@ export interface components {
             invoiceTaxId?: string;
             invoiceTitle?: string;
             note?: string;
+            /** @description 優惠碼（不分大小寫） */
+            couponCode?: string;
         };
         /** @enum {string} */
         OrderStatus: "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
@@ -1934,6 +1986,8 @@ export interface components {
             unitPrice: number;
             quantity: number;
             lineTotal: number;
+            /** @description 分攤到這一列的優惠券折扣 */
+            discount: number;
         };
         /** @enum {string} */
         PaymentProvider: "MOCK" | "ECPAY";
@@ -1992,8 +2046,11 @@ export interface components {
             currency: string;
             subtotal: number;
             shippingFee: number;
+            /** @description 優惠券折抵的商品金額 */
             discountTotal: number;
             total: number;
+            /** @description 使用的優惠碼 */
+            couponCode: string | null;
             recipientName: string;
             recipientPhone: string;
             recipientEmail: string;
@@ -2086,6 +2143,152 @@ export interface components {
         };
         MarkReadResultDto: {
             updated: number;
+        };
+        CouponPreviewRequestDto: {
+            shippingMethod: components["schemas"]["ShippingMethod"];
+            code: string;
+            /** @description 立即購買的商品；省略則以購物車試算 */
+            items?: components["schemas"]["QuoteItemDto"][];
+        };
+        /** @enum {string} */
+        CouponType: "FIXED" | "PERCENT" | "FREE_SHIPPING";
+        CouponPreviewDto: {
+            type: components["schemas"]["CouponType"];
+            code: string;
+            name: string;
+            subtotal: number;
+            /** @description 優惠券折抵的商品金額 */
+            discount: number;
+            /** @description 套用後的運費 */
+            shippingFee: number;
+            /** @description 免運券省下的運費 */
+            shippingDiscount: number;
+            total: number;
+        };
+        AdminCouponDto: {
+            type: components["schemas"]["CouponType"];
+            minTier: components["schemas"]["MemberTier"] | null;
+            /**
+             * @description 目前狀態：可使用、尚未開始、已過期、已停用、已領完
+             * @enum {string}
+             */
+            state: "ACTIVE" | "SCHEDULED" | "EXPIRED" | "DISABLED" | "USED_UP";
+            id: string;
+            code: string;
+            name: string;
+            value: number;
+            minSubtotal: number;
+            maxDiscount: number | null;
+            appliesToLimited: boolean;
+            usageLimit: number | null;
+            perMemberLimit: number;
+            /** @description 已使用次數（不含已退回的） */
+            usedCount: number;
+            /** Format: date-time */
+            startsAt: string | null;
+            /** Format: date-time */
+            endsAt: string | null;
+            isActive: boolean;
+            /** @description 已折抵總金額（含免運券省下的運費，不含已退回的） */
+            totalDiscount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        AdminCouponListDto: {
+            data: components["schemas"]["AdminCouponDto"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        CouponRedemptionDto: {
+            id: string;
+            orderId: string;
+            orderNo: string;
+            memberId: string;
+            memberEmail: string;
+            amount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description 訂單未付款取消時退回
+             */
+            releasedAt: string | null;
+        };
+        AdminCouponDetailDto: {
+            type: components["schemas"]["CouponType"];
+            minTier: components["schemas"]["MemberTier"] | null;
+            /**
+             * @description 目前狀態：可使用、尚未開始、已過期、已停用、已領完
+             * @enum {string}
+             */
+            state: "ACTIVE" | "SCHEDULED" | "EXPIRED" | "DISABLED" | "USED_UP";
+            id: string;
+            code: string;
+            name: string;
+            value: number;
+            minSubtotal: number;
+            maxDiscount: number | null;
+            appliesToLimited: boolean;
+            usageLimit: number | null;
+            perMemberLimit: number;
+            /** @description 已使用次數（不含已退回的） */
+            usedCount: number;
+            /** Format: date-time */
+            startsAt: string | null;
+            /** Format: date-time */
+            endsAt: string | null;
+            isActive: boolean;
+            /** @description 已折抵總金額（含免運券省下的運費，不含已退回的） */
+            totalDiscount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            /** @description 最近 50 筆使用紀錄 */
+            redemptions: components["schemas"]["CouponRedemptionDto"][];
+        };
+        CreateCouponDto: {
+            type: components["schemas"]["CouponType"];
+            minTier?: components["schemas"]["MemberTier"] | null;
+            code: string;
+            name: string;
+            /** @description FIXED：折抵金額；PERCENT：折扣百分比（1–90）；FREE_SHIPPING：填 0 */
+            value: number;
+            /** @description 適用商品的小計門檻（不含運費） */
+            minSubtotal?: number;
+            /** @description 百分比折扣的最高折抵金額 */
+            maxDiscount?: number | null;
+            /** @description 是否可用於限量商品 */
+            appliesToLimited?: boolean;
+            /** @description 總使用次數上限；不填表示不限 */
+            usageLimit?: number | null;
+            perMemberLimit?: number;
+            /** Format: date-time */
+            startsAt?: string | null;
+            /** Format: date-time */
+            endsAt?: string | null;
+            isActive?: boolean;
+        };
+        UpdateCouponDto: {
+            minTier?: components["schemas"]["MemberTier"] | null;
+            name?: string;
+            /** @description FIXED：折抵金額；PERCENT：折扣百分比（1–90）；FREE_SHIPPING：填 0 */
+            value?: number;
+            /** @description 適用商品的小計門檻（不含運費） */
+            minSubtotal?: number;
+            /** @description 百分比折扣的最高折抵金額 */
+            maxDiscount?: number | null;
+            /** @description 是否可用於限量商品 */
+            appliesToLimited?: boolean;
+            /** @description 總使用次數上限；不填表示不限 */
+            usageLimit?: number | null;
+            perMemberLimit?: number;
+            /** Format: date-time */
+            startsAt?: string | null;
+            /** Format: date-time */
+            endsAt?: string | null;
+            isActive?: boolean;
         };
         StartPaymentDto: {
             /**
@@ -2660,8 +2863,11 @@ export interface components {
             currency: string;
             subtotal: number;
             shippingFee: number;
+            /** @description 優惠券折抵的商品金額 */
             discountTotal: number;
             total: number;
+            /** @description 使用的優惠碼 */
+            couponCode: string | null;
             recipientName: string;
             recipientPhone: string;
             recipientEmail: string;
@@ -3935,6 +4141,142 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MarkReadResultDto"];
+                };
+            };
+        };
+    };
+    Coupons_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CouponPreviewRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CouponPreviewDto"];
+                };
+            };
+        };
+    };
+    AdminCoupons_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                state?: "ACTIVE" | "SCHEDULED" | "EXPIRED" | "DISABLED" | "USED_UP";
+                /** @description 搜尋優惠碼或名稱 */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCouponListDto"];
+                };
+            };
+        };
+    };
+    AdminCoupons_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCouponDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCouponDetailDto"];
+                };
+            };
+        };
+    };
+    AdminCoupons_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCouponDetailDto"];
+                };
+            };
+        };
+    };
+    AdminCoupons_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminCoupons_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCouponDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCouponDetailDto"];
                 };
             };
         };

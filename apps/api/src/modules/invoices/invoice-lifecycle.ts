@@ -60,6 +60,7 @@ export function toInvoiceOrder(order: Order & { items: OrderItem[] }): InvoiceOr
       quantity: item.quantity,
       unitPrice: item.unitPrice,
       lineTotal: item.lineTotal,
+      discount: item.discount,
     })),
   };
 }

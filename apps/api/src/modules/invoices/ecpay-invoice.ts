@@ -1,5 +1,6 @@
 import { createCipheriv, createDecipheriv } from 'node:crypto';
 import type { InvoiceType } from '../../generated/prisma/client.js';
+import { splitInvoiceLine } from '../coupons/coupon-pricing.js';
 import { ecpayDate } from '../ecpay/format.js';
 
 export const INVOICE_ENDPOINTS = {
@@ -39,7 +40,14 @@ export interface InvoiceOrder {
   invoiceTitle: string | null;
   /** 公司發票需列印並隨貨寄送，使用收件地址或取貨門市地址 */
   printAddress: string;
-  items: { name: string; quantity: number; unitPrice: number; lineTotal: number }[];
+  /** discount：分攤到這一列的優惠券折扣 */
+  items: {
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    lineTotal: number;
+    discount: number;
+  }[];
 }
 
 const CARRIER_TYPE: Partial<Record<InvoiceType, string>> = {
@@ -48,17 +56,29 @@ const CARRIER_TYPE: Partial<Record<InvoiceType, string>> = {
   MOBILE_BARCODE: '3',
 };
 
-/** 發票品項：商品逐項列出，運費列為一個品項；金額皆含稅，加總等於發票金額 */
+/**
+ * 發票品項：商品逐項列出（金額為扣除優惠券分攤後的實收），運費列為一個品項；
+ * 金額皆含稅，加總等於發票金額。單價必須是整數，除不盡時同一商品拆成兩列。
+ */
 function invoiceItems(order: InvoiceOrder) {
   const lines = [
-    ...order.items.map((item) => ({
-      ItemName: item.name.slice(0, 100),
-      ItemCount: item.quantity,
-      ItemWord: '件',
-      ItemPrice: item.unitPrice,
-      ItemTaxType: '1',
-      ItemAmount: item.lineTotal,
-    })),
+    ...order.items
+      .flatMap((item) =>
+        item.discount === 0
+          ? [{ quantity: item.quantity, unitPrice: item.unitPrice, name: item.name }]
+          : splitInvoiceLine(item.quantity, item.lineTotal - item.discount).map((line) => ({
+              ...line,
+              name: item.name,
+            })),
+      )
+      .map((line) => ({
+        ItemName: line.name.slice(0, 100),
+        ItemCount: line.quantity,
+        ItemWord: '件',
+        ItemPrice: line.unitPrice,
+        ItemTaxType: '1',
+        ItemAmount: line.quantity * line.unitPrice,
+      })),
     ...(order.shippingFee > 0
       ? [
           {
@@ -80,7 +100,7 @@ function invoiceItems(order: InvoiceOrder) {
  * - 有統編：必須列印（Print=1），需要抬頭與地址，不可捐贈、不可使用載具
  * - 捐贈：需要捐贈碼，不可列印
  * - 載具：會員載具不帶號碼；手機條碼、自然人憑證需帶號碼
- * - 運費列為一個品項，品項金額加總必須等於發票金額
+ * - 運費列為一個品項，品項金額加總必須等於發票金額（優惠券折扣已分攤進各商品）
  */
 export function buildIssueData(merchantId: string, order: InvoiceOrder): Record<string, unknown> {
   const company = order.invoiceType === 'COMPANY';

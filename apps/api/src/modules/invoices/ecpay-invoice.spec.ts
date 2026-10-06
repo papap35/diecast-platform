@@ -25,7 +25,7 @@ const order: InvoiceOrder = {
   invoiceTaxId: null,
   invoiceTitle: null,
   printAddress: '臺北市中山區建國北路一段 100 號',
-  items: [{ name: "Formosa Taxi '95", quantity: 3, unitPrice: 399, lineTotal: 1197 }],
+  items: [{ name: "Formosa Taxi '95", quantity: 3, unitPrice: 399, lineTotal: 1197, discount: 0 }],
 };
 
 describe('綠界電子發票', () => {
@@ -45,6 +45,39 @@ describe('綠界電子發票', () => {
     ).toBe(
       '0AeflzwC7R9Ae60jYoCmshozkX5nsABQw40p9im1JEFk/80DuEEV7CMpZscNnixCsqYmhL0du0zVNRsZHOYHan9FMEz2/8vvB0esDkGBnNnH6FhGP4y0WGg4j/4rXDm0CT8Bjc7cMTe2OdJkTRTLLdPop9U6Px6py9ismNaQyac=',
     );
+  });
+
+  it('優惠券折扣分攤進商品：品項單價為整數、除不盡時拆列，加總等於發票金額', () => {
+    const discounted: InvoiceOrder = {
+      ...order,
+      // 3 × 399 = 1,197，折 100 → 實收 1,097；加運費 60 = 1,157
+      total: 1157,
+      items: [{ ...order.items[0]!, discount: 100 }],
+    };
+    const data = buildIssueData('2000132', discounted) as Record<string, unknown> & {
+      Items: { ItemCount: number; ItemPrice: number; ItemAmount: number; ItemName: string }[];
+    };
+    expect(data.SalesAmount).toBe(1157);
+    expect(
+      data.Items.map(({ ItemName, ItemCount, ItemPrice, ItemAmount }) => [
+        ItemName,
+        ItemCount,
+        ItemPrice,
+        ItemAmount,
+      ]),
+    ).toEqual([
+      ["Formosa Taxi '95", 2, 366, 732],
+      ["Formosa Taxi '95", 1, 365, 365],
+      ['運費', 1, 60, 60],
+    ]);
+    expect(data.Items.reduce((sum, item) => sum + item.ItemAmount, 0)).toBe(1157);
+    const allowance = buildAllowanceData({
+      invoiceNo: 'AB12345678',
+      invoiceDate: new Date('2026-10-05T03:00:00Z'),
+      order: discounted,
+    }) as Record<string, unknown> & { Items: { ItemAmount: number }[] };
+    expect(allowance.AllowanceAmount).toBe(1157);
+    expect(allowance.Items.reduce((sum, item) => sum + item.ItemAmount, 0)).toBe(1157);
   });
 
   it('手機條碼：帶載具類型 3 與號碼，運費列為品項且加總等於金額', () => {

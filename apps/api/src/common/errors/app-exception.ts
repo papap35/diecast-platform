@@ -55,6 +55,24 @@ export const ErrorCode = {
   ROLE_IN_USE: 'ROLE_IN_USE',
   /** 超級管理員角色擁有全部權限，不可修改 */
   ROLE_LOCKED: 'ROLE_LOCKED',
+
+  /** 優惠碼不存在 */
+  COUPON_NOT_FOUND: 'COUPON_NOT_FOUND',
+  /** 優惠券已停用、尚未開始或已過期 */
+  COUPON_UNAVAILABLE: 'COUPON_UNAVAILABLE',
+  /** 會員等級未達優惠券的限制 */
+  COUPON_TIER_REQUIRED: 'COUPON_TIER_REQUIRED',
+  /** 適用商品的小計未達門檻 */
+  COUPON_MIN_SUBTOTAL: 'COUPON_MIN_SUBTOTAL',
+  /** 購物車沒有適用的商品，或免運券但訂單已經免運 */
+  COUPON_NOT_APPLICABLE: 'COUPON_NOT_APPLICABLE',
+  /** 這位會員已用完可使用次數 */
+  COUPON_ALREADY_USED: 'COUPON_ALREADY_USED',
+  /** 優惠券已被領完（達總使用次數上限） */
+  COUPON_USED_UP: 'COUPON_USED_UP',
+  COUPON_CODE_TAKEN: 'COUPON_CODE_TAKEN',
+  /** 已有人使用的優惠券不能刪除（請改為停用） */
+  COUPON_IN_USE: 'COUPON_IN_USE',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

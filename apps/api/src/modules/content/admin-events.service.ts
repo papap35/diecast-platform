@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import { pageMeta, skipTake } from '../../common/http/pagination.dto.js';
+import { assertDateRange } from '../../common/validation/date-range.js';
 import { pickTranslation } from '../../common/i18n/locale.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
@@ -183,19 +184,6 @@ export class AdminEventsService {
         { field: 'productId', messages: ['找不到這個商品'] },
       ]);
     }
-  }
-}
-
-/** 結束時間不可早於開始時間 */
-export function assertDateRange(
-  startsAt: Date | null | undefined,
-  endsAt: Date | null | undefined,
-  field = 'endsAt',
-): void {
-  if (startsAt && endsAt && endsAt.getTime() < startsAt.getTime()) {
-    throw AppException.badRequest(ErrorCode.VALIDATION_FAILED, '結束時間不可早於開始時間', [
-      { field, messages: ['結束時間不可早於開始時間'] },
-    ]);
   }
 }
 

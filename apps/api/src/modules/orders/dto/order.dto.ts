@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -20,6 +20,7 @@ import {
 } from 'class-validator';
 import { PageMeta, PaginationQuery } from '../../../common/http/pagination.dto.js';
 import { SUPPORTED_LOCALES, type Locale } from '../../../common/i18n/locale.js';
+import { COUPON_CODE_PATTERN } from '../../../common/validation/patterns.js';
 import {
   CITIZEN_CERT,
   DONATION_CODE,
@@ -180,6 +181,14 @@ export class CheckoutDto {
   @MaxLength(200)
   note?: string;
 
+  /** 優惠碼（不分大小寫） */
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim().toUpperCase() : value,
+  )
+  @Matches(COUPON_CODE_PATTERN, { message: '優惠碼格式不正確' })
+  couponCode?: string;
+
   @ApiPropertyOptional({ enum: SUPPORTED_LOCALES })
   @IsOptional()
   @IsIn(SUPPORTED_LOCALES)
@@ -196,6 +205,8 @@ export class OrderItemDto {
   unitPrice!: number;
   quantity!: number;
   lineTotal!: number;
+  /** 分攤到這一列的優惠券折扣 */
+  discount!: number;
 }
 
 export class OrderPaymentDto {
@@ -247,8 +258,11 @@ export class OrderDto {
   currency!: string;
   subtotal!: number;
   shippingFee!: number;
+  /** 優惠券折抵的商品金額 */
   discountTotal!: number;
   total!: number;
+  /** 使用的優惠碼 */
+  couponCode!: string | null;
   @ApiProperty({ enum: ShippingMethod, enumName: 'ShippingMethod' })
   shippingMethod!: ShippingMethod;
   recipientName!: string;

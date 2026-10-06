@@ -77,32 +77,33 @@ enum MemberStatus {
 }
 
 model Member {
-  id             String            @id @default(uuid(7)) @db.Uuid
-  email          String            @unique
-  passwordHash   String
-  name           String
-  phone          String?
-  locale         String            @default("zh-TW")
-  status         MemberStatus      @default(ACTIVE)
-  marketingOptIn Boolean           @default(false)
+  id                String             @id @default(uuid(7)) @db.Uuid
+  email             String             @unique
+  passwordHash      String
+  name              String
+  phone             String?
+  locale            String             @default("zh-TW")
+  status            MemberStatus       @default(ACTIVE)
+  marketingOptIn    Boolean            @default(false)
   /// 累計有效消費金額（新台幣），用於會員等級計算
-  totalSpent     Int               @default(0)
+  totalSpent        Int                @default(0)
   /// 會員等級，依累計消費自動升降級
-  tier           MemberTier        @default(ROOKIE)
-  tierUpdatedAt  DateTime?
+  tier              MemberTier         @default(ROOKIE)
+  tierUpdatedAt     DateTime?
   /// 公開車庫網址代稱（/garage/{handle}）
-  garageHandle   String?           @unique
-  garagePublic   Boolean           @default(false)
-  lastLoginAt    DateTime?
-  deletedAt      DateTime?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  cart           Cart?
-  orders         Order[]
-  wishlist       WishlistItem[]
-  reminders      ReleaseReminder[]
-  garage         GarageItem[]
-  notifications  Notification[]
+  garageHandle      String?            @unique
+  garagePublic      Boolean            @default(false)
+  lastLoginAt       DateTime?
+  deletedAt         DateTime?
+  couponRedemptions CouponRedemption[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  cart              Cart?
+  orders            Order[]
+  wishlist          WishlistItem[]
+  reminders         ReleaseReminder[]
+  garage            GarageItem[]
+  notifications     Notification[]
 
   @@index([createdAt])
   @@index([tier])
@@ -340,17 +341,20 @@ enum InvoiceType {
 }
 
 model Order {
-  id                  String         @id @default(uuid(7)) @db.Uuid
-  orderNo             String         @unique
-  memberId            String         @db.Uuid
-  member              Member         @relation(fields: [memberId], references: [id])
-  status              OrderStatus    @default(PENDING_PAYMENT)
+  id                  String            @id @default(uuid(7)) @db.Uuid
+  orderNo             String            @unique
+  memberId            String            @db.Uuid
+  member              Member            @relation(fields: [memberId], references: [id])
+  status              OrderStatus       @default(PENDING_PAYMENT)
   locale              String
-  currency            String         @default("TWD")
+  currency            String            @default("TWD")
   subtotal            Int
   shippingFee         Int
-  discountTotal       Int            @default(0)
+  /// 優惠券折抵的商品金額（免運券不計入，運費直接為 0）
+  discountTotal       Int               @default(0)
   total               Int
+  /// 使用的優惠碼（快照）
+  couponCode          String?
   shippingMethod      ShippingMethod
   recipientName       String
   recipientPhone      String
@@ -380,8 +384,9 @@ model Order {
   events              OrderEvent[]
   shipment            Shipment?
   invoice             Invoice?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  couponRedemption    CouponRedemption?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 
   @@index([memberId, createdAt])
   @@index([status, paymentDeadline])
@@ -402,6 +407,8 @@ model OrderItem {
   unitPrice  Int
   quantity   Int
   lineTotal  Int
+  /// 分攤到這一列的優惠券折扣（發票品項金額 = lineTotal - discount）
+  discount   Int         @default(0)
   garageItem GarageItem?
 
   @@index([orderId])
@@ -770,4 +777,68 @@ model BannerTranslation {
   ctaLabel String?
 
   @@id([bannerId, locale])
+}
+
+// ─────────────────────────────────────────────
+// 行銷：優惠券
+// ─────────────────────────────────────────────
+
+enum CouponType {
+  /// 折抵固定金額
+  FIXED
+  /// 依比例折扣（value 為折扣百分比，10 表示打九折）
+  PERCENT
+  /// 免運費
+  FREE_SHIPPING
+}
+
+/// 優惠券（結帳時輸入優惠碼）
+model Coupon {
+  id               String             @id @default(uuid(7)) @db.Uuid
+  /// 優惠碼（大寫英數）
+  code             String             @unique
+  /// 顯示名稱，例如「新會員首購折 100」
+  name             String
+  type             CouponType
+  /// FIXED：折抵金額；PERCENT：折扣百分比（1–90）；FREE_SHIPPING：不使用
+  value            Int                @default(0)
+  /// 適用商品的小計門檻（不含運費）
+  minSubtotal      Int                @default(0)
+  /// PERCENT 的最高折抵金額
+  maxDiscount      Int?
+  /// 限定會員等級以上；null 表示所有會員
+  minTier          MemberTier?
+  /// 是否可用於限量商品（預設排除，避免開賣時被大量折抵）
+  appliesToLimited Boolean            @default(false)
+  /// 總使用次數上限；null 表示不限
+  usageLimit       Int?
+  /// 每位會員可使用的次數
+  perMemberLimit   Int                @default(1)
+  /// 已使用次數（下單即計入；未付款取消或逾期時退回）
+  usedCount        Int                @default(0)
+  startsAt         DateTime?
+  endsAt           DateTime?
+  isActive         Boolean            @default(true)
+  redemptions      CouponRedemption[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+/// 優惠券使用紀錄：一筆訂單最多使用一張
+model CouponRedemption {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  couponId   String    @db.Uuid
+  coupon     Coupon    @relation(fields: [couponId], references: [id])
+  memberId   String    @db.Uuid
+  member     Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  orderId    String    @unique @db.Uuid
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  /// 實際折抵金額（免運券為省下的運費）
+  amount     Int
+  /// 訂單未付款就取消或逾期時退回，可以再使用
+  releasedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([couponId, memberId])
+  @@index([couponId, createdAt])
 }

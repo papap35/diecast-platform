@@ -3,10 +3,10 @@ import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import { toPublicUrl } from '../../common/http/media.js';
 import { type Locale, pickTranslation } from '../../common/i18n/locale.js';
+import { assertDateRange } from '../../common/validation/date-range.js';
 import type { BannerPlacement, Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { assertHasDefaultTranslation } from '../catalog/admin-products.service.js';
-import { assertDateRange } from './admin-events.service.js';
 import type {
   AdminBannerDto,
   AdminBannerListDto,
