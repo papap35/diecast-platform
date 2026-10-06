@@ -1,6 +1,9 @@
 import { getTranslations } from 'next-intl/server';
 import { getPathname, Link } from '@/i18n/navigation';
+import type { AppLocale } from '@/i18n/routing';
+import { serverApi } from '@/lib/api';
 import { memberState } from '@/lib/member-state';
+import { BannerLink } from './banner-link';
 import { BagIcon, BellIcon, UserIcon } from './icons';
 import { LocaleSwitcher } from './locale-switcher';
 import { Logo } from './logo';
@@ -86,12 +89,26 @@ export async function Header({ locale }: { locale: string }) {
   );
 }
 
-export async function AnnouncementBar() {
+/** 全站公告列：後台發布的公告優先，沒有時顯示免運門檻 */
+export async function AnnouncementBar({ locale }: { locale: AppLocale }) {
   const t = await getTranslations('announcement');
+  const api = await serverApi(locale);
+  const notice = await api
+    .GET('/v1/banners', { params: { query: { placement: 'ANNOUNCEMENT', locale } } })
+    .then(({ data }) => data?.[0])
+    .catch(() => undefined);
+  const text = notice?.title ?? t('shipping');
   return (
     <div className="bg-ink text-white">
       <p className="container-page py-2 text-center text-xs font-medium tracking-wide">
-        {t('shipping')}
+        {notice?.linkUrl ? (
+          <BannerLink href={notice.linkUrl} className="underline-offset-4 hover:underline">
+            {text}
+            <span aria-hidden="true"> →</span>
+          </BannerLink>
+        ) : (
+          text
+        )}
       </p>
     </div>
   );

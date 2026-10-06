@@ -50,7 +50,8 @@
     "valueFair": "Fair drops",
     "valueFairBody": "Per-member limits and oversell protection",
     "valueShipping": "Convenience store pickup",
-    "valueShippingBody": "Pick up at 7-ELEVEN, FamilyMart, Hi-Life or OK"
+    "valueShippingBody": "Pick up at 7-ELEVEN, FamilyMart, Hi-Life or OK",
+    "promoLabel": "Events and collections"
   },
   "badge": {
     "IN_STOCK": "In stock",

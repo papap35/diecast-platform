@@ -5,6 +5,7 @@ import { AvailabilityBadge } from '@/components/availability-badge';
 import { Countdown } from '@/components/countdown';
 import { ArrowRightIcon, ShieldIcon, StoreIcon, FlagIcon } from '@/components/icons';
 import { Price } from '@/components/price';
+import { PromoBanners } from '@/components/promo-banners';
 import { ProductGrid } from '@/components/product-card';
 import { SectionHeader, ViewAllLink } from '@/components/section-header';
 import { ButtonLink } from '@/components/ui/button';
@@ -32,15 +33,17 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const products = (query: ProductQuery) =>
     api.GET('/v1/products', { params: { query: { locale, ...query } } });
 
-  const [drops, upcoming, arrivals, preorders, local, brands, categories] = await Promise.all([
-    products({ saleType: 'LIMITED', sort: 'release', pageSize: 10 }),
-    products({ availability: 'upcoming', sort: 'release', pageSize: 4 }),
-    products({ availability: 'available', sort: 'newest', pageSize: 8 }),
-    products({ availability: 'preorder', sort: 'release', pageSize: 4 }),
-    products({ brand: 'formosa-diecast', sort: 'featured', pageSize: 4 }),
-    api.GET('/v1/brands', { params: { query: { locale } } }),
-    api.GET('/v1/categories', { params: { query: { locale } } }),
-  ]);
+  const [drops, upcoming, arrivals, preorders, local, brands, categories, promos] =
+    await Promise.all([
+      products({ saleType: 'LIMITED', sort: 'release', pageSize: 10 }),
+      products({ availability: 'upcoming', sort: 'release', pageSize: 4 }),
+      products({ availability: 'available', sort: 'newest', pageSize: 8 }),
+      products({ availability: 'preorder', sort: 'release', pageSize: 4 }),
+      products({ brand: 'formosa-diecast', sort: 'featured', pageSize: 4 }),
+      api.GET('/v1/brands', { params: { query: { locale } } }),
+      api.GET('/v1/categories', { params: { query: { locale } } }),
+      api.GET('/v1/banners', { params: { query: { placement: 'HOME_PROMO', locale } } }),
+    ]);
 
   const now = requestTime();
   const hero = pickHero(drops.data?.data ?? [], now);
@@ -48,6 +51,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   return (
     <>
       {hero ? <Hero product={hero} now={now} /> : null}
+      <PromoBanners banners={promos.data ?? []} />
 
       <section className="container-page mt-10 grid gap-3 sm:grid-cols-3">
         {[

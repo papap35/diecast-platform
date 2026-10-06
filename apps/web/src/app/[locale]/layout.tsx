@@ -72,7 +72,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
             wishlistIds={member.wishlistIds}
             reminderIds={member.reminderIds}
           >
-            <AnnouncementBar />
+            <AnnouncementBar locale={locale} />
             <Header locale={locale} />
             <main className="flex-1">{children}</main>
             <Footer />

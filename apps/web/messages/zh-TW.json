@@ -50,7 +50,8 @@
     "valueFair": "公平搶購",
     "valueFairBody": "限量商品每人限購，系統防止超賣",
     "valueShipping": "超商取貨",
-    "valueShippingBody": "7-ELEVEN、全家、萊爾富、OK 皆可取貨"
+    "valueShippingBody": "7-ELEVEN、全家、萊爾富、OK 皆可取貨",
+    "promoLabel": "活動與專區"
   },
   "badge": {
     "IN_STOCK": "現貨",
