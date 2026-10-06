@@ -721,3 +721,53 @@ model EventTranslation {
 
   @@id([eventId, locale])
 }
+
+enum BannerPlacement {
+  /// 全站頂部公告列（同一時間只顯示排序最前面的一則）
+  ANNOUNCEMENT
+  /// 首頁活動橫幅（主視覺下方）
+  HOME_PROMO
+}
+
+/// 橫幅底色（沒有圖片時也有完整的視覺）
+enum BannerTheme {
+  INK
+  RED
+  NAVY
+  GOLD
+}
+
+/// 公告與首頁橫幅：發布後依上下架時間自動顯示
+model Banner {
+  id           String              @id @default(uuid(7)) @db.Uuid
+  placement    BannerPlacement
+  status       ContentStatus       @default(DRAFT)
+  theme        BannerTheme         @default(INK)
+  /// 站內路徑（例如 /events/taipei-show）或 https 網址
+  linkUrl      String?
+  imageUrl     String?
+  /// 未設定表示發布後立即上架
+  startsAt     DateTime?
+  /// 未設定表示不自動下架
+  endsAt       DateTime?
+  /// 數字小的排前面
+  sortOrder    Int                 @default(0)
+  translations BannerTranslation[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([placement, status])
+}
+
+model BannerTranslation {
+  bannerId String  @db.Uuid
+  banner   Banner  @relation(fields: [bannerId], references: [id], onDelete: Cascade)
+  locale   String
+  /// 公告列只顯示標題
+  title    String
+  subtitle String?
+  /// 按鈕文字（首頁橫幅）
+  ctaLabel String?
+
+  @@id([bannerId, locale])
+}

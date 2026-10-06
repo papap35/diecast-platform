@@ -20,6 +20,7 @@ import {
 } from 'class-validator';
 import { PageMeta, PaginationQuery } from '../../../common/http/pagination.dto.js';
 import { SUPPORTED_LOCALES } from '../../../common/i18n/locale.js';
+import { SLUG_MESSAGE, SLUG_PATTERN } from '../../../common/validation/patterns.js';
 import {
   MemberTier,
   ProductStatus,
@@ -27,9 +28,6 @@ import {
   StockMovementReason,
 } from '../../../generated/prisma/enums.js';
 import { Availability } from '../availability.js';
-
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const SLUG_MESSAGE = 'slug 只能使用小寫英數字與連字號';
 
 // ── 共用 ──
 

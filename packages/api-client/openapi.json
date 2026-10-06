@@ -2768,6 +2768,405 @@
         ]
       }
     },
+    "/v1/banners": {
+      "get": {
+        "operationId": "Banners_list",
+        "parameters": [
+          {
+            "name": "placement",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/BannerPlacement"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zh-TW",
+                "en",
+                "zh-CN"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BannerDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "目前上架中的公告或首頁橫幅（已依語系挑好文字）",
+        "tags": [
+          "Content"
+        ]
+      }
+    },
+    "/v1/admin/banners": {
+      "get": {
+        "operationId": "AdminBanners_list",
+        "parameters": [
+          {
+            "name": "placement",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/BannerPlacement"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBannerListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Content"
+        ]
+      },
+      "post": {
+        "operationId": "AdminBanners_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBannerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBannerDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Content"
+        ]
+      }
+    },
+    "/v1/admin/banners/{id}": {
+      "patch": {
+        "operationId": "AdminBanners_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBannerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBannerDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Content"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminBanners_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Content"
+        ]
+      }
+    },
+    "/v1/admin/events": {
+      "get": {
+        "operationId": "AdminEvents_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ContentStatus"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/EventType"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "搜尋標題或 slug",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEventListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Content"
+        ]
+      },
+      "post": {
+        "operationId": "AdminEvents_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEventDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Content"
+        ]
+      }
+    },
+    "/v1/admin/events/{id}": {
+      "get": {
+        "operationId": "AdminEvents_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEventDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Content"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminEvents_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEventDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Content"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminEvents_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Content"
+        ]
+      }
+    },
     "/v1/admin/dashboard": {
       "get": {
         "operationId": "AdminDashboard_get",
@@ -7298,6 +7697,763 @@
           "body",
           "product"
         ]
+      },
+      "BannerPlacement": {
+        "type": "string",
+        "enum": [
+          "ANNOUNCEMENT",
+          "HOME_PROMO"
+        ]
+      },
+      "BannerTheme": {
+        "type": "string",
+        "enum": [
+          "INK",
+          "RED",
+          "NAVY",
+          "GOLD"
+        ]
+      },
+      "BannerDto": {
+        "type": "object",
+        "properties": {
+          "placement": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BannerPlacement"
+              }
+            ]
+          },
+          "theme": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BannerTheme"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "ctaLabel": {
+            "type": "string",
+            "nullable": true
+          },
+          "linkUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "placement",
+          "theme",
+          "id",
+          "title",
+          "subtitle",
+          "ctaLabel",
+          "linkUrl",
+          "imageUrl"
+        ]
+      },
+      "ContentStatus": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "PUBLISHED"
+        ]
+      },
+      "BannerTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "ctaLabel": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "locale",
+          "title",
+          "subtitle",
+          "ctaLabel"
+        ]
+      },
+      "AdminBannerDto": {
+        "type": "object",
+        "properties": {
+          "placement": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BannerPlacement"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContentStatus"
+              }
+            ]
+          },
+          "state": {
+            "description": "目前實際狀態：草稿、排程中、上架中、已下架",
+            "enum": [
+              "DRAFT",
+              "SCHEDULED",
+              "LIVE",
+              "ENDED"
+            ],
+            "type": "string"
+          },
+          "theme": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BannerTheme"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "繁中標題"
+          },
+          "linkUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BannerTranslationDto"
+            }
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "placement",
+          "status",
+          "state",
+          "theme",
+          "id",
+          "title",
+          "linkUrl",
+          "imageUrl",
+          "startsAt",
+          "endsAt",
+          "sortOrder",
+          "translations",
+          "updatedAt"
+        ]
+      },
+      "AdminBannerListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminBannerDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "BannerTranslationInput": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "ctaLabel": {
+            "type": "string",
+            "nullable": true,
+            "description": "按鈕文字（首頁橫幅）",
+            "maxLength": 30
+          }
+        },
+        "required": [
+          "locale",
+          "title"
+        ]
+      },
+      "CreateBannerDto": {
+        "type": "object",
+        "properties": {
+          "placement": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BannerPlacement"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContentStatus"
+              }
+            ]
+          },
+          "theme": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BannerTheme"
+              }
+            ]
+          },
+          "linkUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "站內路徑（例如 /events/taipei-show）或 https 網址",
+            "maxLength": 2048
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2048
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "未設定表示發布後立即上架"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "未設定表示不自動下架"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "數字小的排前面",
+            "minimum": -999,
+            "maximum": 999
+          },
+          "translations": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BannerTranslationInput"
+            }
+          }
+        },
+        "required": [
+          "placement",
+          "status",
+          "theme",
+          "translations"
+        ]
+      },
+      "UpdateBannerDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContentStatus"
+              }
+            ]
+          },
+          "theme": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BannerTheme"
+              }
+            ]
+          },
+          "linkUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "站內路徑（例如 /events/taipei-show）或 https 網址",
+            "maxLength": 2048
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2048
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "未設定表示發布後立即上架"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "未設定表示不自動下架"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "數字小的排前面",
+            "minimum": -999,
+            "maximum": 999
+          },
+          "translations": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BannerTranslationInput"
+            }
+          }
+        }
+      },
+      "EventProductRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "name"
+        ]
+      },
+      "AdminEventListItemDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventType"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContentStatus"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "繁中標題"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "venue": {
+            "type": "string",
+            "nullable": true
+          },
+          "product": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventProductRefDto"
+              }
+            ]
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "status",
+          "id",
+          "slug",
+          "title",
+          "startsAt",
+          "endsAt",
+          "venue",
+          "product",
+          "updatedAt"
+        ]
+      },
+      "AdminEventListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminEventListItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "EventTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "locale",
+          "title",
+          "summary",
+          "body"
+        ]
+      },
+      "AdminEventDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventType"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContentStatus"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "繁中標題"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "venue": {
+            "type": "string",
+            "nullable": true
+          },
+          "product": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventProductRefDto"
+              }
+            ]
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventTranslationDto"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "status",
+          "id",
+          "slug",
+          "title",
+          "startsAt",
+          "endsAt",
+          "venue",
+          "product",
+          "updatedAt",
+          "address",
+          "url",
+          "coverImageUrl",
+          "productId",
+          "translations",
+          "createdAt"
+        ]
+      },
+      "EventTranslationInput": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "summary": {
+            "type": "string",
+            "description": "列表與分享用的一句話介紹",
+            "maxLength": 300
+          },
+          "body": {
+            "type": "string",
+            "description": "活動說明（純文字，段落以空行分隔）",
+            "maxLength": 10000
+          }
+        },
+        "required": [
+          "locale",
+          "title",
+          "summary",
+          "body"
+        ]
+      },
+      "CreateEventDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventType"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContentStatus"
+              }
+            ]
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "venue": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "address": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "url": {
+            "type": "string",
+            "nullable": true,
+            "description": "外部報名或活動頁",
+            "maxLength": 2048
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2048
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true,
+            "description": "相關商品（例如發售活動的限量車款）",
+            "format": "uuid"
+          },
+          "translations": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventTranslationInput"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "status",
+          "slug",
+          "startsAt",
+          "translations"
+        ]
+      },
+      "UpdateEventDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventType"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContentStatus"
+              }
+            ]
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "venue": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "address": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "url": {
+            "type": "string",
+            "nullable": true,
+            "description": "外部報名或活動頁",
+            "maxLength": 2048
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2048
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true,
+            "description": "相關商品（例如發售活動的限量車款）",
+            "format": "uuid"
+          },
+          "translations": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventTranslationInput"
+            }
+          }
+        }
       },
       "DashboardKpisDto": {
         "type": "object",

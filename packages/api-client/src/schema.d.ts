@@ -944,6 +944,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/banners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 目前上架中的公告或首頁橫幅（已依語系挑好文字） */
+        get: operations["Banners_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/banners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminBanners_list"];
+        put?: never;
+        post: operations["AdminBanners_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/banners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["AdminBanners_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["AdminBanners_update"];
+        trace?: never;
+    };
+    "/v1/admin/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminEvents_list"];
+        put?: never;
+        post: operations["AdminEvents_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminEvents_get"];
+        put?: never;
+        post?: never;
+        delete: operations["AdminEvents_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["AdminEvents_update"];
+        trace?: never;
+    };
     "/v1/admin/dashboard": {
         parameters: {
             query?: never;
@@ -2222,6 +2303,206 @@ export interface components {
             body: string;
             /** @description 相關商品（例如發售活動的限量車款） */
             product: components["schemas"]["ProductSummaryDto"] | null;
+        };
+        /** @enum {string} */
+        BannerPlacement: "ANNOUNCEMENT" | "HOME_PROMO";
+        /** @enum {string} */
+        BannerTheme: "INK" | "RED" | "NAVY" | "GOLD";
+        BannerDto: {
+            placement: components["schemas"]["BannerPlacement"];
+            theme: components["schemas"]["BannerTheme"];
+            id: string;
+            title: string;
+            subtitle: string | null;
+            ctaLabel: string | null;
+            linkUrl: string | null;
+            imageUrl: string | null;
+        };
+        /** @enum {string} */
+        ContentStatus: "DRAFT" | "PUBLISHED";
+        BannerTranslationDto: {
+            locale: string;
+            title: string;
+            subtitle: string | null;
+            ctaLabel: string | null;
+        };
+        AdminBannerDto: {
+            placement: components["schemas"]["BannerPlacement"];
+            status: components["schemas"]["ContentStatus"];
+            /**
+             * @description 目前實際狀態：草稿、排程中、上架中、已下架
+             * @enum {string}
+             */
+            state: "DRAFT" | "SCHEDULED" | "LIVE" | "ENDED";
+            theme: components["schemas"]["BannerTheme"];
+            id: string;
+            /** @description 繁中標題 */
+            title: string;
+            linkUrl: string | null;
+            imageUrl: string | null;
+            /** Format: date-time */
+            startsAt: string | null;
+            /** Format: date-time */
+            endsAt: string | null;
+            sortOrder: number;
+            translations: components["schemas"]["BannerTranslationDto"][];
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        AdminBannerListDto: {
+            data: components["schemas"]["AdminBannerDto"][];
+        };
+        BannerTranslationInput: {
+            /** @enum {string} */
+            locale: "zh-TW" | "en" | "zh-CN";
+            title: string;
+            subtitle?: string | null;
+            /** @description 按鈕文字（首頁橫幅） */
+            ctaLabel?: string | null;
+        };
+        CreateBannerDto: {
+            placement: components["schemas"]["BannerPlacement"];
+            status: components["schemas"]["ContentStatus"];
+            theme: components["schemas"]["BannerTheme"];
+            /** @description 站內路徑（例如 /events/taipei-show）或 https 網址 */
+            linkUrl?: string | null;
+            imageUrl?: string | null;
+            /**
+             * Format: date-time
+             * @description 未設定表示發布後立即上架
+             */
+            startsAt?: string | null;
+            /**
+             * Format: date-time
+             * @description 未設定表示不自動下架
+             */
+            endsAt?: string | null;
+            /** @description 數字小的排前面 */
+            sortOrder?: number;
+            translations: components["schemas"]["BannerTranslationInput"][];
+        };
+        UpdateBannerDto: {
+            status?: components["schemas"]["ContentStatus"];
+            theme?: components["schemas"]["BannerTheme"];
+            /** @description 站內路徑（例如 /events/taipei-show）或 https 網址 */
+            linkUrl?: string | null;
+            imageUrl?: string | null;
+            /**
+             * Format: date-time
+             * @description 未設定表示發布後立即上架
+             */
+            startsAt?: string | null;
+            /**
+             * Format: date-time
+             * @description 未設定表示不自動下架
+             */
+            endsAt?: string | null;
+            /** @description 數字小的排前面 */
+            sortOrder?: number;
+            translations?: components["schemas"]["BannerTranslationInput"][];
+        };
+        EventProductRefDto: {
+            id: string;
+            sku: string;
+            name: string;
+        };
+        AdminEventListItemDto: {
+            type: components["schemas"]["EventType"];
+            status: components["schemas"]["ContentStatus"];
+            id: string;
+            slug: string;
+            /** @description 繁中標題 */
+            title: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string | null;
+            venue: string | null;
+            product: components["schemas"]["EventProductRefDto"] | null;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        AdminEventListDto: {
+            data: components["schemas"]["AdminEventListItemDto"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        EventTranslationDto: {
+            locale: string;
+            title: string;
+            summary: string;
+            body: string;
+        };
+        AdminEventDto: {
+            type: components["schemas"]["EventType"];
+            status: components["schemas"]["ContentStatus"];
+            id: string;
+            slug: string;
+            /** @description 繁中標題 */
+            title: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string | null;
+            venue: string | null;
+            product: components["schemas"]["EventProductRefDto"] | null;
+            /** Format: date-time */
+            updatedAt: string;
+            address: string | null;
+            url: string | null;
+            coverImageUrl: string | null;
+            productId: string | null;
+            translations: components["schemas"]["EventTranslationDto"][];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        EventTranslationInput: {
+            /** @enum {string} */
+            locale: "zh-TW" | "en" | "zh-CN";
+            title: string;
+            /** @description 列表與分享用的一句話介紹 */
+            summary: string;
+            /** @description 活動說明（純文字，段落以空行分隔） */
+            body: string;
+        };
+        CreateEventDto: {
+            type: components["schemas"]["EventType"];
+            status: components["schemas"]["ContentStatus"];
+            slug: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt?: string | null;
+            venue?: string | null;
+            address?: string | null;
+            /** @description 外部報名或活動頁 */
+            url?: string | null;
+            coverImageUrl?: string | null;
+            /**
+             * Format: uuid
+             * @description 相關商品（例如發售活動的限量車款）
+             */
+            productId?: string | null;
+            translations: components["schemas"]["EventTranslationInput"][];
+        };
+        UpdateEventDto: {
+            type?: components["schemas"]["EventType"];
+            status?: components["schemas"]["ContentStatus"];
+            slug?: string;
+            /** Format: date-time */
+            startsAt?: string;
+            /** Format: date-time */
+            endsAt?: string | null;
+            venue?: string | null;
+            address?: string | null;
+            /** @description 外部報名或活動頁 */
+            url?: string | null;
+            coverImageUrl?: string | null;
+            /**
+             * Format: uuid
+             * @description 相關商品（例如發售活動的限量車款）
+             */
+            productId?: string | null;
+            translations?: components["schemas"]["EventTranslationInput"][];
         };
         DashboardKpisDto: {
             /** @description 今日（台灣時間）已付款營收 */
@@ -4144,6 +4425,230 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EventDetailDto"];
+                };
+            };
+        };
+    };
+    Banners_list: {
+        parameters: {
+            query: {
+                placement: components["schemas"]["BannerPlacement"];
+                locale?: "zh-TW" | "en" | "zh-CN";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BannerDto"][];
+                };
+            };
+        };
+    };
+    AdminBanners_list: {
+        parameters: {
+            query?: {
+                placement?: components["schemas"]["BannerPlacement"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBannerListDto"];
+                };
+            };
+        };
+    };
+    AdminBanners_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBannerDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBannerDto"];
+                };
+            };
+        };
+    };
+    AdminBanners_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminBanners_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBannerDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBannerDto"];
+                };
+            };
+        };
+    };
+    AdminEvents_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                status?: components["schemas"]["ContentStatus"];
+                type?: components["schemas"]["EventType"];
+                /** @description 搜尋標題或 slug */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventListDto"];
+                };
+            };
+        };
+    };
+    AdminEvents_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEventDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventDto"];
+                };
+            };
+        };
+    };
+    AdminEvents_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventDto"];
+                };
+            };
+        };
+    };
+    AdminEvents_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminEvents_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateEventDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventDto"];
                 };
             };
         };

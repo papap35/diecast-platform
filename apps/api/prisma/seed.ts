@@ -10,6 +10,7 @@ import { hashPassword } from '../src/common/security/password.js';
 import { Permission } from '../src/modules/auth/permissions.js';
 import { BRANDS, CATEGORIES, PRODUCTS, type SeedProduct } from './seed/catalog-data.js';
 import { seedDemoMemberExtras, seedEvents } from './seed/collector-data.js';
+import { seedBanners } from './seed/content-data.js';
 import {
   seedDemoFulfilment,
   seedDemoMemberOrders,
@@ -289,6 +290,7 @@ async function main() {
   await seedDemoFulfilment(prisma, DEMO_ACCOUNTS.member.email);
   await syncTiers(prisma);
   await seedEvents(prisma);
+  await seedBanners(prisma);
   await seedDemoMemberExtras(prisma, DEMO_ACCOUNTS.member.email);
 
   console.log(`✔ 示範資料建立完成${orders ? `（新增 ${orders} 筆示範訂單）` : ''}`);
