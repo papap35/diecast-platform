@@ -67,6 +67,9 @@ function productBody(formData: FormData): Omit<CreateProduct, 'stock'> {
     releaseAt: fromTaipeiInput(text(formData, 'releaseAt')),
     preorderClosesAt: fromTaipeiInput(text(formData, 'preorderClosesAt')),
     expectedShipAt: fromTaipeiInput(text(formData, 'expectedShipAt')),
+    earlyAccessTier: (text(formData, 'earlyAccessTier') ||
+      null) as CreateProduct['earlyAccessTier'],
+    earlyAccessAt: fromTaipeiInput(text(formData, 'earlyAccessAt')),
     purchaseLimit: optionalInt(formData, 'purchaseLimit'),
     isFeatured: formData.get('isFeatured') === 'on',
     specs,

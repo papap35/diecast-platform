@@ -30,6 +30,7 @@ export default async function MembersPage({ searchParams }: PageProps<'/members'
     pageSize: 25,
     q: params.q || undefined,
     status: (params.status || undefined) as Query['status'],
+    tier: (params.tier || undefined) as Query['tier'],
   };
   const api = await serverApi();
   const { data } = await api.GET('/v1/admin/members', { params: { query } });
@@ -59,6 +60,21 @@ export default async function MembersPage({ searchParams }: PageProps<'/members'
             </option>
           ))}
         </Select>
+        <Select
+          name="tier"
+          defaultValue={params.tier ?? ''}
+          className="w-40"
+          aria-label={t('tier')}
+        >
+          <option value="">
+            {t('tier')}：{tc('all')}
+          </option>
+          {(['ROOKIE', 'DRIVER', 'CHAMPION', 'LEGEND'] as const).map((tier) => (
+            <option key={tier} value={tier}>
+              {t(`tiers.${tier}`)}
+            </option>
+          ))}
+        </Select>
         <button type="submit" className={buttonClass('primary', 'md')}>
           {tc('search')}
         </button>
@@ -74,6 +90,7 @@ export default async function MembersPage({ searchParams }: PageProps<'/members'
                 <th>{t('name')}</th>
                 <th>{t('email')}</th>
                 <th>{t('phone')}</th>
+                <th>{t('tier')}</th>
                 <th className="text-right">{t('orderCount')}</th>
                 <th className="text-right">{t('totalSpent')}</th>
                 <th>{tc('status')}</th>
@@ -91,6 +108,7 @@ export default async function MembersPage({ searchParams }: PageProps<'/members'
                   </td>
                   <td className="text-ink-2">{member.email}</td>
                   <td className="text-ink-2 tabular">{member.phone ?? '—'}</td>
+                  <td className="whitespace-nowrap text-ink-2">{t(`tiers.${member.tier}`)}</td>
                   <td className="text-right tabular">{member.orderCount}</td>
                   <td className="text-right font-semibold tabular">
                     {formatPrice(member.totalSpent)}

@@ -177,6 +177,16 @@
       "ORDER_PLACED": "Order placed",
       "ORDER_CANCELLED": "Order cancelled",
       "ORDER_EXPIRED": "Payment expired"
+    },
+    "earlyAccessTier": "Early access tier",
+    "earlyAccessAt": "Early access starts",
+    "earlyAccessNone": "No early access",
+    "earlyAccessHint": "Members at this tier or above can buy before the release (must be earlier than the release time)",
+    "tiers": {
+      "ROOKIE": "Rookie",
+      "DRIVER": "Driver",
+      "CHAMPION": "Champion",
+      "LEGEND": "Legend"
     }
   },
   "brands": {
@@ -346,6 +356,13 @@
       "ACTIVE": "Active",
       "SUSPENDED": "Suspended",
       "DELETED": "Deleted"
+    },
+    "tier": "Tier",
+    "tiers": {
+      "ROOKIE": "Rookie",
+      "DRIVER": "Driver",
+      "CHAMPION": "Champion",
+      "LEGEND": "Legend"
     }
   },
   "errors": {

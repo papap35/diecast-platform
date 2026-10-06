@@ -22,6 +22,8 @@ const LOCALES = [
 const SPEC_KEYS = ['material', 'wheels', 'packaging', 'edition', 'features'] as const;
 const STATUSES = ['DRAFT', 'ACTIVE', 'ARCHIVED'] as const;
 const SALE_TYPES = ['REGULAR', 'PRE_ORDER', 'LIMITED'] as const;
+/** 可設定為優先購門檻的會員等級（新手車手為所有會員，不需要優先購） */
+const EARLY_ACCESS_TIERS = ['DRIVER', 'CHAMPION', 'LEGEND'] as const;
 
 export function ProductForm({
   action,
@@ -279,6 +281,33 @@ export function ProductForm({
                 name="expectedShipAt"
                 type="datetime-local"
                 defaultValue={toTaipeiInput(product?.expectedShipAt)}
+              />
+            </Field>
+            <Field label={t('earlyAccessTier')} name="earlyAccessTier" hint={t('earlyAccessHint')}>
+              <Select
+                id="earlyAccessTier"
+                name="earlyAccessTier"
+                defaultValue={product?.earlyAccessTier ?? ''}
+              >
+                <option value="">{t('earlyAccessNone')}</option>
+                {EARLY_ACCESS_TIERS.map((tier) => (
+                  <option key={tier} value={tier}>
+                    {t(`tiers.${tier}`)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field
+              label={t('earlyAccessAt')}
+              name="earlyAccessAt"
+              hint={t('timeHint')}
+              error={fields.earlyAccessAt}
+            >
+              <Input
+                id="earlyAccessAt"
+                name="earlyAccessAt"
+                type="datetime-local"
+                defaultValue={toTaipeiInput(product?.earlyAccessAt)}
               />
             </Field>
             {product ? null : (

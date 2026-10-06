@@ -177,6 +177,16 @@
       "ORDER_PLACED": "订单成立",
       "ORDER_CANCELLED": "订单取消",
       "ORDER_EXPIRED": "逾期未付款"
+    },
+    "earlyAccessTier": "优先购等级",
+    "earlyAccessAt": "优先购开始时间",
+    "earlyAccessNone": "不开放优先购",
+    "earlyAccessHint": "达此等级的会员可在开卖前抢先购买（需早于开卖时间）",
+    "tiers": {
+      "ROOKIE": "新手车手",
+      "DRIVER": "正式车手",
+      "CHAMPION": "冠军车手",
+      "LEGEND": "传奇车手"
     }
   },
   "brands": {
@@ -346,6 +356,13 @@
       "ACTIVE": "正常",
       "SUSPENDED": "停权",
       "DELETED": "已删除"
+    },
+    "tier": "会员等级",
+    "tiers": {
+      "ROOKIE": "新手车手",
+      "DRIVER": "正式车手",
+      "CHAMPION": "冠军车手",
+      "LEGEND": "传奇车手"
     }
   },
   "errors": {

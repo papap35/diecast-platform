@@ -177,6 +177,16 @@
       "ORDER_PLACED": "訂單成立",
       "ORDER_CANCELLED": "訂單取消",
       "ORDER_EXPIRED": "逾期未付款"
+    },
+    "earlyAccessTier": "優先購等級",
+    "earlyAccessAt": "優先購開始時間",
+    "earlyAccessNone": "不開放優先購",
+    "earlyAccessHint": "達此等級的會員可在開賣前搶先購買（需早於開賣時間）",
+    "tiers": {
+      "ROOKIE": "新手車手",
+      "DRIVER": "正式車手",
+      "CHAMPION": "冠軍車手",
+      "LEGEND": "傳奇車手"
     }
   },
   "brands": {
@@ -346,6 +356,13 @@
       "ACTIVE": "正常",
       "SUSPENDED": "停權",
       "DELETED": "已刪除"
+    },
+    "tier": "會員等級",
+    "tiers": {
+      "ROOKIE": "新手車手",
+      "DRIVER": "正式車手",
+      "CHAMPION": "冠軍車手",
+      "LEGEND": "傳奇車手"
     }
   },
   "errors": {

@@ -47,7 +47,11 @@ export default async function MemberPage({ params }: PageProps<'/members/[id]'>)
         }
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatTile label={t('totalSpent')} value={formatPrice(member.totalSpent)} />
+        <StatTile
+          label={t('totalSpent')}
+          value={formatPrice(member.totalSpent)}
+          detail={`${t('tier')} ${t(`tiers.${member.tier}`)}`}
+        />
         <StatTile label={t('orderCount')} value={String(member.orderCount)} />
         <StatTile
           label={t('joined')}
