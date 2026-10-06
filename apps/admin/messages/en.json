@@ -28,7 +28,8 @@
     "coupons": "Coupons",
     "campaigns": "Newsletters",
     "reports": "Reports",
-    "salesReport": "Sales report"
+    "salesReport": "Sales report",
+    "settings": "Settings"
   },
   "login": {
     "title": "Admin sign in",
@@ -497,7 +498,8 @@
       "banner": "Banners & notices",
       "coupon": "Coupons",
       "campaign": "Newsletters",
-      "report": "Report exports"
+      "report": "Report exports",
+      "settings": "Settings"
     },
     "actions": {
       "auth": {
@@ -567,6 +569,9 @@
       "report": {
         "export_orders": "Exported orders",
         "export_products": "Exported product sales"
+      },
+      "settings": {
+        "update": "Updated settings"
       }
     }
   },
@@ -904,5 +909,33 @@
     "unitsCount": "{count, plural, one {# unit} other {# units}}",
     "ordersCount": "{count, plural, one {# order} other {# orders}}",
     "tierDetail": "{members, plural, one {# member} other {# members}} · {customers} ordered in this period"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Shipping fees and payment deadlines. Last updated {time}",
+    "shipping": "Shipping",
+    "shippingHint": "Free-shipping thresholds use the merchandise subtotal after discounts, excluding shipping.",
+    "cvsFee": "Store pickup fee",
+    "cvsFeeHint": "Shared by 7-ELEVEN, FamilyMart, Hi-Life and OK Mart",
+    "cvsThreshold": "Free store pickup over",
+    "homeFee": "Home delivery fee",
+    "homeThreshold": "Free home delivery over",
+    "thresholdHint": "0 means always free",
+    "tierPreview": "Free-shipping thresholds by member tier",
+    "tierPreviewHint": "Champions get 40% off the threshold and Legends always ship free (tier perks, not set here).",
+    "tier": "Tier",
+    "cvs": "Store pickup",
+    "home": "Home delivery",
+    "free": "Free",
+    "over": "Free over {amount}",
+    "payment": "Payment deadlines",
+    "paymentHint": "How long stock is held after ordering. Unpaid orders are cancelled automatically and the stock is released.",
+    "paymentTimeout": "Regular orders",
+    "paymentTimeoutHint": "10 to 4,320 minutes (3 days)",
+    "limitedTimeout": "Orders with limited items",
+    "limitedTimeoutHint": "5 to 120 minutes, no longer than regular orders. Shorter deadlines release unpaid allocations to other collectors sooner.",
+    "minutes": "min",
+    "saved": "Saved. Carts and checkout pick up the new settings within 15 seconds.",
+    "appliesHint": "Existing orders keep the fees and deadlines from when they were placed."
   }
 }

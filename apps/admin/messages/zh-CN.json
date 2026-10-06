@@ -28,7 +28,8 @@
     "coupons": "优惠券",
     "campaigns": "电子报",
     "reports": "报表",
-    "salesReport": "销售报表"
+    "salesReport": "销售报表",
+    "settings": "系统设置"
   },
   "login": {
     "title": "营运后台登录",
@@ -497,7 +498,8 @@
       "banner": "横幅与公告",
       "coupon": "优惠券",
       "campaign": "电子报",
-      "report": "报表导出"
+      "report": "报表导出",
+      "settings": "系统设置"
     },
     "actions": {
       "auth": {
@@ -567,6 +569,9 @@
       "report": {
         "export_orders": "导出订单明细",
         "export_products": "导出商品销售"
+      },
+      "settings": {
+        "update": "修改系统设置"
       }
     }
   },
@@ -904,5 +909,33 @@
     "unitsCount": "{count} 件",
     "ordersCount": "{count} 笔",
     "tierDetail": "{members} 位会员，期间内 {customers} 位下单"
+  },
+  "settings": {
+    "title": "系统设置",
+    "subtitle": "运费与付款期限。最后更新：{time}",
+    "shipping": "运费",
+    "shippingHint": "免运门槛以折扣后的商品小计判断，不含运费。",
+    "cvsFee": "便利店取货运费",
+    "cvsFeeHint": "7-ELEVEN、全家、莱尔富、OK 便利店共用",
+    "cvsThreshold": "便利店取货免运门槛",
+    "homeFee": "宅配运费",
+    "homeThreshold": "宅配免运门槛",
+    "thresholdHint": "0 表示一律免运",
+    "tierPreview": "各会员等级的免运门槛",
+    "tierPreviewHint": "冠军车手门槛打六折、传奇车手全站免运（会员等级权益，不在这里设置）。",
+    "tier": "等级",
+    "cvs": "便利店取货",
+    "home": "宅配",
+    "free": "免运",
+    "over": "满 {amount} 免运",
+    "payment": "付款期限",
+    "paymentHint": "下单后保留库存的时间；逾时未付款的订单由调度自动取消并释放库存。",
+    "paymentTimeout": "一般订单",
+    "paymentTimeoutHint": "10～4,320 分钟（3 天）",
+    "limitedTimeout": "含限量商品的订单",
+    "limitedTimeoutHint": "5～120 分钟，不可长于一般订单；越短，未付款的名额越快释出给其他人",
+    "minutes": "分钟",
+    "saved": "已保存，新设置会在 15 秒内套用到购物车与结帐",
+    "appliesHint": "已成立的订单维持下单当时的运费与付款期限。"
   }
 }

@@ -68,13 +68,18 @@ export default async function ConsoleLayout({ children }: LayoutProps<'/'>) {
     },
     {
       label: t('system'),
-      items: can(admin, 'admin:manage')
-        ? [
-            { href: '/admins', label: t('admins'), icon: 'user' },
-            { href: '/roles', label: t('roles'), icon: 'shield' },
-            { href: '/audit-logs', label: t('auditLogs'), icon: 'clock' },
-          ]
-        : [],
+      items: [
+        ...(can(admin, 'admin:manage')
+          ? [
+              { href: '/admins', label: t('admins'), icon: 'user' as const },
+              { href: '/roles', label: t('roles'), icon: 'shield' as const },
+              { href: '/audit-logs', label: t('auditLogs'), icon: 'clock' as const },
+            ]
+          : []),
+        ...(can(admin, 'settings:write')
+          ? [{ href: '/settings', label: t('settings'), icon: 'settings' as const }]
+          : []),
+      ],
     },
   ];
   const groups = allGroups.filter((group) => group.items.length > 0);

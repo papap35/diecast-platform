@@ -28,7 +28,8 @@
     "coupons": "優惠券",
     "campaigns": "電子報",
     "reports": "報表",
-    "salesReport": "銷售報表"
+    "salesReport": "銷售報表",
+    "settings": "系統設定"
   },
   "login": {
     "title": "營運後台登入",
@@ -497,7 +498,8 @@
       "banner": "橫幅與公告",
       "coupon": "優惠券",
       "campaign": "電子報",
-      "report": "報表匯出"
+      "report": "報表匯出",
+      "settings": "系統設定"
     },
     "actions": {
       "auth": {
@@ -567,6 +569,9 @@
       "report": {
         "export_orders": "匯出訂單明細",
         "export_products": "匯出商品銷售"
+      },
+      "settings": {
+        "update": "修改系統設定"
       }
     }
   },
@@ -904,5 +909,33 @@
     "unitsCount": "{count} 件",
     "ordersCount": "{count} 筆",
     "tierDetail": "{members} 位會員，期間內 {customers} 位下單"
+  },
+  "settings": {
+    "title": "系統設定",
+    "subtitle": "運費與付款期限。最後更新：{time}",
+    "shipping": "運費",
+    "shippingHint": "免運門檻以折扣後的商品小計判斷，不含運費。",
+    "cvsFee": "超商取貨運費",
+    "cvsFeeHint": "7-ELEVEN、全家、萊爾富、OK 超商共用",
+    "cvsThreshold": "超商取貨免運門檻",
+    "homeFee": "宅配運費",
+    "homeThreshold": "宅配免運門檻",
+    "thresholdHint": "0 表示一律免運",
+    "tierPreview": "各會員等級的免運門檻",
+    "tierPreviewHint": "冠軍車手門檻打六折、傳奇車手全站免運（會員等級權益，不在這裡設定）。",
+    "tier": "等級",
+    "cvs": "超商取貨",
+    "home": "宅配",
+    "free": "免運",
+    "over": "滿 {amount} 免運",
+    "payment": "付款期限",
+    "paymentHint": "下單後保留庫存的時間；逾時未付款的訂單由排程自動取消並釋放庫存。",
+    "paymentTimeout": "一般訂單",
+    "paymentTimeoutHint": "10～4,320 分鐘（3 天）",
+    "limitedTimeout": "含限量商品的訂單",
+    "limitedTimeoutHint": "5～120 分鐘，不可長於一般訂單；越短，未付款的名額越快釋出給其他人",
+    "minutes": "分鐘",
+    "saved": "已儲存，新設定會在 15 秒內套用到購物車與結帳",
+    "appliesHint": "已成立的訂單維持下單當時的運費與付款期限。"
   }
 }

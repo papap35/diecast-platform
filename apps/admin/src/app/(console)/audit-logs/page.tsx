@@ -28,10 +28,12 @@ const ACTION_GROUPS = [
   'coupon',
   'campaign',
   'report',
+  'settings',
 ];
 
 /** 操作對象在後台的頁面 */
 function targetHref(type: string, id: string | null): string | null {
+  if (type === 'Setting') return '/settings';
   if (!id) return null;
   switch (type) {
     case 'Product':
@@ -175,7 +177,10 @@ export default async function AuditLogsPage({ searchParams }: PageProps<'/audit-
               ) : null}
               {data?.data.map((log) => {
                 const href = targetHref(log.targetType, log.targetId);
-                const label = log.targetLabel ?? log.targetId ?? '—';
+                const label =
+                  log.targetLabel ??
+                  log.targetId ??
+                  (log.targetType === 'Setting' ? t('groups.settings') : '—');
                 return (
                   <tr key={log.id} className="align-top">
                     <td className="whitespace-nowrap text-xs text-mute tabular">
