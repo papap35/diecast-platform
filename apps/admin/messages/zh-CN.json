@@ -23,7 +23,9 @@
     "menu": "菜单",
     "content": "内容",
     "events": "活动",
-    "banners": "横幅与公告"
+    "banners": "横幅与公告",
+    "marketing": "行销",
+    "coupons": "优惠券"
   },
   "login": {
     "title": "营运后台登录",
@@ -345,7 +347,9 @@
     "invoiceNeedsAttention": "自动重试已停止，请确认错误原因后手动重试。",
     "invoiceNextAttempt": "下次自动重试：{time}",
     "retryInvoice": "立即重试",
-    "noInvoice": "付款成功后自动开立"
+    "noInvoice": "付款成功后自动开立",
+    "coupon": "优惠券 {code}",
+    "couponFreeShipping": "免运（优惠券）"
   },
   "members": {
     "title": "会员",
@@ -396,7 +400,9 @@
     "ROLE_IN_USE": "系统内置角色或仍有管理员使用的角色不能删除",
     "ROLE_LOCKED": "超级管理员拥有全部权限，不可修改",
     "PASSWORD_MISMATCH": "两次输入的新密码不一致",
-    "TOKEN_INVALID": "登录已失效，请重新登录"
+    "TOKEN_INVALID": "登录已失效，请重新登录",
+    "COUPON_CODE_TAKEN": "优惠码已存在",
+    "COUPON_IN_USE": "已有使用纪录的优惠券不能删除，请改为停用"
   },
   "admins": {
     "title": "管理员",
@@ -482,7 +488,8 @@
       "order": "订单",
       "member": "会员",
       "event": "活动",
-      "banner": "横幅与公告"
+      "banner": "横幅与公告",
+      "coupon": "优惠券"
     },
     "actions": {
       "auth": {
@@ -535,6 +542,11 @@
         "create": "添加横幅",
         "update": "编辑横幅",
         "delete": "删除横幅"
+      },
+      "coupon": {
+        "create": "添加优惠券",
+        "update": "修改优惠券",
+        "delete": "删除优惠券"
       }
     }
   },
@@ -644,6 +656,90 @@
       "endsAtHint": "留白表示不自动下架",
       "sortOrder": "排序",
       "sortOrderHint": "数字小的排前面"
+    }
+  },
+  "coupons": {
+    "title": "优惠券",
+    "subtitle": "会员结帐时输入优惠码使用。下单即计入使用次数，未付款就取消或逾期会退回；付款后退款不退回。",
+    "new": "添加优惠券",
+    "create": "创建优惠券",
+    "editTitle": "编辑优惠券",
+    "created": "优惠券已创建",
+    "searchPlaceholder": "搜索优惠码或名称",
+    "deleteConfirm": "确定要删除这张优惠券吗？",
+    "summary": "会员看到的优惠",
+    "benefitLabel": "优惠",
+    "conditions": "使用条件",
+    "usage": "已使用 / 上限",
+    "totalDiscount": "已折抵金额",
+    "period": "使用期间",
+    "now": "立即",
+    "noEnd": "不限",
+    "noPeriod": "不限期间",
+    "allMembers": "所有会员",
+    "tierOrAbove": "{tier}以上",
+    "minSubtotalShort": "满 {amount}",
+    "perMemberShort": "每人限用 {count} 次",
+    "redemptions": "使用纪录（最近 50 笔）",
+    "noRedemptions": "还没有人使用",
+    "released": "已退回（订单未付款取消）",
+    "states": {
+      "ACTIVE": "可使用",
+      "SCHEDULED": "尚未开始",
+      "EXPIRED": "已过期",
+      "DISABLED": "已停用",
+      "USED_UP": "已领完"
+    },
+    "types": {
+      "FIXED": "折抵金额",
+      "PERCENT": "百分比折扣",
+      "FREE_SHIPPING": "免运"
+    },
+    "typeHints": {
+      "FIXED": "折抵固定金额",
+      "PERCENT": "依比例打折，可设折抵上限",
+      "FREE_SHIPPING": "运费全免"
+    },
+    "benefit": {
+      "FIXED": "折 NT${amount}",
+      "PERCENT": "{zhRate} 折{hasCap, select, yes {（最高折 NT${cap}）} other {}}",
+      "FREE_SHIPPING": "免运费"
+    },
+    "tiers": {
+      "DRIVER": "正式车手",
+      "CHAMPION": "冠军车手",
+      "LEGEND": "传奇车手"
+    },
+    "sections": {
+      "benefit": "优惠内容",
+      "rules": "使用条件"
+    },
+    "fields": {
+      "code": "优惠码",
+      "codeHint": "3～30 个英数、底线或连字号，不分大小写",
+      "codeLocked": "创建后不能修改",
+      "name": "名称",
+      "nameHint": "会员结帐时会看到",
+      "type": "类型",
+      "typeLocked": "（创建后不能修改）",
+      "amount": "折抵金额（元）",
+      "percent": "折扣（%）",
+      "percentHint": "例如 15 表示打 85 折",
+      "maxDiscount": "最高折抵（元）",
+      "maxDiscountHint": "留白表示不设上限",
+      "minSubtotal": "消费门槛（元）",
+      "minSubtotalHint": "适用商品的小计，不含运费",
+      "minTier": "会员等级",
+      "perMemberLimit": "每人可用次数",
+      "usageLimit": "总使用次数",
+      "usageLimitHint": "留白表示不限",
+      "usageLimitUsed": "已使用 {used} 次，不能低于这个数字",
+      "startsAt": "开始时间",
+      "startsAtHint": "留白表示立即",
+      "endsAt": "结束时间",
+      "endsAtHint": "留白表示不限",
+      "appliesToLimited": "限量商品也适用（缺省排除，避免开卖时被大量折抵）",
+      "isActive": "激活"
     }
   }
 }

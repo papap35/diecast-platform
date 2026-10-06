@@ -77,3 +77,18 @@ export function BannerStateBadge({ state }: { state: BannerState }) {
   const t = useTranslations('banners.states');
   return <Badge tone={BANNER_TONE[state]}>{t(state)}</Badge>;
 }
+
+type CouponState = Schemas['AdminCouponDto']['state'];
+
+const COUPON_TONE: Record<CouponState, Tone> = {
+  ACTIVE: 'ok',
+  SCHEDULED: 'info',
+  EXPIRED: 'neutral',
+  DISABLED: 'neutral',
+  USED_UP: 'warn',
+};
+
+export function CouponStateBadge({ state }: { state: CouponState }) {
+  const t = useTranslations('coupons.states');
+  return <Badge tone={COUPON_TONE[state]}>{t(state)}</Badge>;
+}

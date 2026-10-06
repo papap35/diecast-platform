@@ -13,6 +13,7 @@ import {
   ReceiptIcon,
   ShieldIcon,
   TagIcon,
+  TicketIcon,
   UserIcon,
   UsersIcon,
 } from './icons';
@@ -29,6 +30,7 @@ const ICONS = {
   clock: ClockIcon,
   calendar: CalendarIcon,
   megaphone: MegaphoneIcon,
+  ticket: TicketIcon,
 };
 
 export interface NavGroup {

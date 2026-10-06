@@ -25,6 +25,7 @@ const ACTION_GROUPS = [
   'member',
   'event',
   'banner',
+  'coupon',
 ];
 
 /** 操作對象在後台的頁面 */
@@ -49,6 +50,8 @@ function targetHref(type: string, id: string | null): string | null {
       return `/events/${id}`;
     case 'Banner':
       return `/banners?edit=${id}`;
+    case 'Coupon':
+      return `/coupons/${id}`;
     default:
       return null;
   }

@@ -143,3 +143,9 @@ export const MegaphoneIcon = (p: IconProps) => (
     <path d="M17.5 9a4 4 0 0 1 0 6M8 14l1.5 5h2.5l-1-4.5" />
   </svg>
 );
+export const TicketIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4V7Z" />
+    <path d="M14 7v10" strokeDasharray="2 2" />
+  </svg>
+);

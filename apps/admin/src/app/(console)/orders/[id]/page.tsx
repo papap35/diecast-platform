@@ -94,6 +94,16 @@ export default async function OrderPage({ params }: PageProps<'/orders/[id]'>) {
             </table>
             <dl className="mt-3 space-y-1.5 border-t border-line pt-3 text-sm">
               <Row label={t('subtotal')} value={formatPrice(order.subtotal)} />
+              {order.couponCode ? (
+                <Row
+                  label={t('coupon', { code: order.couponCode })}
+                  value={
+                    order.discountTotal > 0
+                      ? `−${formatPrice(order.discountTotal)}`
+                      : t('couponFreeShipping')
+                  }
+                />
+              ) : null}
               <Row label={t('shippingFee')} value={formatPrice(order.shippingFee)} />
               <div className="flex justify-between text-base font-bold">
                 <dt>{t('total')}</dt>

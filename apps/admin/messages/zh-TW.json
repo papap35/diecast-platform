@@ -23,7 +23,9 @@
     "menu": "選單",
     "content": "內容",
     "events": "活動",
-    "banners": "橫幅與公告"
+    "banners": "橫幅與公告",
+    "marketing": "行銷",
+    "coupons": "優惠券"
   },
   "login": {
     "title": "營運後台登入",
@@ -345,7 +347,9 @@
     "invoiceNeedsAttention": "自動重試已停止，請確認錯誤原因後手動重試。",
     "invoiceNextAttempt": "下次自動重試：{time}",
     "retryInvoice": "立即重試",
-    "noInvoice": "付款成功後自動開立"
+    "noInvoice": "付款成功後自動開立",
+    "coupon": "優惠券 {code}",
+    "couponFreeShipping": "免運（優惠券）"
   },
   "members": {
     "title": "會員",
@@ -396,7 +400,9 @@
     "ROLE_IN_USE": "系統內建角色或仍有管理員使用的角色不能刪除",
     "ROLE_LOCKED": "超級管理員擁有全部權限，不可修改",
     "PASSWORD_MISMATCH": "兩次輸入的新密碼不一致",
-    "TOKEN_INVALID": "登入已失效，請重新登入"
+    "TOKEN_INVALID": "登入已失效，請重新登入",
+    "COUPON_CODE_TAKEN": "優惠碼已存在",
+    "COUPON_IN_USE": "已有使用紀錄的優惠券不能刪除，請改為停用"
   },
   "admins": {
     "title": "管理員",
@@ -482,7 +488,8 @@
       "order": "訂單",
       "member": "會員",
       "event": "活動",
-      "banner": "橫幅與公告"
+      "banner": "橫幅與公告",
+      "coupon": "優惠券"
     },
     "actions": {
       "auth": {
@@ -535,6 +542,11 @@
         "create": "新增橫幅",
         "update": "編輯橫幅",
         "delete": "刪除橫幅"
+      },
+      "coupon": {
+        "create": "新增優惠券",
+        "update": "修改優惠券",
+        "delete": "刪除優惠券"
       }
     }
   },
@@ -644,6 +656,90 @@
       "endsAtHint": "留白表示不自動下架",
       "sortOrder": "排序",
       "sortOrderHint": "數字小的排前面"
+    }
+  },
+  "coupons": {
+    "title": "優惠券",
+    "subtitle": "會員結帳時輸入優惠碼使用。下單即計入使用次數，未付款就取消或逾期會退回；付款後退款不退回。",
+    "new": "新增優惠券",
+    "create": "建立優惠券",
+    "editTitle": "編輯優惠券",
+    "created": "優惠券已建立",
+    "searchPlaceholder": "搜尋優惠碼或名稱",
+    "deleteConfirm": "確定要刪除這張優惠券嗎？",
+    "summary": "會員看到的優惠",
+    "benefitLabel": "優惠",
+    "conditions": "使用條件",
+    "usage": "已使用 / 上限",
+    "totalDiscount": "已折抵金額",
+    "period": "使用期間",
+    "now": "立即",
+    "noEnd": "不限",
+    "noPeriod": "不限期間",
+    "allMembers": "所有會員",
+    "tierOrAbove": "{tier}以上",
+    "minSubtotalShort": "滿 {amount}",
+    "perMemberShort": "每人限用 {count} 次",
+    "redemptions": "使用紀錄（最近 50 筆）",
+    "noRedemptions": "還沒有人使用",
+    "released": "已退回（訂單未付款取消）",
+    "states": {
+      "ACTIVE": "可使用",
+      "SCHEDULED": "尚未開始",
+      "EXPIRED": "已過期",
+      "DISABLED": "已停用",
+      "USED_UP": "已領完"
+    },
+    "types": {
+      "FIXED": "折抵金額",
+      "PERCENT": "百分比折扣",
+      "FREE_SHIPPING": "免運"
+    },
+    "typeHints": {
+      "FIXED": "折抵固定金額",
+      "PERCENT": "依比例打折，可設折抵上限",
+      "FREE_SHIPPING": "運費全免"
+    },
+    "benefit": {
+      "FIXED": "折 NT${amount}",
+      "PERCENT": "{zhRate} 折{hasCap, select, yes {（最高折 NT${cap}）} other {}}",
+      "FREE_SHIPPING": "免運費"
+    },
+    "tiers": {
+      "DRIVER": "正式車手",
+      "CHAMPION": "冠軍車手",
+      "LEGEND": "傳奇車手"
+    },
+    "sections": {
+      "benefit": "優惠內容",
+      "rules": "使用條件"
+    },
+    "fields": {
+      "code": "優惠碼",
+      "codeHint": "3～30 個英數、底線或連字號，不分大小寫",
+      "codeLocked": "建立後不能修改",
+      "name": "名稱",
+      "nameHint": "會員結帳時會看到",
+      "type": "類型",
+      "typeLocked": "（建立後不能修改）",
+      "amount": "折抵金額（元）",
+      "percent": "折扣（%）",
+      "percentHint": "例如 15 表示打 85 折",
+      "maxDiscount": "最高折抵（元）",
+      "maxDiscountHint": "留白表示不設上限",
+      "minSubtotal": "消費門檻（元）",
+      "minSubtotalHint": "適用商品的小計，不含運費",
+      "minTier": "會員等級",
+      "perMemberLimit": "每人可用次數",
+      "usageLimit": "總使用次數",
+      "usageLimitHint": "留白表示不限",
+      "usageLimitUsed": "已使用 {used} 次，不能低於這個數字",
+      "startsAt": "開始時間",
+      "startsAtHint": "留白表示立即",
+      "endsAt": "結束時間",
+      "endsAtHint": "留白表示不限",
+      "appliesToLimited": "限量商品也適用（預設排除，避免開賣時被大量折抵）",
+      "isActive": "啟用"
     }
   }
 }

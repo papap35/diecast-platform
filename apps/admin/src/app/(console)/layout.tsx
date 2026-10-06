@@ -52,6 +52,12 @@ export default async function ConsoleLayout({ children }: LayoutProps<'/'>) {
         : [],
     },
     {
+      label: t('marketing'),
+      items: can(admin, 'marketing:write')
+        ? [{ href: '/coupons', label: t('coupons'), icon: 'ticket' }]
+        : [],
+    },
+    {
       label: t('system'),
       items: can(admin, 'admin:manage')
         ? [

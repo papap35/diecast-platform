@@ -23,7 +23,9 @@
     "menu": "Menu",
     "content": "Content",
     "events": "Events",
-    "banners": "Banners & notices"
+    "banners": "Banners & notices",
+    "marketing": "Marketing",
+    "coupons": "Coupons"
   },
   "login": {
     "title": "Admin sign in",
@@ -345,7 +347,9 @@
     "invoiceNeedsAttention": "Automatic retries stopped. Check the error, then retry manually.",
     "invoiceNextAttempt": "Next automatic retry: {time}",
     "retryInvoice": "Retry now",
-    "noInvoice": "Issued automatically after payment"
+    "noInvoice": "Issued automatically after payment",
+    "coupon": "Coupon {code}",
+    "couponFreeShipping": "Free (coupon)"
   },
   "members": {
     "title": "Members",
@@ -396,7 +400,9 @@
     "ROLE_IN_USE": "Built-in roles and roles that are still assigned can't be deleted",
     "ROLE_LOCKED": "The super admin role has every permission and can't be edited",
     "PASSWORD_MISMATCH": "The new passwords don't match",
-    "TOKEN_INVALID": "Your session has expired. Please sign in again"
+    "TOKEN_INVALID": "Your session has expired. Please sign in again",
+    "COUPON_CODE_TAKEN": "This coupon code already exists",
+    "COUPON_IN_USE": "Coupons that have been used can't be deleted. Disable it instead"
   },
   "admins": {
     "title": "Admins",
@@ -482,7 +488,8 @@
       "order": "Orders",
       "member": "Members",
       "event": "Events",
-      "banner": "Banners & notices"
+      "banner": "Banners & notices",
+      "coupon": "Coupons"
     },
     "actions": {
       "auth": {
@@ -535,6 +542,11 @@
         "create": "Created banner",
         "update": "Edited banner",
         "delete": "Deleted banner"
+      },
+      "coupon": {
+        "create": "Created coupon",
+        "update": "Edited coupon",
+        "delete": "Deleted coupon"
       }
     }
   },
@@ -644,6 +656,90 @@
       "endsAtHint": "Leave blank to keep showing",
       "sortOrder": "Order",
       "sortOrderHint": "Lower numbers come first"
+    }
+  },
+  "coupons": {
+    "title": "Coupons",
+    "subtitle": "Members enter a code at checkout. Uses count when the order is placed and are returned if it's cancelled before payment; refunds after payment don't return them.",
+    "new": "New coupon",
+    "create": "Create coupon",
+    "editTitle": "Edit coupon",
+    "created": "Coupon created",
+    "searchPlaceholder": "Search code or name",
+    "deleteConfirm": "Delete this coupon?",
+    "summary": "What members get",
+    "benefitLabel": "Benefit",
+    "conditions": "Conditions",
+    "usage": "Used / limit",
+    "totalDiscount": "Total discounted",
+    "period": "Valid",
+    "now": "Now",
+    "noEnd": "No end",
+    "noPeriod": "Always",
+    "allMembers": "All members",
+    "tierOrAbove": "{tier} and above",
+    "minSubtotalShort": "Min. spend {amount}",
+    "perMemberShort": "{count, plural, one {Once} other {# times}} per member",
+    "redemptions": "Redemptions (latest 50)",
+    "noRedemptions": "Not used yet",
+    "released": "Returned (cancelled before payment)",
+    "states": {
+      "ACTIVE": "Active",
+      "SCHEDULED": "Scheduled",
+      "EXPIRED": "Expired",
+      "DISABLED": "Disabled",
+      "USED_UP": "Fully used"
+    },
+    "types": {
+      "FIXED": "Amount off",
+      "PERCENT": "Percentage off",
+      "FREE_SHIPPING": "Free shipping"
+    },
+    "typeHints": {
+      "FIXED": "A fixed amount off",
+      "PERCENT": "A percentage off, with an optional cap",
+      "FREE_SHIPPING": "Waives the shipping fee"
+    },
+    "benefit": {
+      "FIXED": "NT${amount} off",
+      "PERCENT": "{percent}% off{hasCap, select, yes { (up to NT${cap})} other {}}",
+      "FREE_SHIPPING": "Free shipping"
+    },
+    "tiers": {
+      "DRIVER": "Driver",
+      "CHAMPION": "Champion",
+      "LEGEND": "Legend"
+    },
+    "sections": {
+      "benefit": "Benefit",
+      "rules": "Conditions"
+    },
+    "fields": {
+      "code": "Code",
+      "codeHint": "3–30 letters, digits, underscores or hyphens. Not case-sensitive",
+      "codeLocked": "Can't be changed after creation",
+      "name": "Name",
+      "nameHint": "Shown to members at checkout",
+      "type": "Type",
+      "typeLocked": "(can't be changed after creation)",
+      "amount": "Amount off (NT$)",
+      "percent": "Discount (%)",
+      "percentHint": "For example 15 means 15% off",
+      "maxDiscount": "Maximum discount (NT$)",
+      "maxDiscountHint": "Leave blank for no cap",
+      "minSubtotal": "Minimum spend (NT$)",
+      "minSubtotalHint": "Subtotal of eligible items, excluding shipping",
+      "minTier": "Membership level",
+      "perMemberLimit": "Uses per member",
+      "usageLimit": "Total uses",
+      "usageLimitHint": "Leave blank for unlimited",
+      "usageLimitUsed": "Used {used} times; can't go below that",
+      "startsAt": "Starts",
+      "startsAtHint": "Leave blank to start now",
+      "endsAt": "Ends",
+      "endsAtHint": "Leave blank for no end",
+      "appliesToLimited": "Also applies to limited drops (excluded by default to avoid mass discounts at release)",
+      "isActive": "Active"
     }
   }
 }
