@@ -14,16 +14,42 @@ datasource db {
 // ─────────────────────────────────────────────
 
 model AdminUser {
-  id           String    @id @default(uuid(7)) @db.Uuid
-  email        String    @unique
-  passwordHash String
-  name         String
-  roleId       String    @db.Uuid
-  role         Role      @relation(fields: [roleId], references: [id])
-  isActive     Boolean   @default(true)
-  lastLoginAt  DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id               String     @id @default(uuid(7)) @db.Uuid
+  email            String     @unique
+  passwordHash     String
+  name             String
+  roleId           String     @db.Uuid
+  role             Role       @relation(fields: [roleId], references: [id])
+  isActive         Boolean    @default(true)
+  lastLoginAt      DateTime?
+  /// 重設或修改密碼的時間：在這之前簽發的 access token 一律失效
+  tokensValidAfter DateTime?
+  auditLogs        AuditLog[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
+
+/// 後台操作紀錄：誰在什麼時候對哪一筆資料做了什麼（只記成功的寫入與登入）
+model AuditLog {
+  id          String     @id @default(uuid(7)) @db.Uuid
+  /// 管理員被刪除後保留紀錄
+  adminId     String?    @db.Uuid
+  admin       AdminUser? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  /// 動作代碼，例如 product.update、order.status、auth.login
+  action      String
+  /// 資料類型，例如 Product、Order、AdminUser
+  targetType  String
+  targetId    String?
+  /// 寫入當下的辨識文字（訂單編號、Email、SKU…），資料刪除後仍看得出是哪一筆
+  targetLabel String?
+  /// 送出的內容（已遮蔽密碼等敏感欄位）
+  changes     Json?
+  ip          String?
+  createdAt   DateTime   @default(now())
+
+  @@index([createdAt])
+  @@index([targetType, targetId])
+  @@index([adminId, createdAt])
 }
 
 model Role {

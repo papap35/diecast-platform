@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import { pageMeta, skipTake } from '../../common/http/pagination.dto.js';
 import { pickTranslation } from '../../common/i18n/locale.js';
+import { startOfTaipeiDay, toTaipeiDay } from '../../common/time/taipei.js';
 import type { OrderStatus, Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { LOW_STOCK_THRESHOLD } from '../catalog/availability.js';
@@ -29,13 +30,6 @@ const listInclude = {
 } satisfies Prisma.OrderInclude;
 
 type OrderForList = Prisma.OrderGetPayload<{ include: typeof listInclude }>;
-
-/** 台灣時間的當日 00:00（以 UTC Date 表示） */
-export function startOfTaipeiDay(date: Date): Date {
-  const taipei = new Date(date.getTime() + 8 * 3_600_000);
-  taipei.setUTCHours(0, 0, 0, 0);
-  return new Date(taipei.getTime() - 8 * 3_600_000);
-}
 
 @Injectable()
 export class AdminSalesService {
@@ -364,8 +358,7 @@ export function fillDays(
 ): SalesPointDto[] {
   const byDay = new Map(rows.map((row) => [row.day, row]));
   return Array.from({ length: days }, (_, i) => {
-    const taipei = new Date(start.getTime() + i * 86_400_000 + 8 * 3_600_000);
-    const date = taipei.toISOString().slice(0, 10);
+    const date = toTaipeiDay(new Date(start.getTime() + i * 86_400_000));
     const row = byDay.get(date);
     return { date, revenue: row?.revenue ?? 0, orders: row?.orders ?? 0 };
   });

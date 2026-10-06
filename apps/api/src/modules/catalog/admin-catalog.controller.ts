@@ -15,6 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 import type { AdminPrincipal } from '../auth/auth.types.js';
 import { AdminAuth, CurrentAdmin, RequirePermissions } from '../auth/decorators.js';
 import { Permission } from '../auth/permissions.js';
+import { Audit } from '../system/audit.js';
 import { AdminProductsService } from './admin-products.service.js';
 import { AdminTaxonomyService } from './admin-taxonomy.service.js';
 import {
@@ -51,6 +52,7 @@ export class AdminProductsController {
   }
 
   @Post()
+  @Audit('product.create', 'Product')
   @RequirePermissions(Permission.ProductWrite)
   create(
     @Body() dto: CreateProductDto,
@@ -60,6 +62,7 @@ export class AdminProductsController {
   }
 
   @Patch(':id')
+  @Audit('product.update', 'Product')
   @RequirePermissions(Permission.ProductWrite)
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -70,6 +73,7 @@ export class AdminProductsController {
 
   /** 下架封存 */
   @Delete(':id')
+  @Audit('product.archive', 'Product')
   @RequirePermissions(Permission.ProductWrite)
   archive(@Param('id', ParseUUIDPipe) id: string): Promise<AdminProductDto> {
     return this.products.archive(id);
@@ -77,6 +81,7 @@ export class AdminProductsController {
 
   /** 調整庫存（增減量），會留下異動紀錄 */
   @Post(':id/stock')
+  @Audit('product.stock', 'Product')
   @HttpCode(HttpStatus.OK)
   @RequirePermissions(Permission.ProductWrite)
   async adjustStock(
@@ -106,12 +111,14 @@ export class AdminTaxonomyController {
   }
 
   @Post('brands')
+  @Audit('brand.create', 'Brand')
   @RequirePermissions(Permission.CatalogWrite)
   createBrand(@Body() dto: CreateBrandDto): Promise<AdminBrandDto> {
     return this.taxonomy.createBrand(dto);
   }
 
   @Patch('brands/:id')
+  @Audit('brand.update', 'Brand')
   @RequirePermissions(Permission.CatalogWrite)
   updateBrand(
     @Param('id', ParseUUIDPipe) id: string,
@@ -121,6 +128,7 @@ export class AdminTaxonomyController {
   }
 
   @Delete('brands/:id')
+  @Audit('brand.delete', 'Brand')
   @HttpCode(HttpStatus.NO_CONTENT)
   @RequirePermissions(Permission.CatalogWrite)
   deleteBrand(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
@@ -133,12 +141,14 @@ export class AdminTaxonomyController {
   }
 
   @Post('categories')
+  @Audit('category.create', 'Category')
   @RequirePermissions(Permission.CatalogWrite)
   createCategory(@Body() dto: CreateCategoryDto): Promise<AdminCategoryDto> {
     return this.taxonomy.createCategory(dto);
   }
 
   @Patch('categories/:id')
+  @Audit('category.update', 'Category')
   @RequirePermissions(Permission.CatalogWrite)
   updateCategory(
     @Param('id', ParseUUIDPipe) id: string,
@@ -148,6 +158,7 @@ export class AdminTaxonomyController {
   }
 
   @Delete('categories/:id')
+  @Audit('category.delete', 'Category')
   @HttpCode(HttpStatus.NO_CONTENT)
   @RequirePermissions(Permission.CatalogWrite)
   deleteCategory(@Param('id', ParseUUIDPipe) id: string): Promise<void> {

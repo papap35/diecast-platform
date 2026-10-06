@@ -20,6 +20,8 @@ export interface AccessTokenPayload {
   sub: string;
   aud: Audience;
   typ: 'access';
+  /** 簽發時間（秒） */
+  iat?: number;
 }
 
 export interface ClientInfo {

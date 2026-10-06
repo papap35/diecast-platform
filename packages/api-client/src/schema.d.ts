@@ -121,6 +121,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/auth/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 修改自己的密碼；成功後所有裝置（含目前這個）都要重新登入 */
+        post: operations["AdminAuth_changePassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/auth/me": {
         parameters: {
             query?: never;
@@ -1127,6 +1144,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/admins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminUsers_list"];
+        put?: never;
+        /** 新增管理員（初始密碼由建立者設定，請另外告知對方） */
+        post: operations["AdminUsers_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/admins/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 修改名稱、角色或啟用狀態；停用後立即登出該管理員所有裝置 */
+        patch: operations["AdminUsers_update"];
+        trace?: never;
+    };
+    "/v1/admin/admins/{id}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 重設密碼並登出該管理員所有裝置 */
+        post: operations["AdminUsers_resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 角色清單與可指派的權限 */
+        get: operations["Roles_list"];
+        put?: never;
+        post: operations["Roles_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/roles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["Roles_remove"];
+        options?: never;
+        head?: never;
+        /** 修改角色，立即對所有使用這個角色的管理員生效 */
+        patch: operations["Roles_update"];
+        trace?: never;
+    };
+    "/v1/admin/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 操作紀錄：可依管理員、動作、資料與日期篩選 */
+        get: operations["AuditLogs_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1201,6 +1320,11 @@ export interface components {
         AdminAuthResultDto: {
             admin: components["schemas"]["AdminProfileDto"];
             tokens: components["schemas"]["TokenPairDto"];
+        };
+        ChangeAdminPasswordDto: {
+            currentPassword: string;
+            /** @description 至少 10 個字元 */
+            newPassword: string;
         };
         MemberStateDto: {
             tier: components["schemas"]["MemberTier"];
@@ -2357,6 +2481,103 @@ export interface components {
             status: "ACTIVE" | "SUSPENDED";
         };
         HealthDto: Record<string, never>;
+        AdminRoleSummaryDto: {
+            id: string;
+            key: string;
+            name: string;
+        };
+        AdminUserDto: {
+            id: string;
+            email: string;
+            name: string;
+            isActive: boolean;
+            /** Format: date-time */
+            lastLoginAt: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            role: components["schemas"]["AdminRoleSummaryDto"];
+        };
+        AdminUserListDto: {
+            data: components["schemas"]["AdminUserDto"][];
+        };
+        CreateAdminUserDto: {
+            /** Format: email */
+            email: string;
+            name: string;
+            /** Format: uuid */
+            roleId: string;
+            /** @description 初始密碼（至少 10 個字元）；請另外告知對方，登入後自行修改 */
+            password: string;
+        };
+        UpdateAdminUserDto: {
+            name?: string;
+            /** Format: uuid */
+            roleId?: string;
+            /** @description 停用後立即登出所有裝置 */
+            isActive?: boolean;
+        };
+        ResetAdminPasswordDto: {
+            /** @description 新密碼（至少 10 個字元）；重設後該管理員所有裝置都會被登出 */
+            password: string;
+        };
+        RoleDto: {
+            id: string;
+            key: string;
+            name: string;
+            description: string | null;
+            permissions: string[];
+            /** @description 系統內建角色不可刪除 */
+            isSystem: boolean;
+            /** @description 擁有全部權限（超級管理員），不可修改 */
+            isLocked: boolean;
+            adminCount: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        RoleListDto: {
+            data: components["schemas"]["RoleDto"][];
+            /** @description 可以指派給角色的權限 */
+            permissions: string[];
+        };
+        CreateRoleDto: {
+            permissions: ("dashboard:read" | "product:read" | "product:write" | "catalog:write" | "order:read" | "order:write" | "member:read" | "member:write" | "content:write" | "marketing:write" | "report:read" | "admin:manage" | "settings:write")[];
+            /** @description 角色代碼：小寫英文開頭，可含數字與底線，3～30 字元 */
+            key: string;
+            name: string;
+            description?: string | null;
+        };
+        UpdateRoleDto: {
+            permissions?: ("dashboard:read" | "product:read" | "product:write" | "catalog:write" | "order:read" | "order:write" | "member:read" | "member:write" | "content:write" | "marketing:write" | "report:read" | "admin:manage" | "settings:write")[];
+            name?: string;
+            description?: string | null;
+        };
+        AuditAdminDto: {
+            id: string;
+            name: string;
+            email: string;
+        };
+        AuditLogDto: {
+            /** @description 送出的內容（已遮蔽密碼等敏感欄位） */
+            changes: {
+                [key: string]: unknown;
+            } | null;
+            id: string;
+            /** @description 動作代碼，例如 product.update */
+            action: string;
+            targetType: string;
+            targetId: string | null;
+            /** @description 寫入當下的辨識文字（訂單編號、Email、SKU…） */
+            targetLabel: string | null;
+            ip: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** @description 管理員帳號刪除後為 null */
+            admin: components["schemas"]["AuditAdminDto"] | null;
+        };
+        AuditLogListDto: {
+            data: components["schemas"]["AuditLogDto"][];
+            meta: components["schemas"]["PageMeta"];
+        };
     };
     responses: never;
     parameters: never;
@@ -2512,6 +2733,27 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["RefreshTokenDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminAuth_changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeAdminPasswordDto"];
             };
         };
         responses: {
@@ -4179,6 +4421,213 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthDto"];
+                };
+            };
+        };
+    };
+    AdminUsers_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserListDto"];
+                };
+            };
+        };
+    };
+    AdminUsers_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAdminUserDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDto"];
+                };
+            };
+        };
+    };
+    AdminUsers_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAdminUserDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDto"];
+                };
+            };
+        };
+    };
+    AdminUsers_resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetAdminPasswordDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Roles_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleListDto"];
+                };
+            };
+        };
+    };
+    Roles_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRoleDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleDto"];
+                };
+            };
+        };
+    };
+    Roles_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Roles_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRoleDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleDto"];
+                };
+            };
+        };
+    };
+    AuditLogs_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                adminId?: string;
+                /** @description 動作代碼或前綴，例如 order 或 order.status */
+                action?: string;
+                targetType?: string;
+                targetId?: string;
+                /** @description 起日（含，台北時間 YYYY-MM-DD） */
+                from?: string;
+                /** @description 迄日（含，台北時間 YYYY-MM-DD） */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditLogListDto"];
                 };
             };
         };

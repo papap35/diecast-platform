@@ -45,6 +45,16 @@ export const ErrorCode = {
   INVOICE_NOT_RETRYABLE: 'INVOICE_NOT_RETRYABLE',
   /** 第三方服務（綠界物流、電子發票）回傳錯誤或無法連線 */
   PROVIDER_ERROR: 'PROVIDER_ERROR',
+
+  /** 不能停用自己、變更自己的角色或移除自己的管理權限（避免把自己鎖在門外） */
+  CANNOT_MODIFY_SELF: 'CANNOT_MODIFY_SELF',
+  /** 至少要保留一位啟用中的超級管理員 */
+  LAST_SUPER_ADMIN: 'LAST_SUPER_ADMIN',
+  ROLE_KEY_TAKEN: 'ROLE_KEY_TAKEN',
+  /** 還有管理員使用這個角色，或角色為系統內建 */
+  ROLE_IN_USE: 'ROLE_IN_USE',
+  /** 超級管理員角色擁有全部權限，不可修改 */
+  ROLE_LOCKED: 'ROLE_LOCKED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

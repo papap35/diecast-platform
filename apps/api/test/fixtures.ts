@@ -131,8 +131,10 @@ export async function placePaidOrder(ctx: TestContext, options: OrderOptions = {
 export async function createAdmin(
   ctx: TestContext,
   permissions: string[] = ['*'],
-  email = `admin${++seq}@example.com`,
+  emailAddress?: string,
 ) {
+  seq += 1;
+  const email = emailAddress ?? `admin${seq}@example.com`;
   const { hashPassword } = await import('../src/common/security/password.js');
   const role = await ctx.prisma.role.create({
     data: { key: `role-${seq}`, name: `Role ${seq}`, permissions },

@@ -209,6 +209,36 @@
         ]
       }
     },
+    "/v1/admin/auth/password": {
+      "post": {
+        "operationId": "AdminAuth_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeAdminPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "修改自己的密碼；成功後所有裝置（含目前這個）都要重新登入",
+        "tags": [
+          "Admin / Auth"
+        ]
+      }
+    },
     "/v1/admin/auth/me": {
       "get": {
         "operationId": "AdminAuth_me",
@@ -3272,6 +3302,389 @@
           "Health"
         ]
       }
+    },
+    "/v1/admin/admins": {
+      "get": {
+        "operationId": "AdminUsers_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / System"
+        ]
+      },
+      "post": {
+        "operationId": "AdminUsers_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "新增管理員（初始密碼由建立者設定，請另外告知對方）",
+        "tags": [
+          "Admin / System"
+        ]
+      }
+    },
+    "/v1/admin/admins/{id}": {
+      "patch": {
+        "operationId": "AdminUsers_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "修改名稱、角色或啟用狀態；停用後立即登出該管理員所有裝置",
+        "tags": [
+          "Admin / System"
+        ]
+      }
+    },
+    "/v1/admin/admins/{id}/password": {
+      "post": {
+        "operationId": "AdminUsers_resetPassword",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetAdminPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "重設密碼並登出該管理員所有裝置",
+        "tags": [
+          "Admin / System"
+        ]
+      }
+    },
+    "/v1/admin/roles": {
+      "get": {
+        "operationId": "Roles_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "角色清單與可指派的權限",
+        "tags": [
+          "Admin / System"
+        ]
+      },
+      "post": {
+        "operationId": "Roles_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / System"
+        ]
+      }
+    },
+    "/v1/admin/roles/{id}": {
+      "patch": {
+        "operationId": "Roles_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "修改角色，立即對所有使用這個角色的管理員生效",
+        "tags": [
+          "Admin / System"
+        ]
+      },
+      "delete": {
+        "operationId": "Roles_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / System"
+        ]
+      }
+    },
+    "/v1/admin/audit-logs": {
+      "get": {
+        "operationId": "AuditLogs_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "adminId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "description": "動作代碼或前綴，例如 order 或 order.status",
+            "schema": {
+              "pattern": "^[a-z_]+(\\.[a-z_]+)?$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[A-Za-z]{2,30}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 64,
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "起日（含，台北時間 YYYY-MM-DD）",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "迄日（含，台北時間 YYYY-MM-DD）",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "操作紀錄：可依管理員、動作、資料與日期篩選",
+        "tags": [
+          "Admin / System"
+        ]
+      }
     }
   },
   "info": {
@@ -3544,6 +3957,25 @@
         "required": [
           "admin",
           "tokens"
+        ]
+      },
+      "ChangeAdminPasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "至少 10 個字元",
+            "minLength": 10,
+            "maxLength": 72
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
         ]
       },
       "MemberStateDto": {
@@ -7855,6 +8287,392 @@
       "HealthDto": {
         "type": "object",
         "properties": {}
+      },
+      "AdminRoleSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name"
+        ]
+      },
+      "AdminUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "lastLoginAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/AdminRoleSummaryDto"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name",
+          "isActive",
+          "lastLoginAt",
+          "createdAt",
+          "role"
+        ]
+      },
+      "AdminUserListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminUserDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "CreateAdminUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "roleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "password": {
+            "type": "string",
+            "description": "初始密碼（至少 10 個字元）；請另外告知對方，登入後自行修改",
+            "minLength": 10,
+            "maxLength": 72
+          }
+        },
+        "required": [
+          "email",
+          "name",
+          "roleId",
+          "password"
+        ]
+      },
+      "UpdateAdminUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "roleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "停用後立即登出所有裝置"
+          }
+        }
+      },
+      "ResetAdminPasswordDto": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "新密碼（至少 10 個字元）；重設後該管理員所有裝置都會被登出",
+            "minLength": 10,
+            "maxLength": 72
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "RoleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isSystem": {
+            "type": "boolean",
+            "description": "系統內建角色不可刪除"
+          },
+          "isLocked": {
+            "type": "boolean",
+            "description": "擁有全部權限（超級管理員），不可修改"
+          },
+          "adminCount": {
+            "type": "number"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "description",
+          "permissions",
+          "isSystem",
+          "isLocked",
+          "adminCount",
+          "updatedAt"
+        ]
+      },
+      "RoleListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleDto"
+            }
+          },
+          "permissions": {
+            "description": "可以指派給角色的權限",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "data",
+          "permissions"
+        ]
+      },
+      "CreateRoleDto": {
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "dashboard:read",
+                "product:read",
+                "product:write",
+                "catalog:write",
+                "order:read",
+                "order:write",
+                "member:read",
+                "member:write",
+                "content:write",
+                "marketing:write",
+                "report:read",
+                "admin:manage",
+                "settings:write"
+              ]
+            }
+          },
+          "key": {
+            "type": "string",
+            "description": "角色代碼：小寫英文開頭，可含數字與底線，3～30 字元",
+            "pattern": "^[a-z][a-z0-9_]{2,29}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "permissions",
+          "key",
+          "name"
+        ]
+      },
+      "UpdateRoleDto": {
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "dashboard:read",
+                "product:read",
+                "product:write",
+                "catalog:write",
+                "order:read",
+                "order:write",
+                "member:read",
+                "member:write",
+                "content:write",
+                "marketing:write",
+                "report:read",
+                "admin:manage",
+                "settings:write"
+              ]
+            }
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          }
+        }
+      },
+      "AuditAdminDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email"
+        ]
+      },
+      "AuditLogDto": {
+        "type": "object",
+        "properties": {
+          "changes": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true,
+            "description": "送出的內容（已遮蔽密碼等敏感欄位）"
+          },
+          "id": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "description": "動作代碼，例如 product.update"
+          },
+          "targetType": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string",
+            "nullable": true
+          },
+          "targetLabel": {
+            "type": "string",
+            "nullable": true,
+            "description": "寫入當下的辨識文字（訂單編號、Email、SKU…）"
+          },
+          "ip": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "admin": {
+            "nullable": true,
+            "description": "管理員帳號刪除後為 null",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AuditAdminDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "changes",
+          "id",
+          "action",
+          "targetType",
+          "targetId",
+          "targetLabel",
+          "ip",
+          "createdAt",
+          "admin"
+        ]
+      },
+      "AuditLogListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
       }
     }
   }

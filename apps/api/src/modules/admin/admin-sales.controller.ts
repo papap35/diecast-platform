@@ -6,6 +6,7 @@ import { Permission } from '../auth/permissions.js';
 import { InvoicesService } from '../invoices/invoices.service.js';
 import { SimulateShipmentDto } from '../logistics/dto/logistics.dto.js';
 import { LogisticsService } from '../logistics/logistics.service.js';
+import { Audit } from '../system/audit.js';
 import { AdminSalesService } from './admin-sales.service.js';
 import {
   AdminMemberDto,
@@ -57,6 +58,7 @@ export class AdminOrdersController {
 
   /** 變更訂單狀態（依狀態機檢查；取消與退款會自動釋放庫存） */
   @Post(':id/status')
+  @Audit('order.status', 'Order')
   @RequirePermissions(Permission.OrderWrite)
   updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
@@ -68,6 +70,7 @@ export class AdminOrdersController {
 
   /** 新增內部備註 */
   @Post(':id/notes')
+  @Audit('order.note', 'Order')
   @RequirePermissions(Permission.OrderWrite)
   addNote(
     @Param('id', ParseUUIDPipe) id: string,
@@ -79,6 +82,7 @@ export class AdminOrdersController {
 
   /** 建立物流單（綠界 C2C 店到店／黑貓宅配；模擬物流產生假單號）。已付款的訂單會轉為處理中 */
   @Post(':id/shipment')
+  @Audit('order.shipment', 'Order')
   @RequirePermissions(Permission.OrderWrite)
   async createShipment(
     @Param('id', ParseUUIDPipe) id: string,
@@ -90,6 +94,7 @@ export class AdminOrdersController {
 
   /** 推進模擬物流的配送狀態（示範用），訂單狀態會跟著更新 */
   @Post(':id/shipment/simulate')
+  @Audit('order.shipment_simulate', 'Order')
   @RequirePermissions(Permission.OrderWrite)
   async simulateShipment(
     @Param('id', ParseUUIDPipe) id: string,
@@ -101,6 +106,7 @@ export class AdminOrdersController {
 
   /** 立即重試開立或作廢電子發票（重設自動重試次數） */
   @Post(':id/invoice/retry')
+  @Audit('order.invoice_retry', 'Order')
   @RequirePermissions(Permission.OrderWrite)
   async retryInvoice(
     @Param('id', ParseUUIDPipe) id: string,
@@ -129,6 +135,7 @@ export class AdminMembersController {
 
   /** 停權或恢復會員 */
   @Patch(':id/status')
+  @Audit('member.status', 'Member')
   @RequirePermissions(Permission.MemberWrite)
   updateStatus(
     @Param('id', ParseUUIDPipe) id: string,

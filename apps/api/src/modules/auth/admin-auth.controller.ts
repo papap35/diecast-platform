@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { ChangeAdminPasswordDto } from '../system/dto/system.dto.js';
 import type { AdminPrincipal } from './auth.types.js';
 import { AdminAuthService } from './admin-auth.service.js';
 import { Client } from './client-info.js';
@@ -32,6 +33,18 @@ export class AdminAuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   logout(@Body() dto: RefreshTokenDto): Promise<void> {
     return this.auth.logout(dto.refreshToken);
+  }
+
+  /** 修改自己的密碼；成功後所有裝置（含目前這個）都要重新登入 */
+  @Post('password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @AdminAuth()
+  changePassword(
+    @CurrentAdmin() admin: AdminPrincipal,
+    @Body() dto: ChangeAdminPasswordDto,
+    @Client() client: ClientInfo,
+  ): Promise<void> {
+    return this.auth.changePassword(admin.id, dto, client);
   }
 
   /** 目前登入的管理員與其權限 */

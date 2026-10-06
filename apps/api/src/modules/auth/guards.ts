@@ -52,7 +52,7 @@ export class OptionalMemberAuthGuard implements CanActivate {
 
 /**
  * 後台 API：驗證 access token（aud=admin），並每次從資料庫讀取最新角色權限，
- * 停用帳號或調整角色會立即生效，不必等 token 過期。
+ * 停用帳號、調整角色或重設密碼都會立即生效，不必等 token 過期。
  */
 @Injectable()
 export class AdminAuthGuard implements CanActivate {
@@ -74,6 +74,13 @@ export class AdminAuthGuard implements CanActivate {
     });
     if (!admin || !admin.isActive) {
       throw AppException.unauthorized(ErrorCode.ACCOUNT_DISABLED, '帳號已停用或不存在');
+    }
+    // 重設或修改密碼之前簽發的 token 立即失效（以秒比較：同一秒內重新登入的 token 仍有效）
+    if (
+      admin.tokensValidAfter &&
+      (payload.iat ?? 0) < Math.floor(admin.tokensValidAfter.getTime() / 1000)
+    ) {
+      throw AppException.unauthorized(ErrorCode.TOKEN_INVALID, '密碼已變更，請重新登入');
     }
 
     req.admin = {
