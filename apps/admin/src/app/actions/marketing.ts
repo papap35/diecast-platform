@@ -82,3 +82,92 @@ export async function deleteCouponAction(id: string): Promise<ActionResult> {
   if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
   return { ok: true, data: undefined };
 }
+
+type CreateCampaign = Schemas['CreateCampaignDto'];
+const LOCALES = ['zh-TW', 'en', 'zh-CN'] as const;
+
+function campaignBody(formData: FormData): CreateCampaign {
+  return {
+    name: text(formData, 'name'),
+    minTier: (text(formData, 'minTier') || null) as CreateCampaign['minTier'],
+    translations: LOCALES.flatMap((locale) => {
+      const subject = text(formData, `subject.${locale}`);
+      if (locale !== 'zh-TW' && !subject) return [];
+      return [{ locale, subject, body: text(formData, `body.${locale}`) }];
+    }),
+  };
+}
+
+export async function saveCampaignAction(
+  _prev: CouponFormState,
+  formData: FormData,
+): Promise<CouponFormState> {
+  if (!(await ensureAccessToken())) return { error: UNAUTHORIZED };
+  const api = await actionApi();
+  const id = text(formData, 'id');
+  if (!id) {
+    const { data, error, response } = await api.POST('/v1/admin/campaigns', {
+      body: campaignBody(formData),
+    });
+    if (!response.ok || !data) return { error: toActionError(error, response.status) };
+    redirect(`/campaigns/${data.id}?created=1`);
+  }
+  const { error, response } = await api.PATCH('/v1/admin/campaigns/{id}', {
+    params: { path: { id } },
+    body: campaignBody(formData),
+  });
+  if (!response.ok) return { error: toActionError(error, response.status) };
+  refresh();
+  return { saved: true };
+}
+
+export async function deleteCampaignAction(id: string): Promise<ActionResult> {
+  if (!(await ensureAccessToken())) return { ok: false, error: UNAUTHORIZED };
+  const api = await actionApi();
+  const { error, response } = await api.DELETE('/v1/admin/campaigns/{id}', {
+    params: { path: { id } },
+  });
+  if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
+  return { ok: true, data: undefined };
+}
+
+/** 排程寄送：scheduledAt 為空表示立即 */
+export async function scheduleCampaignAction(
+  id: string,
+  scheduledAt: string | null,
+): Promise<ActionResult> {
+  if (!(await ensureAccessToken())) return { ok: false, error: UNAUTHORIZED };
+  const api = await actionApi();
+  const { error, response } = await api.POST('/v1/admin/campaigns/{id}/schedule', {
+    params: { path: { id } },
+    body: { scheduledAt: fromTaipeiInput(scheduledAt) },
+  });
+  if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
+  refresh();
+  return { ok: true, data: undefined };
+}
+
+export async function cancelCampaignAction(id: string): Promise<ActionResult> {
+  if (!(await ensureAccessToken())) return { ok: false, error: UNAUTHORIZED };
+  const api = await actionApi();
+  const { error, response } = await api.POST('/v1/admin/campaigns/{id}/cancel', {
+    params: { path: { id } },
+  });
+  if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
+  refresh();
+  return { ok: true, data: undefined };
+}
+
+export async function testCampaignAction(
+  id: string,
+  locale: (typeof LOCALES)[number],
+): Promise<ActionResult> {
+  if (!(await ensureAccessToken())) return { ok: false, error: UNAUTHORIZED };
+  const api = await actionApi();
+  const { error, response } = await api.POST('/v1/admin/campaigns/{id}/test', {
+    params: { path: { id } },
+    body: { locale },
+  });
+  if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
+  return { ok: true, data: undefined };
+}

@@ -25,7 +25,8 @@
     "events": "活动",
     "banners": "横幅与公告",
     "marketing": "行销",
-    "coupons": "优惠券"
+    "coupons": "优惠券",
+    "campaigns": "电子报"
   },
   "login": {
     "title": "营运后台登录",
@@ -402,7 +403,8 @@
     "PASSWORD_MISMATCH": "两次输入的新密码不一致",
     "TOKEN_INVALID": "登录已失效，请重新登录",
     "COUPON_CODE_TAKEN": "优惠码已存在",
-    "COUPON_IN_USE": "已有使用纪录的优惠券不能删除，请改为停用"
+    "COUPON_IN_USE": "已有使用纪录的优惠券不能删除，请改为停用",
+    "CAMPAIGN_NOT_EDITABLE": "电子报已调度或寄出，不能修改（调度中可先取消）"
   },
   "admins": {
     "title": "管理员",
@@ -489,7 +491,8 @@
       "member": "会员",
       "event": "活动",
       "banner": "横幅与公告",
-      "coupon": "优惠券"
+      "coupon": "优惠券",
+      "campaign": "电子报"
     },
     "actions": {
       "auth": {
@@ -547,6 +550,14 @@
         "create": "添加优惠券",
         "update": "修改优惠券",
         "delete": "删除优惠券"
+      },
+      "campaign": {
+        "create": "添加电子报",
+        "update": "修改电子报",
+        "delete": "删除电子报",
+        "test": "寄送测试信",
+        "schedule": "调度寄送电子报",
+        "cancel": "取消电子报调度"
       }
     }
   },
@@ -740,6 +751,68 @@
       "endsAtHint": "留白表示不限",
       "appliesToLimited": "限量商品也适用（缺省排除，避免开卖时被大量折抵）",
       "isActive": "激活"
+    }
+  },
+  "campaigns": {
+    "title": "电子报",
+    "subtitle": "寄给同意接收新品与限量发售通知的会员，依会员语系寄出对应内容，每封都附退订链接。",
+    "new": "添加电子报",
+    "newHint": "先存成草稿，寄测试信确认内容后再寄送。",
+    "create": "存成草稿",
+    "editTitle": "编辑电子报",
+    "created": "电子报草稿已创建",
+    "deleteConfirm": "确定要删除这封电子报草稿吗？",
+    "lockedHint": "电子报已调度或寄出，内容不能修改。调度中的可以先取消调度再修改。",
+    "allSubscribers": "所有订阅的会员",
+    "tierOrAbove": "{tier}以上",
+    "tiers": {
+      "DRIVER": "正式车手",
+      "CHAMPION": "冠军车手",
+      "LEGEND": "传奇车手"
+    },
+    "recipients": "收件人数",
+    "audienceNow": "目前符合条件",
+    "delivered": "已寄出",
+    "failedShort": "{count} 封失败",
+    "when": "寄送时间",
+    "scheduledFor": "预定 {time} 寄出",
+    "sentAt": "{time} 寄出",
+    "statuses": {
+      "DRAFT": "草稿",
+      "SCHEDULED": "已调度",
+      "SENDING": "寄送中",
+      "SENT": "已寄出"
+    },
+    "stats": {
+      "sent": "已寄出",
+      "pending": "待寄出",
+      "failed": "寄送失败"
+    },
+    "sendPanel": "寄送",
+    "testTitle": "寄测试信给自己",
+    "testLocale": "测试信语系",
+    "sendTest": "寄测试信",
+    "testHint": "主旨会加上［测试］，不计入收件人数。",
+    "testSent": "测试信已排入外寄匣，约 30 秒内寄出",
+    "sendTitle": "寄给 {count} 位会员",
+    "scheduleAt": "调度时间",
+    "scheduleHint": "留白表示立即寄送（调度每分钟检查一次）",
+    "sendNow": "立即寄送",
+    "schedule": "调度寄送",
+    "sendConfirm": "确定要寄给 {count} 位会员吗？开始寄送后就不能取消。",
+    "scheduled": "已调度",
+    "sendingSoon": "已排入寄送，一分钟内开始",
+    "cancelSchedule": "取消调度",
+    "cancelled": "已取消调度，回到草稿",
+    "fields": {
+      "name": "名称",
+      "nameHint": "内部辨识用，会员看不到",
+      "audience": "收件对象",
+      "audienceHint": "只会寄给同意接收行销消息、帐号正常的会员",
+      "subject": "主旨",
+      "body": "内容",
+      "bodyHint": "纯文本，段落之间空一行；'{{name}}' 会换成会员名称。信件最后会自动加上退订说明。",
+      "optionalLocale": "选填，没有翻译的语系会收到繁中内容"
     }
   }
 }

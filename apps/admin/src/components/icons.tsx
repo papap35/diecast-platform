@@ -149,3 +149,9 @@ export const TicketIcon = (p: IconProps) => (
     <path d="M14 7v10" strokeDasharray="2 2" />
   </svg>
 );
+export const MailIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
+    <path d="m4 7 8 6 8-6" />
+  </svg>
+);

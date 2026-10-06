@@ -92,3 +92,17 @@ export function CouponStateBadge({ state }: { state: CouponState }) {
   const t = useTranslations('coupons.states');
   return <Badge tone={COUPON_TONE[state]}>{t(state)}</Badge>;
 }
+
+type CampaignStatus = Schemas['CampaignDto']['status'];
+
+const CAMPAIGN_TONE: Record<CampaignStatus, Tone> = {
+  DRAFT: 'neutral',
+  SCHEDULED: 'info',
+  SENDING: 'warn',
+  SENT: 'ok',
+};
+
+export function CampaignStatusBadge({ status }: { status: CampaignStatus }) {
+  const t = useTranslations('campaigns.statuses');
+  return <Badge tone={CAMPAIGN_TONE[status]}>{t(status)}</Badge>;
+}

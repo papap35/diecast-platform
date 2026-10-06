@@ -9,6 +9,7 @@ import {
   ClockIcon,
   FolderIcon,
   GridIcon,
+  MailIcon,
   MegaphoneIcon,
   ReceiptIcon,
   ShieldIcon,
@@ -31,6 +32,7 @@ const ICONS = {
   calendar: CalendarIcon,
   megaphone: MegaphoneIcon,
   ticket: TicketIcon,
+  mail: MailIcon,
 };
 
 export interface NavGroup {

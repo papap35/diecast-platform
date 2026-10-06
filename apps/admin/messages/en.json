@@ -25,7 +25,8 @@
     "events": "Events",
     "banners": "Banners & notices",
     "marketing": "Marketing",
-    "coupons": "Coupons"
+    "coupons": "Coupons",
+    "campaigns": "Newsletters"
   },
   "login": {
     "title": "Admin sign in",
@@ -402,7 +403,8 @@
     "PASSWORD_MISMATCH": "The new passwords don't match",
     "TOKEN_INVALID": "Your session has expired. Please sign in again",
     "COUPON_CODE_TAKEN": "This coupon code already exists",
-    "COUPON_IN_USE": "Coupons that have been used can't be deleted. Disable it instead"
+    "COUPON_IN_USE": "Coupons that have been used can't be deleted. Disable it instead",
+    "CAMPAIGN_NOT_EDITABLE": "Scheduled or sent newsletters can't be edited (cancel the schedule first)"
   },
   "admins": {
     "title": "Admins",
@@ -489,7 +491,8 @@
       "member": "Members",
       "event": "Events",
       "banner": "Banners & notices",
-      "coupon": "Coupons"
+      "coupon": "Coupons",
+      "campaign": "Newsletters"
     },
     "actions": {
       "auth": {
@@ -547,6 +550,14 @@
         "create": "Created coupon",
         "update": "Edited coupon",
         "delete": "Deleted coupon"
+      },
+      "campaign": {
+        "create": "Created newsletter",
+        "update": "Edited newsletter",
+        "delete": "Deleted newsletter",
+        "test": "Sent test email",
+        "schedule": "Scheduled newsletter",
+        "cancel": "Cancelled newsletter schedule"
       }
     }
   },
@@ -740,6 +751,68 @@
       "endsAtHint": "Leave blank for no end",
       "appliesToLimited": "Also applies to limited drops (excluded by default to avoid mass discounts at release)",
       "isActive": "Active"
+    }
+  },
+  "campaigns": {
+    "title": "Newsletters",
+    "subtitle": "Sent to members who opted in to new arrivals and drop alerts, in each member's language, always with an unsubscribe link.",
+    "new": "New newsletter",
+    "newHint": "Save a draft and send yourself a test before sending it out.",
+    "create": "Save draft",
+    "editTitle": "Edit newsletter",
+    "created": "Draft created",
+    "deleteConfirm": "Delete this draft?",
+    "lockedHint": "Scheduled or sent newsletters can't be edited. Cancel a scheduled one to edit it.",
+    "allSubscribers": "All subscribers",
+    "tierOrAbove": "{tier} and above",
+    "tiers": {
+      "DRIVER": "Driver",
+      "CHAMPION": "Champion",
+      "LEGEND": "Legend"
+    },
+    "recipients": "Recipients",
+    "audienceNow": "Matching now",
+    "delivered": "Delivered",
+    "failedShort": "{count} failed",
+    "when": "Sent / scheduled",
+    "scheduledFor": "Scheduled for {time}",
+    "sentAt": "Sent {time}",
+    "statuses": {
+      "DRAFT": "Draft",
+      "SCHEDULED": "Scheduled",
+      "SENDING": "Sending",
+      "SENT": "Sent"
+    },
+    "stats": {
+      "sent": "Delivered",
+      "pending": "Queued",
+      "failed": "Failed"
+    },
+    "sendPanel": "Send",
+    "testTitle": "Send yourself a test",
+    "testLocale": "Test language",
+    "sendTest": "Send test",
+    "testHint": "The subject is prefixed with [Test] and it doesn't count as a recipient.",
+    "testSent": "Test queued; it goes out within about 30 seconds",
+    "sendTitle": "Send to {count, plural, one {# member} other {# members}}",
+    "scheduleAt": "Schedule for",
+    "scheduleHint": "Leave blank to send now (the scheduler runs every minute)",
+    "sendNow": "Send now",
+    "schedule": "Schedule",
+    "sendConfirm": "Send to {count, plural, one {# member} other {# members}}? This can't be cancelled once it starts.",
+    "scheduled": "Scheduled",
+    "sendingSoon": "Queued; sending starts within a minute",
+    "cancelSchedule": "Cancel schedule",
+    "cancelled": "Schedule cancelled; back to draft",
+    "fields": {
+      "name": "Name",
+      "nameHint": "For internal use; members don't see it",
+      "audience": "Audience",
+      "audienceHint": "Only members who opted in and have an active account",
+      "subject": "Subject",
+      "body": "Body",
+      "bodyHint": "Plain text; separate paragraphs with a blank line. '{{name}}' becomes the member's name. An unsubscribe note is added automatically.",
+      "optionalLocale": "Optional; members get the Traditional Chinese version if blank"
     }
   }
 }
