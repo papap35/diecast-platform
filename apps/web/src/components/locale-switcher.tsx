@@ -13,7 +13,8 @@ const LABELS: Record<AppLocale, string> = {
   'zh-CN': '简体中文',
 };
 
-export function LocaleSwitcher({ className }: { className?: string }) {
+/** 語言切換；display 由呼叫端決定（例如頁首在手機版隱藏，改放在選單內） */
+export function LocaleSwitcher({ className = 'inline-flex' }: { className?: string }) {
   const t = useTranslations('nav');
   const locale = useLocale();
   const router = useRouter();
@@ -22,9 +23,7 @@ export function LocaleSwitcher({ className }: { className?: string }) {
   const [pending, startTransition] = useTransition();
 
   return (
-    <label
-      className={`relative inline-flex items-center gap-1 text-sm text-ink-2 ${className ?? ''}`}
-    >
+    <label className={`relative items-center gap-1 text-sm text-ink-2 ${className}`}>
       <GlobeIcon size={18} />
       <span className="sr-only">{t('language')}</span>
       <select

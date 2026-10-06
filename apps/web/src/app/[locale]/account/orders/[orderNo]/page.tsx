@@ -136,6 +136,11 @@ export default async function OrderDetailPage({
         <section className="rounded-3xl bg-surface p-6 text-sm ring-1 ring-line">
           <h2 className="mb-3 text-base font-semibold">{t('shippingInfo')}</h2>
           <p className="font-medium">{tc('methods.' + order.shippingMethod)}</p>
+          {order.expectedShipAt ? (
+            <p className="mt-1 inline-flex rounded-full bg-gold-soft px-2.5 py-0.5 text-xs font-semibold text-gold">
+              {t('expectedShip', { date: formatDate(order.expectedShipAt, locale) })}
+            </p>
+          ) : null}
           <p className="mt-1 text-ink-2">
             {order.recipientName} · {order.recipientPhone}
           </p>

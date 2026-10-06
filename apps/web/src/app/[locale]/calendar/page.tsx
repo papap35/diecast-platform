@@ -3,10 +3,12 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { AvailabilityBadge, SaleTypeBadge } from '@/components/availability-badge';
+import { ReminderButton } from '@/components/collector-buttons';
 import { Countdown } from '@/components/countdown';
+import { EventCard } from '@/components/event-card';
 import { Price } from '@/components/price';
 import { ProductGrid } from '@/components/product-card';
-import { SectionHeader } from '@/components/section-header';
+import { SectionHeader, ViewAllLink } from '@/components/section-header';
 import { Link } from '@/i18n/navigation';
 import { pageLocale } from '@/i18n/page-locale';
 import { serverApi } from '@/lib/api';
@@ -25,7 +27,7 @@ export default async function CalendarPage({ params }: PageProps<'/[locale]/cale
   const locale = await pageLocale(params);
   const t = await getTranslations('calendar');
   const api = await serverApi(locale);
-  const [upcoming, live, preorders] = await Promise.all([
+  const [upcoming, live, preorders, events] = await Promise.all([
     api.GET('/v1/products', {
       params: { query: { locale, availability: 'upcoming', sort: 'release', pageSize: 50 } },
     }),
@@ -43,6 +45,7 @@ export default async function CalendarPage({ params }: PageProps<'/[locale]/cale
     api.GET('/v1/products', {
       params: { query: { locale, availability: 'preorder', sort: 'release', pageSize: 12 } },
     }),
+    api.GET('/v1/events', { params: { query: { locale, pageSize: 3 } } }),
   ]);
   const now = requestTime();
 
@@ -73,6 +76,20 @@ export default async function CalendarPage({ params }: PageProps<'/[locale]/cale
         )}
       </section>
 
+      {events.data?.data.length ? (
+        <section className="mb-14">
+          <SectionHeader
+            title={t('events')}
+            action={<ViewAllLink href="/events" label={t('allEvents')} />}
+          />
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {events.data.data.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {preorders.data?.data.length ? (
         <section>
           <SectionHeader title={t('preorders')} />
@@ -96,10 +113,7 @@ function TimelineItem({
   return (
     <li className="relative">
       <span className="absolute top-6 -left-[33px] h-4 w-4 rounded-full border-4 border-paper bg-accent sm:-left-[41px]" />
-      <Link
-        href={`/products/${product.slug}`}
-        className="grid items-center gap-4 rounded-2xl bg-surface p-4 ring-1 ring-line transition-shadow hover:shadow-card sm:grid-cols-[5.5rem_9rem_1fr_auto]"
-      >
+      <div className="grid items-center gap-4 rounded-2xl bg-surface p-4 ring-1 ring-line transition-shadow hover:shadow-card sm:grid-cols-[5.5rem_9rem_1fr_auto]">
         <div className="flex items-baseline gap-2 sm:flex-col sm:items-start sm:gap-0">
           <span className="display text-3xl leading-none">{when.day}</span>
           <span className="text-xs text-mute">
@@ -126,16 +140,24 @@ function TimelineItem({
           <p className="text-xs font-semibold tracking-wide text-mute uppercase">
             {product.brand.name}
           </p>
-          <p className="truncate font-semibold">{product.name}</p>
+          <Link
+            href={`/products/${product.slug}`}
+            className="block truncate font-semibold after:absolute after:inset-0"
+          >
+            {product.name}
+          </Link>
           <Price price={product.price} />
         </div>
-        <Countdown
-          target={product.releaseAt!}
-          serverNow={now}
-          variant="inline"
-          className="text-sm text-ink-2"
-        />
-      </Link>
+        <div className="relative z-10 flex flex-col items-start gap-2 sm:items-end">
+          <Countdown
+            target={product.releaseAt!}
+            serverNow={now}
+            variant="inline"
+            className="text-sm text-ink-2"
+          />
+          <ReminderButton productId={product.id} className="h-9 px-4 text-xs" />
+        </div>
+      </div>
     </li>
   );
 }

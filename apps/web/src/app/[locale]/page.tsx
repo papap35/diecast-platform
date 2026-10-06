@@ -6,7 +6,7 @@ import { Countdown } from '@/components/countdown';
 import { ArrowRightIcon, ShieldIcon, StoreIcon, FlagIcon } from '@/components/icons';
 import { Price } from '@/components/price';
 import { ProductGrid } from '@/components/product-card';
-import { SectionHeader } from '@/components/section-header';
+import { SectionHeader, ViewAllLink } from '@/components/section-header';
 import { ButtonLink } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { pageLocale } from '@/i18n/page-locale';
@@ -75,7 +75,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
           <SectionHeader
             title={t('upcomingTitle')}
             subtitle={t('upcomingSubtitle')}
-            action={<ViewAll href="/calendar" label={t('viewAll')} />}
+            action={<ViewAllLink href="/calendar" label={t('viewAll')} />}
           />
           <ProductGrid products={upcoming.data.data} />
         </section>
@@ -84,7 +84,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
       <section className="container-page mt-20">
         <SectionHeader
           title={t('newArrivals')}
-          action={<ViewAll href="/products" label={t('viewAll')} />}
+          action={<ViewAllLink href="/products" label={t('viewAll')} />}
         />
         <ProductGrid products={arrivals.data?.data ?? []} priorityCount={4} />
       </section>
@@ -113,7 +113,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
           <SectionHeader
             title={t('preorderTitle')}
             subtitle={t('preorderSubtitle')}
-            action={<ViewAll href="/products?availability=preorder" label={t('viewAll')} />}
+            action={<ViewAllLink href="/products?availability=preorder" label={t('viewAll')} />}
           />
           <ProductGrid products={preorders.data.data} />
         </section>
@@ -162,7 +162,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
         <section className="container-page mt-20">
           <SectionHeader
             title={t('brandsTitle')}
-            action={<ViewAll href="/brands" label={t('viewAll')} />}
+            action={<ViewAllLink href="/brands" label={t('viewAll')} />}
           />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {brands.data.map((brand) => (
@@ -195,18 +195,6 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
 }
 
 const CATEGORY_TONES = ['bg-[#16161a]', 'bg-[#a91c15]', 'bg-[#1d3f6e]', 'bg-[#7a5a12]'];
-
-function ViewAll({ href, label }: { href: string; label: string }) {
-  return (
-    <Link
-      href={href}
-      className="inline-flex items-center gap-1 text-sm font-semibold text-ink-2 hover:text-ink"
-    >
-      {label}
-      <ArrowRightIcon size={16} />
-    </Link>
-  );
-}
 
 async function Hero({ product, now }: { product: Product; now: number }) {
   const t = await getTranslations('home');

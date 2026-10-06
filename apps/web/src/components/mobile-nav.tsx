@@ -69,7 +69,7 @@ export function MobileNav({ items, searchAction }: { items: NavItem[]; searchAct
                 </li>
               ))}
             </ul>
-            <LocaleSwitcher className="mt-auto" />
+            <LocaleSwitcher className="mt-auto inline-flex" />
           </nav>
         </div>
       ) : null}

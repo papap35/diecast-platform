@@ -398,6 +398,11 @@ export function CheckoutForm({
           </div>
         </dl>
 
+        {cart.preorderMixed ? (
+          <p role="alert" className="rounded-xl bg-warn-soft px-3 py-2 text-sm text-warn">
+            {tc('preorderMixed')}
+          </p>
+        ) : null}
         {errorText && !state.payment ? (
           <p role="alert" className="rounded-xl bg-accent-soft px-3 py-2 text-sm text-accent">
             {errorText}

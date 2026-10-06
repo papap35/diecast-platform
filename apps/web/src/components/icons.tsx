@@ -84,3 +84,49 @@ export const FlagIcon = (p: IconProps) => (
     <path d="M5 21V4M5 4h12l-2 4 2 4H5" />
   </svg>
 );
+export const HeartIcon = ({ filled, ...p }: IconProps & { filled?: boolean }) => (
+  <svg {...base(p)} fill={filled ? 'currentColor' : 'none'}>
+    <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" />
+  </svg>
+);
+export const BellIcon = ({ filled, ...p }: IconProps & { filled?: boolean }) => (
+  <svg {...base(p)} fill={filled ? 'currentColor' : 'none'}>
+    <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z" />
+    <path d="M10 20a2 2 0 0 0 4 0" />
+  </svg>
+);
+export const StarIcon = ({ filled, ...p }: IconProps & { filled?: boolean }) => (
+  <svg {...base(p)} fill={filled ? 'currentColor' : 'none'}>
+    <path d="m12 3.5 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8L12 3.5Z" />
+  </svg>
+);
+export const GarageIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M3 10 12 4l9 6v10H3V10Z" />
+    <path d="M7 20v-6h10v6M7 17h10" />
+  </svg>
+);
+export const MapPinIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 21s-6-5.3-6-11a6 6 0 0 1 12 0c0 5.7-6 11-6 11Z" />
+    <circle cx="12" cy="10" r="2.2" />
+  </svg>
+);
+export const CalendarIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="4" y="5" width="16" height="15" rx="2" />
+    <path d="M4 10h16M9 3v4M15 3v4" />
+  </svg>
+);
+export const LinkIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+    <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+  </svg>
+);
+export const TrophyIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M8 4h8v5a4 4 0 0 1-8 0V4Z" />
+    <path d="M8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M8 20h8M9 17h6" />
+  </svg>
+);

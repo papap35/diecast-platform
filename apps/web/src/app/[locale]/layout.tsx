@@ -3,10 +3,12 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Barlow_Condensed, Noto_Sans_SC, Noto_Sans_TC } from 'next/font/google';
 import { notFound } from 'next/navigation';
+import { CollectorProvider } from '@/components/collector-context';
 import { AnnouncementBar, Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { routing } from '@/i18n/routing';
 import { SITE_URL } from '@/lib/env';
+import { memberState } from '@/lib/member-state';
 import '../globals.css';
 
 const display = Barlow_Condensed({
@@ -58,14 +60,23 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   setRequestLocale(locale);
 
   const body = locale === 'zh-CN' ? bodySC : bodyTC;
+  const member = await memberState(locale);
   return (
     <html lang={HTML_LANG[locale]} className={`${display.variable} ${body.variable}`}>
       <body className="flex min-h-screen flex-col">
         <NextIntlClientProvider>
-          <AnnouncementBar />
-          <Header locale={locale} />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          {/* 登入狀態改變時重新掛載，載入新會員的願望清單與提醒 */}
+          <CollectorProvider
+            key={member.loggedIn ? 'member' : 'guest'}
+            loggedIn={member.loggedIn}
+            wishlistIds={member.wishlistIds}
+            reminderIds={member.reminderIds}
+          >
+            <AnnouncementBar />
+            <Header locale={locale} />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </CollectorProvider>
         </NextIntlClientProvider>
       </body>
     </html>

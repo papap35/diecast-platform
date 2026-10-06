@@ -13,7 +13,13 @@ interface Instruction {
  * redirect → 直接換頁；form_post → 以隱藏表單 POST 到第三方（綠界規格）。
  * 表單動態建立在 body 下，避免出現在結帳表單裡形成巢狀 form。
  */
-export function GatewayRedirect({ instruction, label }: { instruction: Instruction; label: string }) {
+export function GatewayRedirect({
+  instruction,
+  label,
+}: {
+  instruction: Instruction;
+  label: string;
+}) {
   useEffect(() => {
     if (instruction.type === 'redirect') {
       window.location.assign(instruction.url);

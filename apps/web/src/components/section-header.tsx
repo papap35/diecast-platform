@@ -1,3 +1,5 @@
+import { Link } from '@/i18n/navigation';
+import { ArrowRightIcon } from './icons';
 import type { ReactNode } from 'react';
 
 export function SectionHeader({
@@ -17,5 +19,18 @@ export function SectionHeader({
       </div>
       {action}
     </div>
+  );
+}
+
+/** 區塊標題右側的「查看全部」連結 */
+export function ViewAllLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center gap-1 text-sm font-semibold text-ink-2 hover:text-ink"
+    >
+      {label}
+      <ArrowRightIcon size={16} />
+    </Link>
   );
 }

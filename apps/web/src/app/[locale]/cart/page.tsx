@@ -68,7 +68,9 @@ export default async function CartPage({ params }: PageProps<'/[locale]/cart'>) 
             ) : null}
           </div>
           {cart.hasIssues ? (
-            <p className="text-xs font-medium text-accent">{t('fixIssues')}</p>
+            <p className="text-xs font-medium text-accent">
+              {cart.preorderMixed ? t('preorderMixed') : t('fixIssues')}
+            </p>
           ) : null}
           {cart.hasIssues ? (
             <span className="flex h-13 w-full items-center justify-center rounded-full bg-faint text-sm font-semibold text-white">

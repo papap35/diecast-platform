@@ -4,6 +4,15 @@ import { Link, redirect } from '@/i18n/navigation';
 import { pageLocale } from '@/i18n/page-locale';
 import { hasSession } from '@/lib/session';
 
+const NAV = [
+  { href: '/account', key: 'profile' },
+  { href: '/account/orders', key: 'orders' },
+  { href: '/account/garage', key: 'garage' },
+  { href: '/account/wishlist', key: 'wishlist' },
+  { href: '/account/reminders', key: 'reminders' },
+  { href: '/account/notifications', key: 'notifications' },
+] as const;
+
 export default async function AccountLayout({
   children,
   params,
@@ -16,18 +25,15 @@ export default async function AccountLayout({
   return (
     <div className="container-page grid gap-8 py-10 lg:grid-cols-[14rem_1fr]">
       <aside className="h-fit space-y-1 rounded-3xl bg-surface p-3 ring-1 ring-line lg:sticky lg:top-24">
-        <Link
-          href="/account"
-          className="block rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-paper"
-        >
-          {t('profile')}
-        </Link>
-        <Link
-          href="/account/orders"
-          className="block rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-paper"
-        >
-          {t('orders')}
-        </Link>
+        {NAV.map(({ href, key }) => (
+          <Link
+            key={href}
+            href={href}
+            className="block rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-paper"
+          >
+            {t(key)}
+          </Link>
+        ))}
         <form action={logoutAction}>
           <input type="hidden" name="locale" value={locale} />
           <button

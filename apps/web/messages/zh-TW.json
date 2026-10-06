@@ -20,7 +20,10 @@
     "cart": "購物車",
     "menu": "選單",
     "close": "關閉",
-    "language": "語言"
+    "language": "語言",
+    "events": "活動",
+    "notifications": "通知",
+    "notificationsUnread": "{count} 則未讀通知"
   },
   "announcement": {
     "shipping": "超商取貨滿 NT$1,000、宅配滿 NT$1,500 免運"
@@ -82,7 +85,7 @@
     "category": "分類",
     "description": "商品介紹",
     "related": "同品牌的其他車款",
-    "preorderNote": "預購商品會在到貨後出貨，與其他商品分開寄送。",
+    "preorderNote": "預購商品會在到貨後出貨，需與現貨分開結帳。",
     "limitedNote": "限量商品下單後請於 10 分鐘內完成付款，逾時名額將釋出。",
     "specLabels": {
       "material": "材質",
@@ -91,7 +94,11 @@
       "edition": "版本",
       "features": "特色"
     },
-    "limitLabel": "限購"
+    "limitLabel": "限購",
+    "earlyAccessIn": "距離你的{tier}優先購",
+    "earlyAccessInfo": "{tier}以上會員 {time} 起優先購。",
+    "earlyAccessEligible": "你符合資格！",
+    "earlyAccessOpen": "{tier}優先購進行中"
   },
   "countdown": {
     "days": "天",
@@ -147,7 +154,9 @@
     "live": "發售中",
     "upcoming": "即將開賣",
     "preorders": "預購開放中",
-    "noUpcoming": "目前沒有排定的發售。"
+    "noUpcoming": "目前沒有排定的發售。",
+    "events": "近期活動",
+    "allEvents": "所有活動"
   },
   "brands": {
     "title": "品牌",
@@ -175,7 +184,8 @@
       "SOLD_OUT": "已售完，請移除",
       "INSUFFICIENT_STOCK": "庫存不足，請調整數量",
       "LIMIT_EXCEEDED": "超過限購數量，請調整"
-    }
+    },
+    "preorderMixed": "預購商品需與現貨分開結帳，請先移除其中一類商品。"
   },
   "checkout": {
     "title": "結帳",
@@ -290,7 +300,8 @@
       "VOIDED": "已作廢",
       "ALLOWANCE_ISSUED": "已開立折讓單",
       "CANCELLED": "不需開立"
-    }
+    },
+    "expectedShip": "預購・預計 {date} 出貨"
   },
   "account": {
     "title": "會員中心",
@@ -304,7 +315,11 @@
     "saved": "已儲存",
     "memberSince": "加入時間",
     "orders": "訂單紀錄",
-    "recentOrders": "最近訂單"
+    "recentOrders": "最近訂單",
+    "garage": "我的車庫",
+    "wishlist": "願望清單",
+    "reminders": "發售提醒",
+    "notifications": "通知"
   },
   "auth": {
     "loginTitle": "登入",
@@ -346,7 +361,12 @@
     "ORDER_NOT_PAYABLE": "訂單目前無法付款",
     "ORDER_NOT_CANCELLABLE": "訂單已付款，請聯繫客服取消",
     "RATE_LIMITED": "操作太頻繁，請稍候再試",
-    "CVS_SELECTION_NOT_FOUND": "選店資料已過期，請重新選擇門市"
+    "CVS_SELECTION_NOT_FOUND": "選店資料已過期，請重新選擇門市",
+    "PREORDER_SEPARATE_CHECKOUT": "預購商品需與現貨分開結帳",
+    "REMINDER_NOT_AVAILABLE": "這個商品已開賣，不需要提醒",
+    "GARAGE_HANDLE_TAKEN": "這個網址代稱已經有人使用",
+    "GARAGE_FULL": "車庫已滿（最多 500 筆）",
+    "WISHLIST_FULL": "願望清單已滿（最多 200 件）"
   },
   "footer": {
     "tagline": "為模型車收藏家打造的線上車庫。",
@@ -367,5 +387,120 @@
     "free": "免費",
     "yes": "是",
     "no": "否"
+  },
+  "collector": {
+    "addToWishlist": "加入願望清單",
+    "wishlisted": "已加入願望清單",
+    "remindMe": "開賣提醒我",
+    "reminderSet": "已設定提醒"
+  },
+  "membership": {
+    "title": "會員等級",
+    "tiers": {
+      "ROOKIE": "新手車手",
+      "DRIVER": "正式車手",
+      "CHAMPION": "冠軍車手",
+      "LEGEND": "傳奇車手"
+    },
+    "totalSpent": "累計消費",
+    "nextTier": "再消費 {amount} 升級為{tier}",
+    "topTier": "已達最高等級，感謝你的支持！",
+    "benefits": "等級權益",
+    "threshold": "升級門檻",
+    "cvsShipping": "超商免運門檻",
+    "homeShipping": "宅配免運門檻",
+    "earlyAccess": "限量車款優先購",
+    "alwaysFree": "全站免運",
+    "yes": "有",
+    "no": "無",
+    "note": "累計消費以已付款且未退款的訂單計算，退款會扣回並重新計算等級。"
+  },
+  "wishlist": {
+    "title": "願望清單",
+    "subtitle": "售完的車款補貨時會通知你。",
+    "empty": "還沒有收藏的車款。",
+    "browse": "去逛逛"
+  },
+  "reminders": {
+    "title": "發售提醒",
+    "subtitle": "開賣（或你的優先購開始）前 15 分鐘通知你。",
+    "empty": "還沒有設定發售提醒。",
+    "releaseAt": "{time} 開賣",
+    "remindAt": "{time} 通知",
+    "browseCalendar": "看發售行事曆"
+  },
+  "notifications": {
+    "title": "通知",
+    "empty": "目前沒有通知。",
+    "markAllRead": "全部標為已讀",
+    "unread": "未讀",
+    "unreadCount": "{count} 則未讀"
+  },
+  "garage": {
+    "title": "我的車庫",
+    "subtitle": "本站訂單取件後會自動停進車庫，也可以登錄在其他地方入手的車。",
+    "models": "車款",
+    "cars": "總台數",
+    "totalPaid": "購入總額",
+    "privateHint": "只有你看得到",
+    "brands": "品牌分布",
+    "scales": "比例",
+    "empty": "車庫還是空的，完成第一筆訂單或手動登錄一台車吧！",
+    "add": "登錄一台車",
+    "addTitle": "登錄其他來源的車款",
+    "name": "車款名稱",
+    "namePlaceholder": "例如：展場限定色 Shiden RS",
+    "brand": "品牌",
+    "scale": "比例",
+    "condition": "狀態",
+    "quantity": "數量",
+    "pricePaid": "購入價（NT$）",
+    "acquiredAt": "入手日期",
+    "note": "備註",
+    "favorite": "最愛車款",
+    "markFavorite": "設為最愛（排在最前面）",
+    "save": "儲存",
+    "cancel": "取消",
+    "edit": "編輯",
+    "remove": "移除",
+    "removeConfirm": "確定要從車庫移除這台車嗎？",
+    "sourceOrder": "本站購入",
+    "sourceManual": "手動登錄",
+    "conditions": {
+      "SEALED": "未拆封",
+      "OPENED": "已拆封",
+      "DISPLAYED": "展示中",
+      "PLAYWORN": "有使用痕跡"
+    },
+    "share": "公開分享",
+    "shareHint": "公開後任何人都能用網址瀏覽你的車庫（不會顯示購入價與備註）。",
+    "sharePublic": "公開我的車庫",
+    "handle": "網址代稱",
+    "handleHint": "3–20 個小寫英數字或連字號",
+    "shareSaved": "已更新分享設定",
+    "copy": "複製",
+    "copied": "已複製網址",
+    "publicEyebrow": "收藏家車庫",
+    "publicTitle": "@{handle} 的車庫",
+    "publicSubtitle": "{models} 款車、共 {cars} 台收藏",
+    "publicEmpty": "這個車庫還沒有車。"
+  },
+  "events": {
+    "title": "活動",
+    "subtitle": "模型車展、車聚、發售活動與線上直播（台灣時間）",
+    "filter": "活動類型",
+    "all": "全部",
+    "empty": "目前沒有排定的活動。",
+    "types": {
+      "EXHIBITION": "車展",
+      "MEETUP": "車聚",
+      "LAUNCH": "發售活動",
+      "ONLINE": "線上活動"
+    },
+    "time": "時間",
+    "venue": "地點",
+    "externalLink": "活動頁面",
+    "relatedProduct": "活動車款",
+    "back": "所有活動"
   }
 }

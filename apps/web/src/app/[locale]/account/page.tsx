@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { MembershipCard } from '@/components/membership-card';
 import { OrderList } from '@/components/order-list';
 import { ProfileForm } from '@/components/profile-form';
 import { pageLocale } from '@/i18n/page-locale';
@@ -18,9 +19,10 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/accou
   const locale = await pageLocale(params);
   const t = await getTranslations('account');
   const api = await serverApi(locale);
-  const [me, orders] = await Promise.all([
+  const [me, orders, membership] = await Promise.all([
     api.GET('/v1/me'),
     api.GET('/v1/orders', { params: { query: { pageSize: 3 } } }),
+    api.GET('/v1/me/membership'),
   ]);
   if (!me.data) return null;
 
@@ -32,6 +34,7 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/accou
           {me.data.name} · {t('memberSince')} {formatDate(me.data.createdAt, locale)}
         </p>
       </div>
+      {membership.data ? <MembershipCard membership={membership.data} /> : null}
       <section className="rounded-3xl bg-surface p-6 ring-1 ring-line">
         <h2 className="mb-5 text-base font-semibold">{t('profile')}</h2>
         <ProfileForm profile={me.data} />

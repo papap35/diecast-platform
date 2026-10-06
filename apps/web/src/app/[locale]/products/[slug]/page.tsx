@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { AvailabilityBadge, SaleTypeBadge } from '@/components/availability-badge';
+import { WishlistButton } from '@/components/collector-buttons';
 import { ClockIcon } from '@/components/icons';
 import { Price } from '@/components/price';
 import { ProductGallery } from '@/components/product-gallery';
@@ -16,7 +17,7 @@ import type { AppLocale } from '@/i18n/routing';
 import { serverApi } from '@/lib/api';
 import { requestTime } from '@/lib/time';
 import { countryName, flagEmoji, formatDate, formatDateTime } from '@/lib/format';
-import { hasSession } from '@/lib/session';
+import { memberState } from '@/lib/member-state';
 
 type Product = Schemas['ProductDetailDto'];
 
@@ -77,14 +78,14 @@ export default async function ProductPage({ params }: PageProps<'/[locale]/produ
   const tl = await getTranslations('listing');
   const product = await loadProduct(slug, locale);
   const api = await serverApi(locale);
-  const [related, brand, loggedIn] = await Promise.all([
+  const [related, brand, member] = await Promise.all([
     api.GET('/v1/products', {
       params: { query: { locale, brand: product.brand.slug, pageSize: 5 } },
     }),
     api.GET('/v1/brands/{slug}', {
       params: { path: { slug: product.brand.slug }, query: { locale } },
     }),
-    hasSession(),
+    memberState(locale),
   ]);
   const now = requestTime();
   const specs = SPEC_KEYS.filter((key) => product.specs[key]);
@@ -163,7 +164,13 @@ export default async function ProductPage({ params }: PageProps<'/[locale]/produ
             ) : null}
           </dl>
 
-          <PurchasePanel product={product} loggedIn={loggedIn} serverNow={now} />
+          <PurchasePanel
+            product={product}
+            loggedIn={member.loggedIn}
+            memberTier={member.tier}
+            serverNow={now}
+          />
+          <WishlistButton productId={product.id} variant="full" className="w-full" />
 
           {product.saleType !== 'REGULAR' ? (
             <p className="flex gap-2 rounded-xl bg-paper p-3 text-xs text-ink-2 ring-1 ring-line">

@@ -1,27 +1,26 @@
 import { getTranslations } from 'next-intl/server';
 import { getPathname, Link } from '@/i18n/navigation';
-import { serverApi } from '@/lib/api';
-import { hasSession } from '@/lib/session';
-import { BagIcon, UserIcon } from './icons';
+import { memberState } from '@/lib/member-state';
+import { BagIcon, BellIcon, UserIcon } from './icons';
 import { LocaleSwitcher } from './locale-switcher';
 import { Logo } from './logo';
 import { MobileNav, type NavItem } from './mobile-nav';
 import { SearchForm } from './search-form';
 
-async function cartCount(locale: string): Promise<number> {
-  try {
-    const api = await serverApi(locale);
-    const { data } = await api.GET('/v1/cart');
-    return data?.itemCount ?? 0;
-  } catch {
-    return 0;
-  }
+function CountBadge({ count, tone = 'accent' }: { count: number; tone?: 'accent' | 'ink' }) {
+  if (count <= 0) return null;
+  return (
+    <span
+      className={`absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold text-white ${tone === 'accent' ? 'bg-accent' : 'bg-ink'}`}
+    >
+      {count > 99 ? '99+' : count}
+    </span>
+  );
 }
 
 export async function Header({ locale }: { locale: string }) {
   const t = await getTranslations('nav');
-  const loggedIn = await hasSession();
-  const count = loggedIn ? await cartCount(locale) : 0;
+  const { loggedIn, cartCount: count, unreadCount } = await memberState(locale);
   const searchAction = getPathname({ href: '/products', locale });
 
   const items: NavItem[] = [
@@ -29,6 +28,7 @@ export async function Header({ locale }: { locale: string }) {
     { href: '/drops', label: t('drops') },
     { href: '/products?saleType=PRE_ORDER', label: t('preorders') },
     { href: '/calendar', label: t('calendar') },
+    { href: '/events', label: t('events') },
     { href: '/brands', label: t('brands') },
   ];
 
@@ -51,6 +51,20 @@ export async function Header({ locale }: { locale: string }) {
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
           <SearchForm action={searchAction} className="hidden w-56 lg:block xl:w-72" />
           <LocaleSwitcher className="hidden md:inline-flex" />
+          {loggedIn ? (
+            <Link
+              href="/account/notifications"
+              className="relative rounded-full p-2 text-ink-2 hover:bg-black/5 hover:text-ink"
+              aria-label={
+                unreadCount > 0
+                  ? t('notificationsUnread', { count: unreadCount })
+                  : t('notifications')
+              }
+            >
+              <BellIcon />
+              <CountBadge count={unreadCount} tone="ink" />
+            </Link>
+          ) : null}
           <Link
             href={loggedIn ? '/account' : '/login'}
             className="rounded-full p-2 text-ink-2 hover:bg-black/5 hover:text-ink"
@@ -64,11 +78,7 @@ export async function Header({ locale }: { locale: string }) {
             aria-label={t('cart')}
           >
             <BagIcon />
-            {count > 0 ? (
-              <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[11px] font-bold text-white">
-                {count > 99 ? '99+' : count}
-              </span>
-            ) : null}
+            <CountBadge count={count} />
           </Link>
         </div>
       </div>

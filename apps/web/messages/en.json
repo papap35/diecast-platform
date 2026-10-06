@@ -20,7 +20,10 @@
     "cart": "Cart",
     "menu": "Menu",
     "close": "Close",
-    "language": "Language"
+    "language": "Language",
+    "events": "Events",
+    "notifications": "Notifications",
+    "notificationsUnread": "{count} unread notifications"
   },
   "announcement": {
     "shipping": "Free store pickup over NT$1,000 · Free home delivery over NT$1,500"
@@ -82,7 +85,7 @@
     "category": "Category",
     "description": "About this model",
     "related": "More from this brand",
-    "preorderNote": "Pre-order items ship on arrival, separately from other items.",
+    "preorderNote": "Pre-orders ship when stock arrives and must be checked out separately from in-stock items.",
     "limitedNote": "Limited items must be paid within 10 minutes of ordering, or the allocation is released.",
     "specLabels": {
       "material": "Material",
@@ -91,7 +94,11 @@
       "edition": "Edition",
       "features": "Features"
     },
-    "limitLabel": "Limit"
+    "limitLabel": "Limit",
+    "earlyAccessIn": "Your {tier} early access starts in",
+    "earlyAccessInfo": "{tier} members and above can buy from {time}.",
+    "earlyAccessEligible": "You're eligible!",
+    "earlyAccessOpen": "{tier} early access is open"
   },
   "countdown": {
     "days": "d",
@@ -147,7 +154,9 @@
     "live": "Live now",
     "upcoming": "Upcoming",
     "preorders": "Open for pre-order",
-    "noUpcoming": "No drops scheduled right now."
+    "noUpcoming": "No drops scheduled right now.",
+    "events": "Upcoming events",
+    "allEvents": "All events"
   },
   "brands": {
     "title": "Brands",
@@ -175,7 +184,8 @@
       "SOLD_OUT": "Sold out — please remove",
       "INSUFFICIENT_STOCK": "Not enough stock — adjust quantity",
       "LIMIT_EXCEEDED": "Over the purchase limit — adjust quantity"
-    }
+    },
+    "preorderMixed": "Pre-orders must be checked out separately. Remove either the pre-order or the in-stock items first."
   },
   "checkout": {
     "title": "Checkout",
@@ -290,7 +300,8 @@
       "VOIDED": "Voided",
       "ALLOWANCE_ISSUED": "Allowance issued",
       "CANCELLED": "Not required"
-    }
+    },
+    "expectedShip": "Pre-order · expected to ship {date}"
   },
   "account": {
     "title": "Account",
@@ -304,7 +315,11 @@
     "saved": "Saved",
     "memberSince": "Member since",
     "orders": "Orders",
-    "recentOrders": "Recent orders"
+    "recentOrders": "Recent orders",
+    "garage": "My garage",
+    "wishlist": "Wishlist",
+    "reminders": "Release reminders",
+    "notifications": "Notifications"
   },
   "auth": {
     "loginTitle": "Log in",
@@ -346,7 +361,12 @@
     "ORDER_NOT_PAYABLE": "This order can't be paid right now",
     "ORDER_NOT_CANCELLABLE": "Paid orders must be cancelled by support",
     "RATE_LIMITED": "Too many attempts. Please wait a moment.",
-    "CVS_SELECTION_NOT_FOUND": "Store selection expired. Please pick a store again."
+    "CVS_SELECTION_NOT_FOUND": "Store selection expired. Please pick a store again.",
+    "PREORDER_SEPARATE_CHECKOUT": "Pre-orders must be checked out separately",
+    "REMINDER_NOT_AVAILABLE": "This item is already on sale",
+    "GARAGE_HANDLE_TAKEN": "That handle is already taken",
+    "GARAGE_FULL": "Your garage is full (500 items max)",
+    "WISHLIST_FULL": "Your wishlist is full (200 items max)"
   },
   "footer": {
     "tagline": "An online garage built for diecast collectors.",
@@ -367,5 +387,120 @@
     "free": "Free",
     "yes": "Yes",
     "no": "No"
+  },
+  "collector": {
+    "addToWishlist": "Add to wishlist",
+    "wishlisted": "In your wishlist",
+    "remindMe": "Remind me",
+    "reminderSet": "Reminder set"
+  },
+  "membership": {
+    "title": "Membership",
+    "tiers": {
+      "ROOKIE": "Rookie",
+      "DRIVER": "Driver",
+      "CHAMPION": "Champion",
+      "LEGEND": "Legend"
+    },
+    "totalSpent": "Total spent",
+    "nextTier": "Spend {amount} more to become a {tier}",
+    "topTier": "You've reached the top tier. Thank you!",
+    "benefits": "Perks",
+    "threshold": "Required spend",
+    "cvsShipping": "Free store pickup from",
+    "homeShipping": "Free home delivery from",
+    "earlyAccess": "Early access to drops",
+    "alwaysFree": "Always free",
+    "yes": "Yes",
+    "no": "No",
+    "note": "Total spend counts paid, non-refunded orders. Refunds are deducted and your tier is recalculated."
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "subtitle": "We'll let you know when sold-out cars are back in stock.",
+    "empty": "Your wishlist is empty.",
+    "browse": "Browse cars"
+  },
+  "reminders": {
+    "title": "Release reminders",
+    "subtitle": "We'll notify you 15 minutes before the drop (or your early access) starts.",
+    "empty": "No reminders yet.",
+    "releaseAt": "Drops {time}",
+    "remindAt": "Reminder at {time}",
+    "browseCalendar": "See the release calendar"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet.",
+    "markAllRead": "Mark all as read",
+    "unread": "unread",
+    "unreadCount": "{count} unread"
+  },
+  "garage": {
+    "title": "My garage",
+    "subtitle": "Cars from completed orders park here automatically. You can also log cars you got elsewhere.",
+    "models": "Models",
+    "cars": "Cars",
+    "totalPaid": "Total paid",
+    "privateHint": "Only visible to you",
+    "brands": "By brand",
+    "scales": "Scales",
+    "empty": "Your garage is empty. Complete an order or log a car to get started.",
+    "add": "Log a car",
+    "addTitle": "Log a car from elsewhere",
+    "name": "Name",
+    "namePlaceholder": "e.g. Shiden RS show exclusive",
+    "brand": "Brand",
+    "scale": "Scale",
+    "condition": "Condition",
+    "quantity": "Quantity",
+    "pricePaid": "Price paid (NT$)",
+    "acquiredAt": "Acquired on",
+    "note": "Note",
+    "favorite": "Favourite",
+    "markFavorite": "Mark as favourite (shown first)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "remove": "Remove",
+    "removeConfirm": "Remove this car from your garage?",
+    "sourceOrder": "Bought here",
+    "sourceManual": "Logged",
+    "conditions": {
+      "SEALED": "Sealed",
+      "OPENED": "Opened",
+      "DISPLAYED": "On display",
+      "PLAYWORN": "Play-worn"
+    },
+    "share": "Share",
+    "shareHint": "Anyone with the link can view your garage (prices and notes stay private).",
+    "sharePublic": "Make my garage public",
+    "handle": "Handle",
+    "handleHint": "3–20 lowercase letters, numbers or hyphens",
+    "shareSaved": "Sharing settings saved",
+    "copy": "Copy",
+    "copied": "Link copied",
+    "publicEyebrow": "Collector's garage",
+    "publicTitle": "@{handle}'s garage",
+    "publicSubtitle": "{models} models, {cars} cars in total",
+    "publicEmpty": "This garage is empty."
+  },
+  "events": {
+    "title": "Events",
+    "subtitle": "Diecast expos, meetups, launch nights and live streams (Taiwan time)",
+    "filter": "Event type",
+    "all": "All",
+    "empty": "No upcoming events.",
+    "types": {
+      "EXHIBITION": "Expo",
+      "MEETUP": "Meetup",
+      "LAUNCH": "Launch",
+      "ONLINE": "Online"
+    },
+    "time": "When",
+    "venue": "Where",
+    "externalLink": "Event page",
+    "relatedProduct": "Featured car",
+    "back": "All events"
   }
 }

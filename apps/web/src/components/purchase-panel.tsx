@@ -6,8 +6,11 @@ import { useState, useTransition } from 'react';
 import { setCartItemAction } from '@/app/actions/cart';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import type { AppLocale } from '@/i18n/routing';
+import { formatDateTime } from '@/lib/format';
+import { meetsTier, type Tier } from '@/lib/tiers';
+import { ReminderButton } from './collector-buttons';
 import { Countdown } from './countdown';
-import { CheckIcon } from './icons';
+import { CheckIcon, TrophyIcon } from './icons';
 import { Button } from './ui/button';
 
 type Product = Schemas['ProductDetailDto'];
@@ -17,13 +20,16 @@ const PURCHASABLE = new Set(['IN_STOCK', 'LOW_STOCK', 'PREORDER_OPEN']);
 export function PurchasePanel({
   product,
   loggedIn,
+  memberTier,
   serverNow,
 }: {
   product: Product;
   loggedIn: boolean;
+  memberTier: Tier | null;
   serverNow: number;
 }) {
   const t = useTranslations('product');
+  const tm = useTranslations('membership');
   const te = useTranslations('errors');
   const locale = useLocale() as AppLocale;
   const router = useRouter();
@@ -56,17 +62,44 @@ export function PurchasePanel({
     router.push(`/checkout?buyNow=${product.id}&qty=${quantity}`);
   };
 
+  const early =
+    product.earlyAccessTier && product.earlyAccessAt
+      ? { tier: product.earlyAccessTier, at: product.earlyAccessAt }
+      : null;
+  const eligible = !!early && meetsTier(memberTier, early.tier);
+
   if (product.availability === 'COMING_SOON' && product.releaseAt) {
+    // 符合優先購資格的會員倒數到自己的優先購時間
+    const target = eligible ? early!.at : product.releaseAt;
     return (
       <div className="space-y-4 rounded-2xl bg-ink p-5 text-white">
-        <p className="text-sm text-white/70">{t('releasesIn')}</p>
-        <Countdown target={product.releaseAt} serverNow={serverNow} onElapsedReload />
-        <Button variant="secondary" size="lg" className="w-full" disabled>
-          {t('notReleased')}
-        </Button>
+        <p className="text-sm text-white/70">
+          {eligible ? t('earlyAccessIn', { tier: tm(`tiers.${early!.tier}`) }) : t('releasesIn')}
+        </p>
+        <Countdown target={target} serverNow={serverNow} onElapsedReload />
+        {early ? (
+          <p className="flex items-start gap-2 rounded-xl bg-white/10 px-3 py-2 text-xs text-white/85">
+            <TrophyIcon size={16} className="mt-px shrink-0" />
+            <span>
+              {t('earlyAccessInfo', {
+                tier: tm(`tiers.${early.tier}`),
+                time: formatDateTime(early.at, locale),
+              })}{' '}
+              {eligible ? t('earlyAccessEligible') : null}
+            </span>
+          </p>
+        ) : null}
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Button variant="secondary" size="lg" disabled>
+            {t('notReleased')}
+          </Button>
+          <ReminderButton productId={product.id} tone="dark" />
+        </div>
       </div>
     );
   }
+  const earlyAccessActive =
+    eligible && !!product.releaseAt && new Date(product.releaseAt).getTime() > serverNow;
 
   if (!purchasable) {
     return (
@@ -78,6 +111,12 @@ export function PurchasePanel({
 
   return (
     <div className="space-y-3">
+      {earlyAccessActive ? (
+        <p className="flex items-center gap-2 rounded-xl bg-gold-soft px-3 py-2 text-sm font-semibold text-gold">
+          <TrophyIcon size={16} />
+          {t('earlyAccessOpen', { tier: tm(`tiers.${early!.tier}`) })}
+        </p>
+      ) : null}
       <div className="flex items-center gap-3">
         <label htmlFor="quantity" className="text-sm text-mute">
           {t('quantity')}
