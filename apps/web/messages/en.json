@@ -26,7 +26,7 @@
     "notificationsUnread": "{count} unread notifications"
   },
   "announcement": {
-    "shipping": "Free store pickup over NT$1,000 · Free home delivery over NT$1,500"
+    "shipping": "{cvs, plural, =0 {Free store pickup} other {Free store pickup over NT$#}} · {home, plural, =0 {Free home delivery} other {Free home delivery over NT$#}}"
   },
   "home": {
     "heroEyebrow": "This week",
@@ -87,7 +87,7 @@
     "description": "About this model",
     "related": "More from this brand",
     "preorderNote": "Pre-orders ship when stock arrives and must be checked out separately from in-stock items.",
-    "limitedNote": "Limited items must be paid within 10 minutes of ordering, or the allocation is released.",
+    "limitedNote": "Limited items must be paid within {minutes} minutes of ordering, or the allocation is released.",
     "specLabels": {
       "material": "Material",
       "wheels": "Wheels",

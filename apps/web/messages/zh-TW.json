@@ -26,7 +26,7 @@
     "notificationsUnread": "{count} 則未讀通知"
   },
   "announcement": {
-    "shipping": "超商取貨滿 NT$1,000、宅配滿 NT$1,500 免運"
+    "shipping": "{cvs, plural, =0 {超商取貨免運} other {超商取貨滿 NT$# 免運}}、{home, plural, =0 {宅配免運} other {宅配滿 NT$# 免運}}"
   },
   "home": {
     "heroEyebrow": "本週焦點",
@@ -87,7 +87,7 @@
     "description": "商品介紹",
     "related": "同品牌的其他車款",
     "preorderNote": "預購商品會在到貨後出貨，需與現貨分開結帳。",
-    "limitedNote": "限量商品下單後請於 10 分鐘內完成付款，逾時名額將釋出。",
+    "limitedNote": "限量商品下單後請於 {minutes} 分鐘內完成付款，逾時名額將釋出。",
     "specLabels": {
       "material": "材質",
       "wheels": "輪胎",

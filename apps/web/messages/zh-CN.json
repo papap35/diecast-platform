@@ -26,7 +26,7 @@
     "notificationsUnread": "{count} 则未读通知"
   },
   "announcement": {
-    "shipping": "便利店取货满 NT$1,000、宅配满 NT$1,500 免运"
+    "shipping": "{cvs, plural, =0 {便利店取货免运} other {便利店取货满 NT$# 免运}}、{home, plural, =0 {宅配免运} other {宅配满 NT$# 免运}}"
   },
   "home": {
     "heroEyebrow": "本周焦点",
@@ -87,7 +87,7 @@
     "description": "商品介绍",
     "related": "同品牌的其他车款",
     "preorderNote": "预购商品会在到货后出货，需与现货分开结帐。",
-    "limitedNote": "限量商品下单后请于 10 分钟内完成付款，逾时名额将释出。",
+    "limitedNote": "限量商品下单后请于 {minutes} 分钟内完成付款，逾时名额将释出。",
     "specLabels": {
       "material": "材质",
       "wheels": "轮胎",
@@ -238,7 +238,7 @@
     },
     "total": "总计",
     "storeRequired": "尚未选择取货门市",
-    "storeMapHint": "将打开超商电子地图选择门市，选好后会回到这一页，已填写的数据会保留。",
+    "storeMapHint": "将打开便利店电子地图选择门市，选好后会回到这一页，已填写的数据会保留。",
     "openingMap": "打开电子地图…",
     "storeCancelled": "已取消选择门市",
     "storeExpired": "选店已逾时，请重新选择门市",
@@ -425,7 +425,7 @@
     "topTier": "已达最高等级，感谢你的支持！",
     "benefits": "等级权益",
     "threshold": "升级门槛",
-    "cvsShipping": "超商免运门槛",
+    "cvsShipping": "便利店免运门槛",
     "homeShipping": "宅配免运门槛",
     "earlyAccess": "限量车款优先购",
     "alwaysFree": "全站免运",

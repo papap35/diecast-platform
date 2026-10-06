@@ -3,6 +3,7 @@ import { getPathname, Link } from '@/i18n/navigation';
 import type { AppLocale } from '@/i18n/routing';
 import { serverApi } from '@/lib/api';
 import { memberState } from '@/lib/member-state';
+import { storeSettings } from '@/lib/store-settings';
 import { BannerLink } from './banner-link';
 import { BagIcon, BellIcon, UserIcon } from './icons';
 import { LocaleSwitcher } from './locale-switcher';
@@ -93,11 +94,22 @@ export async function Header({ locale }: { locale: string }) {
 export async function AnnouncementBar({ locale }: { locale: AppLocale }) {
   const t = await getTranslations('announcement');
   const api = await serverApi(locale);
-  const notice = await api
-    .GET('/v1/banners', { params: { query: { placement: 'ANNOUNCEMENT', locale } } })
-    .then(({ data }) => data?.[0])
-    .catch(() => undefined);
-  const text = notice?.title ?? t('shipping');
+  const [notice, settings] = await Promise.all([
+    api
+      .GET('/v1/banners', { params: { query: { placement: 'ANNOUNCEMENT', locale } } })
+      .then(({ data }) => data?.[0])
+      .catch(() => undefined),
+    storeSettings(),
+  ]);
+  const text =
+    notice?.title ??
+    (settings
+      ? t('shipping', {
+          cvs: settings.cvsFreeShippingThreshold,
+          home: settings.homeFreeShippingThreshold,
+        })
+      : null);
+  if (!text) return null;
   return (
     <div className="bg-ink text-white">
       <p className="container-page py-2 text-center text-xs font-medium tracking-wide">

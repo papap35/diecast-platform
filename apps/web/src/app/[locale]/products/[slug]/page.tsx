@@ -18,6 +18,7 @@ import { serverApi } from '@/lib/api';
 import { requestTime } from '@/lib/time';
 import { countryName, flagEmoji, formatDate, formatDateTime } from '@/lib/format';
 import { memberState } from '@/lib/member-state';
+import { storeSettings } from '@/lib/store-settings';
 
 type Product = Schemas['ProductDetailDto'];
 
@@ -78,7 +79,7 @@ export default async function ProductPage({ params }: PageProps<'/[locale]/produ
   const tl = await getTranslations('listing');
   const product = await loadProduct(slug, locale);
   const api = await serverApi(locale);
-  const [related, brand, member] = await Promise.all([
+  const [related, brand, member, settings] = await Promise.all([
     api.GET('/v1/products', {
       params: { query: { locale, brand: product.brand.slug, pageSize: 5 } },
     }),
@@ -86,8 +87,15 @@ export default async function ProductPage({ params }: PageProps<'/[locale]/produ
       params: { path: { slug: product.brand.slug }, query: { locale } },
     }),
     memberState(locale),
+    storeSettings(),
   ]);
   const now = requestTime();
+  const saleNote =
+    product.saleType === 'PRE_ORDER'
+      ? t('preorderNote')
+      : product.saleType === 'LIMITED' && settings
+        ? t('limitedNote', { minutes: settings.limitedPaymentTimeoutMinutes })
+        : null;
   const specs = SPEC_KEYS.filter((key) => product.specs[key]);
   const others = (related.data?.data ?? []).filter((p) => p.id !== product.id).slice(0, 4);
 
@@ -172,10 +180,10 @@ export default async function ProductPage({ params }: PageProps<'/[locale]/produ
           />
           <WishlistButton productId={product.id} variant="full" className="w-full" />
 
-          {product.saleType !== 'REGULAR' ? (
+          {saleNote ? (
             <p className="flex gap-2 rounded-xl bg-paper p-3 text-xs text-ink-2 ring-1 ring-line">
               <ClockIcon size={16} className="mt-0.5 shrink-0" />
-              {product.saleType === 'PRE_ORDER' ? t('preorderNote') : t('limitedNote')}
+              {saleNote}
             </p>
           ) : null}
 
