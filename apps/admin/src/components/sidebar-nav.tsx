@@ -6,6 +6,7 @@ import { cn } from '@/lib/cn';
 import {
   BoxIcon,
   CalendarIcon,
+  ChartIcon,
   ClockIcon,
   FolderIcon,
   GridIcon,
@@ -33,6 +34,7 @@ const ICONS = {
   megaphone: MegaphoneIcon,
   ticket: TicketIcon,
   mail: MailIcon,
+  chart: ChartIcon,
 };
 
 export interface NavGroup {

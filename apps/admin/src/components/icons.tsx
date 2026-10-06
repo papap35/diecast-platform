@@ -155,3 +155,9 @@ export const MailIcon = (p: IconProps) => (
     <path d="m4 7 8 6 8-6" />
   </svg>
 );
+export const ChartIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M4 20h16" />
+    <path d="M7 16v-5M12 16V6M17 16v-8" />
+  </svg>
+);

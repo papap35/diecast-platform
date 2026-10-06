@@ -26,7 +26,9 @@
     "banners": "横幅与公告",
     "marketing": "行销",
     "coupons": "优惠券",
-    "campaigns": "电子报"
+    "campaigns": "电子报",
+    "reports": "报表",
+    "salesReport": "销售报表"
   },
   "login": {
     "title": "营运后台登录",
@@ -99,7 +101,8 @@
     "upcoming": "即将发售",
     "recentOrders": "最新订单",
     "viewAll": "查看全部",
-    "peak": "最高"
+    "peak": "最高",
+    "weekOf": "{date} 当周"
   },
   "products": {
     "title": "商品",
@@ -404,7 +407,8 @@
     "TOKEN_INVALID": "登录已失效，请重新登录",
     "COUPON_CODE_TAKEN": "优惠码已存在",
     "COUPON_IN_USE": "已有使用纪录的优惠券不能删除，请改为停用",
-    "CAMPAIGN_NOT_EDITABLE": "电子报已调度或寄出，不能修改（调度中可先取消）"
+    "CAMPAIGN_NOT_EDITABLE": "电子报已调度或寄出，不能修改（调度中可先取消）",
+    "INTERNAL_ERROR": "系统暂时发生问题，请稍后再试"
   },
   "admins": {
     "title": "管理员",
@@ -492,7 +496,8 @@
       "event": "活动",
       "banner": "横幅与公告",
       "coupon": "优惠券",
-      "campaign": "电子报"
+      "campaign": "电子报",
+      "report": "报表导出"
     },
     "actions": {
       "auth": {
@@ -558,6 +563,10 @@
         "test": "寄送测试信",
         "schedule": "调度寄送电子报",
         "cancel": "取消电子报调度"
+      },
+      "report": {
+        "export_orders": "导出订单明细",
+        "export_products": "导出商品销售"
       }
     }
   },
@@ -814,5 +823,86 @@
       "bodyHint": "纯文本，段落之间空一行；'{{name}}' 会换成会员名称。信件最后会自动加上退订说明。",
       "optionalLocale": "选填，没有翻译的语系会收到繁中内容"
     }
+  },
+  "reports": {
+    "title": "销售报表",
+    "subtitle": "营收依付款日统计（台湾时间），已退款的订单不计入；可导出 CSV 用 Excel 进一步分析。",
+    "presetsLabel": "快速选择期间",
+    "presets": {
+      "7d": "近 7 天",
+      "30d": "近 30 天",
+      "90d": "近 90 天",
+      "thisMonth": "本月",
+      "lastMonth": "上个月",
+      "thisYear": "今年"
+    },
+    "from": "起日",
+    "to": "迄日",
+    "granularity": "时间单位",
+    "granularities": {
+      "day": "依日",
+      "week": "依周",
+      "month": "依月"
+    },
+    "apply": "套用",
+    "period": "{from} – {to}，共 {days} 天",
+    "comparedTo": "成长率与前一段同样长度的期间（{from} – {to}）比较",
+    "exportOrders": "导出订单明细",
+    "exportProducts": "导出商品销售",
+    "exportFailed": "导出失败：{reason}",
+    "rangeInverted": "迄日不可早于起日",
+    "rangeTooLong": "期间太长：依日最长 366 天、依周约 3 年、依月约 5 年，请缩短期间或改用较大的时间单位",
+    "kpi": {
+      "revenue": "营收",
+      "orders": "订单数",
+      "aov": "平均客单价",
+      "units": "售出件数",
+      "customers": "下单会员",
+      "newMembers": "新会员",
+      "discount": "优惠折抵",
+      "refunds": "退款"
+    },
+    "vsPrevious": "前期 {value}",
+    "discountDetail": "占营收 {share} · 实收运费 {shipping}",
+    "refundDetail": "{count} 笔 · 前期 {previous}",
+    "trend": "营收趋势（{unit}）",
+    "trendHint": "已付款且未退款的订单，依付款日计算",
+    "merchandiseHint": "商品实收：扣除优惠券分摊、不含运费",
+    "byBrand": "品牌",
+    "byCategory": "分类",
+    "byCategoryHint": "依第一层分类加总；商品实收扣除优惠券分摊、不含运费",
+    "brand": "品牌",
+    "category": "分类",
+    "bySaleType": "销售型态",
+    "units": "件数",
+    "netRevenue": "商品实收",
+    "share": "占比",
+    "byShipping": "配送方式",
+    "byShippingHint": "依订单数",
+    "orders": "订单",
+    "byTier": "会员等级",
+    "byTierHint": "依会员目前的等级；占比为期间内的订单金额",
+    "topProducts": "热销商品 Top 10",
+    "product": "商品",
+    "coupons": "优惠券成效",
+    "couponsHint": "使用次数前 20 名；折抵含免运券省下的运费",
+    "code": "优惠码",
+    "uses": "使用",
+    "discount": "折抵",
+    "couponRevenue": "订单金额",
+    "empty": "这段期间没有数据",
+    "others": "其他 {count} 项",
+    "definitions": "名词说明",
+    "definitionItems": {
+      "revenue": "营收：期间内付款、目前没有退款的订单实付金额（含运费、已扣优惠）。订单之后退款，营收会跟着减少。",
+      "merchandise": "商品实收：商品金额扣除分摊到各品项的优惠券折扣，不含运费；品牌、分类、销售型态与热销商品都用这个金额。",
+      "discount": "优惠折抵：优惠券折抵的商品金额，加上免运券省下的运费。",
+      "refunds": "退款：期间内标记为已退款的订单（依退款日），金额为订单实付金额。",
+      "tiers": "会员等级依会员「目前」的等级归类，期间内升级的会员会算在新等级。",
+      "exports": "导出：订单明细依下单日、包含所有状态，内容有个人数据，需要订单查看权限且会记到操作纪录；商品销售依付款日。"
+    },
+    "unitsCount": "{count} 件",
+    "ordersCount": "{count} 笔",
+    "tierDetail": "{members} 位会员，期间内 {customers} 位下单"
   }
 }

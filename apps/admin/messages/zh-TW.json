@@ -26,7 +26,9 @@
     "banners": "橫幅與公告",
     "marketing": "行銷",
     "coupons": "優惠券",
-    "campaigns": "電子報"
+    "campaigns": "電子報",
+    "reports": "報表",
+    "salesReport": "銷售報表"
   },
   "login": {
     "title": "營運後台登入",
@@ -99,7 +101,8 @@
     "upcoming": "即將發售",
     "recentOrders": "最新訂單",
     "viewAll": "查看全部",
-    "peak": "最高"
+    "peak": "最高",
+    "weekOf": "{date} 當週"
   },
   "products": {
     "title": "商品",
@@ -404,7 +407,8 @@
     "TOKEN_INVALID": "登入已失效，請重新登入",
     "COUPON_CODE_TAKEN": "優惠碼已存在",
     "COUPON_IN_USE": "已有使用紀錄的優惠券不能刪除，請改為停用",
-    "CAMPAIGN_NOT_EDITABLE": "電子報已排程或寄出，不能修改（排程中可先取消）"
+    "CAMPAIGN_NOT_EDITABLE": "電子報已排程或寄出，不能修改（排程中可先取消）",
+    "INTERNAL_ERROR": "系統暫時發生問題，請稍後再試"
   },
   "admins": {
     "title": "管理員",
@@ -492,7 +496,8 @@
       "event": "活動",
       "banner": "橫幅與公告",
       "coupon": "優惠券",
-      "campaign": "電子報"
+      "campaign": "電子報",
+      "report": "報表匯出"
     },
     "actions": {
       "auth": {
@@ -558,6 +563,10 @@
         "test": "寄送測試信",
         "schedule": "排程寄送電子報",
         "cancel": "取消電子報排程"
+      },
+      "report": {
+        "export_orders": "匯出訂單明細",
+        "export_products": "匯出商品銷售"
       }
     }
   },
@@ -814,5 +823,86 @@
       "bodyHint": "純文字，段落之間空一行；'{{name}}' 會換成會員名稱。信件最後會自動加上退訂說明。",
       "optionalLocale": "選填，沒有翻譯的語系會收到繁中內容"
     }
+  },
+  "reports": {
+    "title": "銷售報表",
+    "subtitle": "營收依付款日統計（台灣時間），已退款的訂單不計入；可匯出 CSV 用 Excel 進一步分析。",
+    "presetsLabel": "快速選擇期間",
+    "presets": {
+      "7d": "近 7 天",
+      "30d": "近 30 天",
+      "90d": "近 90 天",
+      "thisMonth": "本月",
+      "lastMonth": "上個月",
+      "thisYear": "今年"
+    },
+    "from": "起日",
+    "to": "迄日",
+    "granularity": "時間單位",
+    "granularities": {
+      "day": "依日",
+      "week": "依週",
+      "month": "依月"
+    },
+    "apply": "套用",
+    "period": "{from} – {to}，共 {days} 天",
+    "comparedTo": "成長率與前一段同樣長度的期間（{from} – {to}）比較",
+    "exportOrders": "匯出訂單明細",
+    "exportProducts": "匯出商品銷售",
+    "exportFailed": "匯出失敗：{reason}",
+    "rangeInverted": "迄日不可早於起日",
+    "rangeTooLong": "期間太長：依日最長 366 天、依週約 3 年、依月約 5 年，請縮短期間或改用較大的時間單位",
+    "kpi": {
+      "revenue": "營收",
+      "orders": "訂單數",
+      "aov": "平均客單價",
+      "units": "售出件數",
+      "customers": "下單會員",
+      "newMembers": "新會員",
+      "discount": "優惠折抵",
+      "refunds": "退款"
+    },
+    "vsPrevious": "前期 {value}",
+    "discountDetail": "占營收 {share} · 實收運費 {shipping}",
+    "refundDetail": "{count} 筆 · 前期 {previous}",
+    "trend": "營收趨勢（{unit}）",
+    "trendHint": "已付款且未退款的訂單，依付款日計算",
+    "merchandiseHint": "商品實收：扣除優惠券分攤、不含運費",
+    "byBrand": "品牌",
+    "byCategory": "分類",
+    "byCategoryHint": "依第一層分類加總；商品實收扣除優惠券分攤、不含運費",
+    "brand": "品牌",
+    "category": "分類",
+    "bySaleType": "銷售型態",
+    "units": "件數",
+    "netRevenue": "商品實收",
+    "share": "占比",
+    "byShipping": "配送方式",
+    "byShippingHint": "依訂單數",
+    "orders": "訂單",
+    "byTier": "會員等級",
+    "byTierHint": "依會員目前的等級；占比為期間內的訂單金額",
+    "topProducts": "熱銷商品 Top 10",
+    "product": "商品",
+    "coupons": "優惠券成效",
+    "couponsHint": "使用次數前 20 名；折抵含免運券省下的運費",
+    "code": "優惠碼",
+    "uses": "使用",
+    "discount": "折抵",
+    "couponRevenue": "訂單金額",
+    "empty": "這段期間沒有資料",
+    "others": "其他 {count} 項",
+    "definitions": "名詞說明",
+    "definitionItems": {
+      "revenue": "營收：期間內付款、目前沒有退款的訂單實付金額（含運費、已扣優惠）。訂單之後退款，營收會跟著減少。",
+      "merchandise": "商品實收：商品金額扣除分攤到各品項的優惠券折扣，不含運費；品牌、分類、銷售型態與熱銷商品都用這個金額。",
+      "discount": "優惠折抵：優惠券折抵的商品金額，加上免運券省下的運費。",
+      "refunds": "退款：期間內標記為已退款的訂單（依退款日），金額為訂單實付金額。",
+      "tiers": "會員等級依會員「目前」的等級歸類，期間內升級的會員會算在新等級。",
+      "exports": "匯出：訂單明細依下單日、包含所有狀態，內容有個人資料，需要訂單檢視權限且會記到操作紀錄；商品銷售依付款日。"
+    },
+    "unitsCount": "{count} 件",
+    "ordersCount": "{count} 筆",
+    "tierDetail": "{members} 位會員，期間內 {customers} 位下單"
   }
 }

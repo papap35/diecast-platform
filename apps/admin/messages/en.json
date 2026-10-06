@@ -26,7 +26,9 @@
     "banners": "Banners & notices",
     "marketing": "Marketing",
     "coupons": "Coupons",
-    "campaigns": "Newsletters"
+    "campaigns": "Newsletters",
+    "reports": "Reports",
+    "salesReport": "Sales report"
   },
   "login": {
     "title": "Admin sign in",
@@ -99,7 +101,8 @@
     "upcoming": "Upcoming releases",
     "recentOrders": "Latest orders",
     "viewAll": "View all",
-    "peak": "Peak"
+    "peak": "Peak",
+    "weekOf": "Week of {date}"
   },
   "products": {
     "title": "Products",
@@ -404,7 +407,8 @@
     "TOKEN_INVALID": "Your session has expired. Please sign in again",
     "COUPON_CODE_TAKEN": "This coupon code already exists",
     "COUPON_IN_USE": "Coupons that have been used can't be deleted. Disable it instead",
-    "CAMPAIGN_NOT_EDITABLE": "Scheduled or sent newsletters can't be edited (cancel the schedule first)"
+    "CAMPAIGN_NOT_EDITABLE": "Scheduled or sent newsletters can't be edited (cancel the schedule first)",
+    "INTERNAL_ERROR": "Something went wrong. Please try again later."
   },
   "admins": {
     "title": "Admins",
@@ -492,7 +496,8 @@
       "event": "Events",
       "banner": "Banners & notices",
       "coupon": "Coupons",
-      "campaign": "Newsletters"
+      "campaign": "Newsletters",
+      "report": "Report exports"
     },
     "actions": {
       "auth": {
@@ -558,6 +563,10 @@
         "test": "Sent test email",
         "schedule": "Scheduled newsletter",
         "cancel": "Cancelled newsletter schedule"
+      },
+      "report": {
+        "export_orders": "Exported orders",
+        "export_products": "Exported product sales"
       }
     }
   },
@@ -814,5 +823,86 @@
       "bodyHint": "Plain text; separate paragraphs with a blank line. '{{name}}' becomes the member's name. An unsubscribe note is added automatically.",
       "optionalLocale": "Optional; members get the Traditional Chinese version if blank"
     }
+  },
+  "reports": {
+    "title": "Sales report",
+    "subtitle": "Revenue by payment date (Taiwan time), excluding refunded orders. Export CSV files for further analysis in Excel.",
+    "presetsLabel": "Quick ranges",
+    "presets": {
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 90 days",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "thisYear": "This year"
+    },
+    "from": "From",
+    "to": "To",
+    "granularity": "Interval",
+    "granularities": {
+      "day": "Daily",
+      "week": "Weekly",
+      "month": "Monthly"
+    },
+    "apply": "Apply",
+    "period": "{from} – {to} · {days} days",
+    "comparedTo": "Growth is compared with the previous period of the same length ({from} – {to})",
+    "exportOrders": "Export orders",
+    "exportProducts": "Export product sales",
+    "exportFailed": "Export failed: {reason}",
+    "rangeInverted": "The end date can't be earlier than the start date",
+    "rangeTooLong": "The range is too long: up to 366 days daily, about 3 years weekly or 5 years monthly. Shorten the range or pick a larger interval.",
+    "kpi": {
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "aov": "Average order value",
+      "units": "Units sold",
+      "customers": "Customers",
+      "newMembers": "New members",
+      "discount": "Coupon discounts",
+      "refunds": "Refunds"
+    },
+    "vsPrevious": "Previous {value}",
+    "discountDetail": "{share} of revenue · Shipping collected {shipping}",
+    "refundDetail": "{count, plural, one {# order} other {# orders}} · Previous {previous}",
+    "trend": "Revenue trend ({unit})",
+    "trendHint": "Paid, non-refunded orders by payment date",
+    "merchandiseHint": "Net merchandise: after coupon allocation, excluding shipping",
+    "byBrand": "Brands",
+    "byCategory": "Categories",
+    "byCategoryHint": "Rolled up to top-level categories; net merchandise after coupons, excluding shipping",
+    "brand": "Brand",
+    "category": "Category",
+    "bySaleType": "Sale types",
+    "units": "Units",
+    "netRevenue": "Net merchandise",
+    "share": "Share",
+    "byShipping": "Shipping methods",
+    "byShippingHint": "By number of orders",
+    "orders": "Orders",
+    "byTier": "Member tiers",
+    "byTierHint": "By each member's current tier; share of order revenue in the period",
+    "topProducts": "Top 10 products",
+    "product": "Product",
+    "coupons": "Coupon performance",
+    "couponsHint": "Top 20 by uses; discounts include shipping saved by free-shipping coupons",
+    "code": "Code",
+    "uses": "Uses",
+    "discount": "Discount",
+    "couponRevenue": "Order revenue",
+    "empty": "No data for this period",
+    "others": "{count} others",
+    "definitions": "Definitions",
+    "definitionItems": {
+      "revenue": "Revenue: the amount paid for orders paid in the period that haven't been refunded (including shipping, after discounts). Refunding an order later reduces revenue.",
+      "merchandise": "Net merchandise: item amounts minus the coupon discount allocated to each line, excluding shipping. Brands, categories, sale types and top products use this amount.",
+      "discount": "Coupon discounts: merchandise discounts plus shipping saved by free-shipping coupons.",
+      "refunds": "Refunds: orders marked as refunded in the period (by refund date), at the amount paid.",
+      "tiers": "Member tiers use each member's current tier; members who upgraded during the period count toward their new tier.",
+      "exports": "Exports: order details are filtered by order date and include every status. They contain personal data, so they require the view-orders permission and are recorded in the audit log. Product sales are filtered by payment date."
+    },
+    "unitsCount": "{count, plural, one {# unit} other {# units}}",
+    "ordersCount": "{count, plural, one {# order} other {# orders}}",
+    "tierDetail": "{members, plural, one {# member} other {# members}} · {customers} ordered in this period"
   }
 }

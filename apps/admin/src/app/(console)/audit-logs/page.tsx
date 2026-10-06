@@ -27,6 +27,7 @@ const ACTION_GROUPS = [
   'banner',
   'coupon',
   'campaign',
+  'report',
 ];
 
 /** 操作對象在後台的頁面 */

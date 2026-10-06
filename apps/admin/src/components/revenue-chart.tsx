@@ -11,6 +11,8 @@ export interface RevenuePoint {
   orders: number;
 }
 
+export type Granularity = 'day' | 'week' | 'month';
+
 const HEIGHT = 240;
 const MARGIN = { top: 20, right: 8, bottom: 28, left: 56 };
 const MAX_BAR = 24;
@@ -45,8 +47,32 @@ function useWidth<T extends HTMLElement>() {
   return { ref, width };
 }
 
-export function RevenueChart({ data, locale }: { data: RevenuePoint[]; locale: string }) {
+/** 座標軸標籤：日、週顯示月/日；月顯示年-月 */
+function axisLabel(date: string, granularity: Granularity, locale: string): string {
+  return granularity === 'month' ? date.slice(0, 7) : formatShortDate(date, locale);
+}
+
+export function RevenueChart({
+  data,
+  locale,
+  title,
+  hint,
+  granularity = 'day',
+}: {
+  data: RevenuePoint[];
+  locale: string;
+  title?: string;
+  hint?: string;
+  granularity?: Granularity;
+}) {
   const t = useTranslations('dashboard');
+  const heading = title ?? t('salesTrend');
+  const periodLabel = (date: string) =>
+    granularity === 'week'
+      ? t('weekOf', { date })
+      : granularity === 'month'
+        ? date.slice(0, 7)
+        : date;
   const { ref, width } = useWidth<HTMLDivElement>();
   const [active, setActive] = useState<number | null>(null);
   const [view, setView] = useState<'chart' | 'table'>('chart');
@@ -62,15 +88,20 @@ export function RevenueChart({ data, locale }: { data: RevenuePoint[]; locale: s
   const barW = Math.min(MAX_BAR, band * 0.6);
   const y = (value: number) => MARGIN.top + innerH - (value / max) * innerH;
   const ticks = Array.from({ length: Math.round(max / step) + 1 }, (_, i) => i * step);
-  const labelEvery = band < 34 ? 2 : 1;
+  // 標籤之間至少留 36px（月份較長 56px），點很多時（例如一整年的每日資料）自動跳著標
+  const minGap = granularity === 'month' ? 56 : 36;
+  const labelEvery = band > 0 ? Math.ceil(minGap / band) : 1;
+  const lastLabeled = Math.floor((data.length - 1) / labelEvery) * labelEvery;
+  const showLabel = (i: number) =>
+    i % labelEvery === 0 || (i === data.length - 1 && (i - lastLabeled) * band >= minGap);
   const hovered = active !== null ? data[active] : undefined;
 
   return (
     <div className="card p-5">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-sm font-semibold">{t('salesTrend')}</h2>
-          <p className="text-xs text-mute">{t('salesTrendHint')}</p>
+          <h2 className="text-sm font-semibold">{heading}</h2>
+          <p className="text-xs text-mute">{hint ?? t('salesTrendHint')}</p>
         </div>
         <button
           type="button"
@@ -94,7 +125,7 @@ export function RevenueChart({ data, locale }: { data: RevenuePoint[]; locale: s
             <tbody>
               {data.map((d) => (
                 <tr key={d.date}>
-                  <td className="tabular">{d.date}</td>
+                  <td className="tabular">{periodLabel(d.date)}</td>
                   <td className="text-right tabular">{formatPrice(d.revenue)}</td>
                   <td className="text-right tabular">{d.orders}</td>
                 </tr>
@@ -105,7 +136,7 @@ export function RevenueChart({ data, locale }: { data: RevenuePoint[]; locale: s
       ) : (
         <div ref={ref} className="relative" style={{ height: HEIGHT }}>
           {width > 0 ? (
-            <svg width={width} height={HEIGHT} role="img" aria-label={t('salesTrend')}>
+            <svg width={width} height={HEIGHT} role="img" aria-label={heading}>
               {ticks.map((tick) => (
                 <g key={tick}>
                   <line
@@ -137,14 +168,14 @@ export function RevenueChart({ data, locale }: { data: RevenuePoint[]; locale: s
                       fill="var(--color-series-1)"
                       opacity={active === null || active === i ? 1 : 0.45}
                     />
-                    {i % labelEvery === 0 || i === data.length - 1 ? (
+                    {showLabel(i) ? (
                       <text
                         x={x + barW / 2}
                         y={HEIGHT - 8}
                         textAnchor="middle"
                         className="tabular fill-mute text-[11px]"
                       >
-                        {formatShortDate(d.date, locale)}
+                        {axisLabel(d.date, granularity, locale)}
                       </text>
                     ) : null}
                     {i === peakIndex && d.revenue > 0 ? (
@@ -165,7 +196,7 @@ export function RevenueChart({ data, locale }: { data: RevenuePoint[]; locale: s
                       height={innerH}
                       fill="transparent"
                       tabIndex={0}
-                      aria-label={`${d.date} ${formatPrice(d.revenue)}`}
+                      aria-label={`${periodLabel(d.date)} ${formatPrice(d.revenue)}`}
                       onPointerEnter={() => setActive(i)}
                       onPointerLeave={() => setActive(null)}
                       onFocus={() => setActive(i)}
@@ -190,7 +221,7 @@ export function RevenueChart({ data, locale }: { data: RevenuePoint[]; locale: s
             >
               <p className="text-sm font-bold tabular">{formatPrice(hovered.revenue)}</p>
               <p className="text-white/70">
-                {hovered.date} · {t('orders')} {hovered.orders}
+                {periodLabel(hovered.date)} · {t('orders')} {hovered.orders}
               </p>
             </div>
           ) : null}

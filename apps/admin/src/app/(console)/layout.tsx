@@ -61,6 +61,12 @@ export default async function ConsoleLayout({ children }: LayoutProps<'/'>) {
         : [],
     },
     {
+      label: t('reports'),
+      items: can(admin, 'report:read')
+        ? [{ href: '/reports', label: t('salesReport'), icon: 'chart' }]
+        : [],
+    },
+    {
       label: t('system'),
       items: can(admin, 'admin:manage')
         ? [
@@ -113,9 +119,9 @@ export default async function ConsoleLayout({ children }: LayoutProps<'/'>) {
         </div>
       </aside>
       <div className="flex min-w-0 flex-col">
-        <header className="flex h-14 items-center justify-end gap-3 border-b border-line bg-surface px-6">
+        <header className="flex min-h-14 flex-wrap items-center justify-end gap-x-3 gap-y-1 border-b border-line bg-surface px-4 py-2 sm:px-6">
           <LocaleSelect label={t('language')} />
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm whitespace-nowrap">
             <span className="font-semibold">{admin.name}</span>
             <Badge tone="neutral">{admin.role.name}</Badge>
           </div>
