@@ -131,3 +131,15 @@ export const PlusIcon = (p: IconProps) => (
     <path d="M12 5v14M5 12h14" />
   </svg>
 );
+export const CalendarIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="4" y="5" width="16" height="15" rx="2" />
+    <path d="M4 10h16M9 3v4M15 3v4" />
+  </svg>
+);
+export const MegaphoneIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M4 10v4h3l7 4V6L7 10H4Z" />
+    <path d="M17.5 9a4 4 0 0 1 0 6M8 14l1.5 5h2.5l-1-4.5" />
+  </svg>
+);

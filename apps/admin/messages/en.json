@@ -20,7 +20,10 @@
     "roles": "Roles & permissions",
     "auditLogs": "Audit log",
     "changePassword": "Change password",
-    "menu": "Menu"
+    "menu": "Menu",
+    "content": "Content",
+    "events": "Events",
+    "banners": "Banners & notices"
   },
   "login": {
     "title": "Admin sign in",
@@ -477,7 +480,9 @@
       "brand": "Brands",
       "category": "Categories",
       "order": "Orders",
-      "member": "Members"
+      "member": "Members",
+      "event": "Events",
+      "banner": "Banners & notices"
     },
     "actions": {
       "auth": {
@@ -520,6 +525,16 @@
       },
       "member": {
         "status": "Changed member status"
+      },
+      "event": {
+        "create": "Created event",
+        "update": "Edited event",
+        "delete": "Deleted event"
+      },
+      "banner": {
+        "create": "Created banner",
+        "update": "Edited banner",
+        "delete": "Deleted banner"
       }
     }
   },
@@ -533,5 +548,102 @@
     "mismatch": "The new passwords don't match",
     "logoutNotice": "You'll be signed out after submitting.",
     "submit": "Update password"
+  },
+  "content": {
+    "statuses": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published"
+    },
+    "required": "Required",
+    "optional": "Optional. Traditional Chinese is shown when left blank",
+    "imageHint": "A full URL, or a /static/... path for built-in images"
+  },
+  "events": {
+    "title": "Events",
+    "subtitle": "Shows, meetups and launch events. Published events appear on the storefront and the launch calendar.",
+    "new": "New event",
+    "create": "Create event",
+    "editTitle": "Edit event",
+    "created": "Event created",
+    "viewOnStorefront": "View on storefront",
+    "searchPlaceholder": "Search title or slug",
+    "deleteConfirm": "Delete this event? Its storefront page will disappear immediately.",
+    "sections": {
+      "content": "Event content",
+      "basic": "Time, place and links"
+    },
+    "types": {
+      "EXHIBITION": "Exhibition",
+      "MEETUP": "Meetup",
+      "LAUNCH": "Launch",
+      "ONLINE": "Online"
+    },
+    "fields": {
+      "title": "Title",
+      "summary": "One-line summary",
+      "body": "Description",
+      "bodyHint": "Plain text. Separate paragraphs with a blank line",
+      "slugHint": "Used in the URL, e.g. taipei-show-2026",
+      "type": "Type",
+      "startsAt": "Starts",
+      "endsAt": "Ends",
+      "venue": "Venue",
+      "address": "Address",
+      "url": "Registration or event URL",
+      "urlHint": "An external URL starting with https://",
+      "coverImageUrl": "Cover image",
+      "product": "Related product",
+      "productHint": "For example the limited model of a launch event, shown on the event page"
+    }
+  },
+  "banners": {
+    "title": "Banners & notices",
+    "subtitle": "Published items show automatically within their schedule. Changes reach the storefront within 30 seconds.",
+    "new": "New banner",
+    "create": "Create",
+    "preview": "Preview",
+    "previewPlaceholder": "Type a title to preview it here",
+    "deleteConfirm": "Delete this banner?",
+    "now": "Now",
+    "noEnd": "No end",
+    "always": "Always shown once published",
+    "sortOrderShort": "Order {order}",
+    "placements": {
+      "ANNOUNCEMENT": "Site-wide notice",
+      "HOME_PROMO": "Home page promos"
+    },
+    "placementHints": {
+      "ANNOUNCEMENT": "Shown at the top of every page. Only the first one by order is shown; the free-shipping message appears when there's none.",
+      "HOME_PROMO": "Shown below the home page hero, up to three."
+    },
+    "states": {
+      "DRAFT": "Draft",
+      "SCHEDULED": "Scheduled",
+      "LIVE": "Live",
+      "ENDED": "Ended"
+    },
+    "themes": {
+      "INK": "Carbon",
+      "RED": "Racing red",
+      "NAVY": "Navy",
+      "GOLD": "Champagne"
+    },
+    "fields": {
+      "placement": "Placement",
+      "placementLocked": "Placement can't be changed after creation",
+      "theme": "Colour",
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "ctaLabel": "Button text",
+      "linkUrl": "Link",
+      "linkHint": "A site path (e.g. /events/taipei-show) or an https:// URL",
+      "imageUrl": "Image",
+      "startsAt": "Show from",
+      "startsAtHint": "Leave blank to show as soon as it's published",
+      "endsAt": "Show until",
+      "endsAtHint": "Leave blank to keep showing",
+      "sortOrder": "Order",
+      "sortOrderHint": "Lower numbers come first"
+    }
   }
 }

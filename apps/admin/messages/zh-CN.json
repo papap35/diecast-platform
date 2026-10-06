@@ -20,7 +20,10 @@
     "roles": "角色与权限",
     "auditLogs": "操作纪录",
     "changePassword": "修改密码",
-    "menu": "菜单"
+    "menu": "菜单",
+    "content": "内容",
+    "events": "活动",
+    "banners": "横幅与公告"
   },
   "login": {
     "title": "营运后台登录",
@@ -477,7 +480,9 @@
       "brand": "品牌",
       "category": "分类",
       "order": "订单",
-      "member": "会员"
+      "member": "会员",
+      "event": "活动",
+      "banner": "横幅与公告"
     },
     "actions": {
       "auth": {
@@ -520,6 +525,16 @@
       },
       "member": {
         "status": "变更会员状态"
+      },
+      "event": {
+        "create": "添加活动",
+        "update": "编辑活动",
+        "delete": "删除活动"
+      },
+      "banner": {
+        "create": "添加横幅",
+        "update": "编辑横幅",
+        "delete": "删除横幅"
       }
     }
   },
@@ -533,5 +548,102 @@
     "mismatch": "两次输入的新密码不一致",
     "logoutNotice": "送出后会自动注销。",
     "submit": "更新密码"
+  },
+  "content": {
+    "statuses": {
+      "DRAFT": "草稿",
+      "PUBLISHED": "已发布"
+    },
+    "required": "必填",
+    "optional": "选填，留白时前台显示繁中内容",
+    "imageHint": "完整网址，或内置图片的 /static/... 路径"
+  },
+  "events": {
+    "title": "活动",
+    "subtitle": "车展、车聚与发售活动。发布后出现在前台的活动页与发售行事历。",
+    "new": "添加活动",
+    "create": "创建活动",
+    "editTitle": "编辑活动",
+    "created": "活动已创建",
+    "viewOnStorefront": "在前台查看",
+    "searchPlaceholder": "搜索标题或 slug",
+    "deleteConfirm": "确定要删除这个活动吗？前台的活动页会立即消失。",
+    "sections": {
+      "content": "活动内容",
+      "basic": "时间、地点与链接"
+    },
+    "types": {
+      "EXHIBITION": "模型车展",
+      "MEETUP": "车聚交流",
+      "LAUNCH": "发售活动",
+      "ONLINE": "在线活动"
+    },
+    "fields": {
+      "title": "标题",
+      "summary": "一句话介绍",
+      "body": "活动说明",
+      "bodyHint": "纯文本，段落之间空一行",
+      "slugHint": "网址用的代称，例如 taipei-show-2026",
+      "type": "类型",
+      "startsAt": "开始时间",
+      "endsAt": "结束时间",
+      "venue": "场地",
+      "address": "地址",
+      "url": "报名或活动网址",
+      "urlHint": "https:// 开头的外部网址",
+      "coverImageUrl": "封面图片",
+      "product": "相关商品",
+      "productHint": "例如发售活动的限量车款，会显示在活动页"
+    }
+  },
+  "banners": {
+    "title": "横幅与公告",
+    "subtitle": "发布后依上下架时间自动显示，修改后前台最多 30 秒内更新。",
+    "new": "添加横幅",
+    "create": "创建",
+    "preview": "预览",
+    "previewPlaceholder": "输入标题后在这里预览",
+    "deleteConfirm": "确定要删除这则横幅吗？",
+    "now": "立即",
+    "noEnd": "不下架",
+    "always": "发布后一直显示",
+    "sortOrderShort": "排序 {order}",
+    "placements": {
+      "ANNOUNCEMENT": "全站公告列",
+      "HOME_PROMO": "首页活动横幅"
+    },
+    "placementHints": {
+      "ANNOUNCEMENT": "显示在每一页最上方，同时间只显示排序最前的一则；没有公告时显示免运门槛。",
+      "HOME_PROMO": "显示在首页主视觉下方，最多三则。"
+    },
+    "states": {
+      "DRAFT": "草稿",
+      "SCHEDULED": "调度中",
+      "LIVE": "上架中",
+      "ENDED": "已下架"
+    },
+    "themes": {
+      "INK": "碳黑",
+      "RED": "赛车红",
+      "NAVY": "海军蓝",
+      "GOLD": "香槟金"
+    },
+    "fields": {
+      "placement": "版位",
+      "placementLocked": "创建后不能更改版位",
+      "theme": "底色",
+      "title": "标题",
+      "subtitle": "副标",
+      "ctaLabel": "按钮文本",
+      "linkUrl": "链接",
+      "linkHint": "站内路径（例如 /events/taipei-show）或 https:// 网址",
+      "imageUrl": "图片",
+      "startsAt": "上架时间",
+      "startsAtHint": "留白表示发布后立即上架",
+      "endsAt": "下架时间",
+      "endsAtHint": "留白表示不自动下架",
+      "sortOrder": "排序",
+      "sortOrderHint": "数字小的排前面"
+    }
   }
 }

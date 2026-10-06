@@ -14,7 +14,18 @@ import { can, getAdmin } from '@/lib/permissions';
 type Query = NonNullable<paths['/v1/admin/audit-logs']['get']['parameters']['query']>;
 
 /** 可篩選的動作分類（動作代碼的前綴） */
-const ACTION_GROUPS = ['auth', 'admin', 'role', 'product', 'brand', 'category', 'order', 'member'];
+const ACTION_GROUPS = [
+  'auth',
+  'admin',
+  'role',
+  'product',
+  'brand',
+  'category',
+  'order',
+  'member',
+  'event',
+  'banner',
+];
 
 /** 操作對象在後台的頁面 */
 function targetHref(type: string, id: string | null): string | null {
@@ -34,6 +45,10 @@ function targetHref(type: string, id: string | null): string | null {
       return `/brands?edit=${id}`;
     case 'Category':
       return `/categories?edit=${id}`;
+    case 'Event':
+      return `/events/${id}`;
+    case 'Banner':
+      return `/banners?edit=${id}`;
     default:
       return null;
   }

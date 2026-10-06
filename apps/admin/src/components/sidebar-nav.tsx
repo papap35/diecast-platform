@@ -5,9 +5,11 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import {
   BoxIcon,
+  CalendarIcon,
   ClockIcon,
   FolderIcon,
   GridIcon,
+  MegaphoneIcon,
   ReceiptIcon,
   ShieldIcon,
   TagIcon,
@@ -25,6 +27,8 @@ const ICONS = {
   user: UserIcon,
   shield: ShieldIcon,
   clock: ClockIcon,
+  calendar: CalendarIcon,
+  megaphone: MegaphoneIcon,
 };
 
 export interface NavGroup {

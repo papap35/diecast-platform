@@ -20,7 +20,10 @@
     "roles": "角色與權限",
     "auditLogs": "操作紀錄",
     "changePassword": "修改密碼",
-    "menu": "選單"
+    "menu": "選單",
+    "content": "內容",
+    "events": "活動",
+    "banners": "橫幅與公告"
   },
   "login": {
     "title": "營運後台登入",
@@ -477,7 +480,9 @@
       "brand": "品牌",
       "category": "分類",
       "order": "訂單",
-      "member": "會員"
+      "member": "會員",
+      "event": "活動",
+      "banner": "橫幅與公告"
     },
     "actions": {
       "auth": {
@@ -520,6 +525,16 @@
       },
       "member": {
         "status": "變更會員狀態"
+      },
+      "event": {
+        "create": "新增活動",
+        "update": "編輯活動",
+        "delete": "刪除活動"
+      },
+      "banner": {
+        "create": "新增橫幅",
+        "update": "編輯橫幅",
+        "delete": "刪除橫幅"
       }
     }
   },
@@ -533,5 +548,102 @@
     "mismatch": "兩次輸入的新密碼不一致",
     "logoutNotice": "送出後會自動登出。",
     "submit": "更新密碼"
+  },
+  "content": {
+    "statuses": {
+      "DRAFT": "草稿",
+      "PUBLISHED": "已發布"
+    },
+    "required": "必填",
+    "optional": "選填，留白時前台顯示繁中內容",
+    "imageHint": "完整網址，或內建圖片的 /static/... 路徑"
+  },
+  "events": {
+    "title": "活動",
+    "subtitle": "車展、車聚與發售活動。發布後出現在前台的活動頁與發售行事曆。",
+    "new": "新增活動",
+    "create": "建立活動",
+    "editTitle": "編輯活動",
+    "created": "活動已建立",
+    "viewOnStorefront": "在前台查看",
+    "searchPlaceholder": "搜尋標題或 slug",
+    "deleteConfirm": "確定要刪除這個活動嗎？前台的活動頁會立即消失。",
+    "sections": {
+      "content": "活動內容",
+      "basic": "時間、地點與連結"
+    },
+    "types": {
+      "EXHIBITION": "模型車展",
+      "MEETUP": "車聚交流",
+      "LAUNCH": "發售活動",
+      "ONLINE": "線上活動"
+    },
+    "fields": {
+      "title": "標題",
+      "summary": "一句話介紹",
+      "body": "活動說明",
+      "bodyHint": "純文字，段落之間空一行",
+      "slugHint": "網址用的代稱，例如 taipei-show-2026",
+      "type": "類型",
+      "startsAt": "開始時間",
+      "endsAt": "結束時間",
+      "venue": "場地",
+      "address": "地址",
+      "url": "報名或活動網址",
+      "urlHint": "https:// 開頭的外部網址",
+      "coverImageUrl": "封面圖片",
+      "product": "相關商品",
+      "productHint": "例如發售活動的限量車款，會顯示在活動頁"
+    }
+  },
+  "banners": {
+    "title": "橫幅與公告",
+    "subtitle": "發布後依上下架時間自動顯示，修改後前台最多 30 秒內更新。",
+    "new": "新增橫幅",
+    "create": "建立",
+    "preview": "預覽",
+    "previewPlaceholder": "輸入標題後在這裡預覽",
+    "deleteConfirm": "確定要刪除這則橫幅嗎？",
+    "now": "立即",
+    "noEnd": "不下架",
+    "always": "發布後一直顯示",
+    "sortOrderShort": "排序 {order}",
+    "placements": {
+      "ANNOUNCEMENT": "全站公告列",
+      "HOME_PROMO": "首頁活動橫幅"
+    },
+    "placementHints": {
+      "ANNOUNCEMENT": "顯示在每一頁最上方，同時間只顯示排序最前的一則；沒有公告時顯示免運門檻。",
+      "HOME_PROMO": "顯示在首頁主視覺下方，最多三則。"
+    },
+    "states": {
+      "DRAFT": "草稿",
+      "SCHEDULED": "排程中",
+      "LIVE": "上架中",
+      "ENDED": "已下架"
+    },
+    "themes": {
+      "INK": "碳黑",
+      "RED": "賽車紅",
+      "NAVY": "海軍藍",
+      "GOLD": "香檳金"
+    },
+    "fields": {
+      "placement": "版位",
+      "placementLocked": "建立後不能更改版位",
+      "theme": "底色",
+      "title": "標題",
+      "subtitle": "副標",
+      "ctaLabel": "按鈕文字",
+      "linkUrl": "連結",
+      "linkHint": "站內路徑（例如 /events/taipei-show）或 https:// 網址",
+      "imageUrl": "圖片",
+      "startsAt": "上架時間",
+      "startsAtHint": "留白表示發布後立即上架",
+      "endsAt": "下架時間",
+      "endsAtHint": "留白表示不自動下架",
+      "sortOrder": "排序",
+      "sortOrderHint": "數字小的排前面"
+    }
   }
 }

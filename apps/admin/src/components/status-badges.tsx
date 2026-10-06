@@ -57,3 +57,23 @@ export function MemberStatusBadge({ status }: { status: MemberStatus }) {
   const t = useTranslations('members.statuses');
   return <Badge tone={MEMBER_TONE[status]}>{t(status)}</Badge>;
 }
+
+type ContentStatus = Schemas['AdminEventDto']['status'];
+type BannerState = Schemas['AdminBannerDto']['state'];
+
+export function ContentStatusBadge({ status }: { status: ContentStatus }) {
+  const t = useTranslations('content.statuses');
+  return <Badge tone={status === 'PUBLISHED' ? 'ok' : 'neutral'}>{t(status)}</Badge>;
+}
+
+const BANNER_TONE: Record<BannerState, Tone> = {
+  LIVE: 'ok',
+  SCHEDULED: 'info',
+  DRAFT: 'neutral',
+  ENDED: 'neutral',
+};
+
+export function BannerStateBadge({ state }: { state: BannerState }) {
+  const t = useTranslations('banners.states');
+  return <Badge tone={BANNER_TONE[state]}>{t(state)}</Badge>;
+}
