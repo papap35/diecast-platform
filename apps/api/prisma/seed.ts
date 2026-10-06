@@ -11,7 +11,7 @@ import { Permission } from '../src/modules/auth/permissions.js';
 import { BRANDS, CATEGORIES, PRODUCTS, type SeedProduct } from './seed/catalog-data.js';
 import { seedDemoMemberExtras, seedEvents } from './seed/collector-data.js';
 import { seedBanners } from './seed/content-data.js';
-import { seedCoupons } from './seed/marketing-data.js';
+import { seedCampaigns, seedCoupons } from './seed/marketing-data.js';
 import {
   seedDemoFulfilment,
   seedDemoMemberOrders,
@@ -293,6 +293,7 @@ async function main() {
   await seedEvents(prisma);
   await seedBanners(prisma);
   await seedCoupons(prisma);
+  await seedCampaigns(prisma);
   await seedDemoMemberExtras(prisma, DEMO_ACCOUNTS.member.email);
 
   console.log(`✔ 示範資料建立完成${orders ? `（新增 ${orders} 筆示範訂單）` : ''}`);

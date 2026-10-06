@@ -73,6 +73,11 @@ export const ErrorCode = {
   COUPON_CODE_TAKEN: 'COUPON_CODE_TAKEN',
   /** 已有人使用的優惠券不能刪除（請改為停用） */
   COUPON_IN_USE: 'COUPON_IN_USE',
+
+  /** 電子報已排程或寄出，不能修改（排程中可先取消） */
+  CAMPAIGN_NOT_EDITABLE: 'CAMPAIGN_NOT_EDITABLE',
+  /** 退訂連結無效 */
+  UNSUBSCRIBE_INVALID: 'UNSUBSCRIBE_INVALID',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

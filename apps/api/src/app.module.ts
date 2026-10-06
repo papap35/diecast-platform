@@ -17,6 +17,7 @@ import { HealthModule } from './modules/health/health.module.js';
 import { InventoryModule } from './modules/inventory/inventory.module.js';
 import { InvoicesModule } from './modules/invoices/invoices.module.js';
 import { LogisticsModule } from './modules/logistics/logistics.module.js';
+import { MarketingModule } from './modules/marketing/marketing.module.js';
 import { MembersModule } from './modules/members/members.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import { OrdersModule } from './modules/orders/orders.module.js';
@@ -54,6 +55,7 @@ import { WishlistModule } from './modules/wishlist/wishlist.module.js';
     EventsModule,
     ContentModule,
     CouponsModule,
+    MarketingModule,
     AdminModule,
     HealthModule,
     // 放最後：OpenAPI 文件依模組順序排列，系統管理排在其他後台 API 之後

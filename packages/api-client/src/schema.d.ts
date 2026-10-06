@@ -1075,6 +1075,124 @@ export interface paths {
         patch: operations["AdminEvents_update"];
         trace?: never;
     };
+    "/v1/unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 退訂電子報（前台確認頁送出；不需要登入，靠連結中的簽章權杖辨識會員） */
+        post: operations["Unsubscribe_unsubscribe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/unsubscribe/one-click": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** RFC 8058 一鍵退訂：信箱服務（Gmail、Yahoo…）依 List-Unsubscribe 標頭直接 POST */
+        post: operations["Unsubscribe_oneClick"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/campaigns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminCampaigns_list"];
+        put?: never;
+        post: operations["AdminCampaigns_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/campaigns/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminCampaigns_get"];
+        put?: never;
+        post?: never;
+        delete: operations["AdminCampaigns_remove"];
+        options?: never;
+        head?: never;
+        /** 只有草稿可以修改 */
+        patch: operations["AdminCampaigns_update"];
+        trace?: never;
+    };
+    "/v1/admin/campaigns/{id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 寄一封測試信給自己（或指定 Email） */
+        post: operations["AdminCampaigns_test"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/campaigns/{id}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 排程寄送；不指定時間表示立即（排程每分鐘檢查） */
+        post: operations["AdminCampaigns_schedule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/campaigns/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 取消排程，回到草稿 */
+        post: operations["AdminCampaigns_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/dashboard": {
         parameters: {
             query?: never;
@@ -2706,6 +2824,85 @@ export interface components {
              */
             productId?: string | null;
             translations?: components["schemas"]["EventTranslationInput"][];
+        };
+        UnsubscribeDto: {
+            token: string;
+        };
+        /** @enum {string} */
+        CampaignStatus: "DRAFT" | "SCHEDULED" | "SENDING" | "SENT";
+        CampaignStatsDto: {
+            /** @description 已寫入外寄匣、等待寄出 */
+            pending: number;
+            sent: number;
+            failed: number;
+        };
+        CampaignTranslationDto: {
+            locale: string;
+            subject: string;
+            body: string;
+        };
+        CampaignDto: {
+            status: components["schemas"]["CampaignStatus"];
+            minTier: components["schemas"]["MemberTier"] | null;
+            id: string;
+            name: string;
+            /** @description 繁中主旨 */
+            subject: string;
+            /** Format: date-time */
+            scheduledAt: string | null;
+            /** Format: date-time */
+            startedAt: string | null;
+            /** Format: date-time */
+            sentAt: string | null;
+            /** @description 草稿與排程中為目前符合條件的人數；寄出後為實際收件人數 */
+            audienceCount: number;
+            stats: components["schemas"]["CampaignStatsDto"];
+            translations: components["schemas"]["CampaignTranslationDto"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CampaignListDto: {
+            data: components["schemas"]["CampaignDto"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        CampaignTranslationInput: {
+            /** @enum {string} */
+            locale: "zh-TW" | "en" | "zh-CN";
+            subject: string;
+            /** @description 純文字，段落以空行分隔；{{name}} 會換成會員名稱 */
+            body: string;
+        };
+        CreateCampaignDto: {
+            /** @description 收件對象的最低會員等級；不填表示所有訂閱的會員 */
+            minTier?: components["schemas"]["MemberTier"] | null;
+            /** @description 內部名稱（會員看不到） */
+            name: string;
+            translations: components["schemas"]["CampaignTranslationInput"][];
+        };
+        UpdateCampaignDto: {
+            /** @description 收件對象的最低會員等級；不填表示所有訂閱的會員 */
+            minTier?: components["schemas"]["MemberTier"] | null;
+            /** @description 內部名稱（會員看不到） */
+            name?: string;
+            translations?: components["schemas"]["CampaignTranslationInput"][];
+        };
+        TestCampaignDto: {
+            /** @enum {string} */
+            locale?: "zh-TW" | "en" | "zh-CN";
+            /**
+             * Format: email
+             * @description 收件 Email；不填寄給目前登入的管理員
+             */
+            email?: string;
+        };
+        ScheduleCampaignDto: {
+            /**
+             * Format: date-time
+             * @description 預定寄送時間；不填或已過去表示立即（排程每分鐘檢查一次）
+             */
+            scheduledAt?: string | null;
         };
         DashboardKpisDto: {
             /** @description 今日（台灣時間）已付款營收 */
@@ -4991,6 +5188,226 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminEventDto"];
+                };
+            };
+        };
+    };
+    Unsubscribe_unsubscribe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UnsubscribeDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Unsubscribe_oneClick: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminCampaigns_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                status?: components["schemas"]["CampaignStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignListDto"];
+                };
+            };
+        };
+    };
+    AdminCampaigns_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCampaignDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDto"];
+                };
+            };
+        };
+    };
+    AdminCampaigns_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDto"];
+                };
+            };
+        };
+    };
+    AdminCampaigns_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminCampaigns_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCampaignDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDto"];
+                };
+            };
+        };
+    };
+    AdminCampaigns_test: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestCampaignDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminCampaigns_schedule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScheduleCampaignDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDto"];
+                };
+            };
+        };
+    };
+    AdminCampaigns_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDto"];
                 };
             };
         };

@@ -54,3 +54,28 @@ export async function seedCoupons(prisma: PrismaClient): Promise<void> {
     await prisma.coupon.upsert({ where: { code: coupon.code }, create: coupon, update: {} });
   }
 }
+
+/** 一封示範電子報草稿（已有電子報時不建立） */
+export async function seedCampaigns(prisma: PrismaClient): Promise<void> {
+  if ((await prisma.campaign.count()) > 0) return;
+  await prisma.campaign.create({
+    data: {
+      name: '十月新品快報',
+      minTier: null,
+      translations: {
+        create: [
+          {
+            locale: 'zh-TW',
+            subject: '十月新品快報：液態鉻 GT3 限量開賣',
+            body: '{{name}} 你好：\n\n限量 300 台的 Vortex GT3「液態鉻」收藏家版即將開賣，正式車手以上會員可提前 1 小時優先購。\n\n本月還有三款 1:18 預購新品，以及 Paddock 64 年度模型車展的活動消息，歡迎到官網看看。',
+          },
+          {
+            locale: 'en',
+            subject: 'October drops: Liquid Chrome GT3',
+            body: 'Hi {{name}},\n\nOnly 300 of the Vortex GT3 "Liquid Chrome" collector edition are coming soon, with one-hour early access for Driver members and above.\n\nThis month also brings three new 1:18 pre-orders and news about the Paddock 64 Annual Diecast Expo.',
+          },
+        ],
+      },
+    },
+  });
+}

@@ -3416,6 +3416,371 @@
         ]
       }
     },
+    "/v1/unsubscribe": {
+      "post": {
+        "operationId": "Unsubscribe_unsubscribe",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsubscribeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "退訂電子報（前台確認頁送出；不需要登入，靠連結中的簽章權杖辨識會員）",
+        "tags": [
+          "Marketing"
+        ]
+      }
+    },
+    "/v1/unsubscribe/one-click": {
+      "post": {
+        "operationId": "Unsubscribe_oneClick",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "RFC 8058 一鍵退訂：信箱服務（Gmail、Yahoo…）依 List-Unsubscribe 標頭直接 POST",
+        "tags": [
+          "Marketing"
+        ]
+      }
+    },
+    "/v1/admin/campaigns": {
+      "get": {
+        "operationId": "AdminCampaigns_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/CampaignStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Marketing"
+        ]
+      },
+      "post": {
+        "operationId": "AdminCampaigns_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCampaignDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Marketing"
+        ]
+      }
+    },
+    "/v1/admin/campaigns/{id}": {
+      "get": {
+        "operationId": "AdminCampaigns_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Marketing"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminCampaigns_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCampaignDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "只有草稿可以修改",
+        "tags": [
+          "Admin / Marketing"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminCampaigns_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Marketing"
+        ]
+      }
+    },
+    "/v1/admin/campaigns/{id}/test": {
+      "post": {
+        "operationId": "AdminCampaigns_test",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestCampaignDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "寄一封測試信給自己（或指定 Email）",
+        "tags": [
+          "Admin / Marketing"
+        ]
+      }
+    },
+    "/v1/admin/campaigns/{id}/schedule": {
+      "post": {
+        "operationId": "AdminCampaigns_schedule",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleCampaignDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "排程寄送；不指定時間表示立即（排程每分鐘檢查）",
+        "tags": [
+          "Admin / Marketing"
+        ]
+      }
+    },
+    "/v1/admin/campaigns/{id}/cancel": {
+      "post": {
+        "operationId": "AdminCampaigns_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "取消排程，回到草稿",
+        "tags": [
+          "Admin / Marketing"
+        ]
+      }
+    },
     "/v1/admin/dashboard": {
       "get": {
         "operationId": "AdminDashboard_get",
@@ -9230,6 +9595,282 @@
             "items": {
               "$ref": "#/components/schemas/EventTranslationInput"
             }
+          }
+        }
+      },
+      "UnsubscribeDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "CampaignStatus": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "SCHEDULED",
+          "SENDING",
+          "SENT"
+        ]
+      },
+      "CampaignStatsDto": {
+        "type": "object",
+        "properties": {
+          "pending": {
+            "type": "number",
+            "description": "已寫入外寄匣、等待寄出"
+          },
+          "sent": {
+            "type": "number"
+          },
+          "failed": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "pending",
+          "sent",
+          "failed"
+        ]
+      },
+      "CampaignTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "locale",
+          "subject",
+          "body"
+        ]
+      },
+      "CampaignDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CampaignStatus"
+              }
+            ]
+          },
+          "minTier": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string",
+            "description": "繁中主旨"
+          },
+          "scheduledAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "startedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "sentAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "audienceCount": {
+            "type": "number",
+            "description": "草稿與排程中為目前符合條件的人數；寄出後為實際收件人數"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/CampaignStatsDto"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignTranslationDto"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "minTier",
+          "id",
+          "name",
+          "subject",
+          "scheduledAt",
+          "startedAt",
+          "sentAt",
+          "audienceCount",
+          "stats",
+          "translations",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CampaignListDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CampaignTranslationInput": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "body": {
+            "type": "string",
+            "description": "純文字，段落以空行分隔；{{name}} 會換成會員名稱",
+            "minLength": 1,
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "locale",
+          "subject",
+          "body"
+        ]
+      },
+      "CreateCampaignDto": {
+        "type": "object",
+        "properties": {
+          "minTier": {
+            "nullable": true,
+            "description": "收件對象的最低會員等級；不填表示所有訂閱的會員",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "內部名稱（會員看不到）",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "translations": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignTranslationInput"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "translations"
+        ]
+      },
+      "UpdateCampaignDto": {
+        "type": "object",
+        "properties": {
+          "minTier": {
+            "nullable": true,
+            "description": "收件對象的最低會員等級；不填表示所有訂閱的會員",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "內部名稱（會員看不到）",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "translations": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignTranslationInput"
+            }
+          }
+        }
+      },
+      "TestCampaignDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "enum": [
+              "zh-TW",
+              "en",
+              "zh-CN"
+            ],
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "description": "收件 Email；不填寄給目前登入的管理員",
+            "format": "email"
+          }
+        }
+      },
+      "ScheduleCampaignDto": {
+        "type": "object",
+        "properties": {
+          "scheduledAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "預定寄送時間；不填或已過去表示立即（排程每分鐘檢查一次）"
           }
         }
       },

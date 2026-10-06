@@ -670,12 +670,18 @@ model EmailMessage {
   subject        String
   text           String
   notificationId String?     @db.Uuid
+  /// 電子報的信件（同一封電子報對同一個收件人只會有一封）
+  campaignId     String?     @db.Uuid
+  campaign       Campaign?   @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  /// 一鍵退訂網址（RFC 8058 List-Unsubscribe），只有行銷信件才有
+  unsubscribeUrl String?
   status         EmailStatus @default(PENDING)
   attempts       Int         @default(0)
   lastError      String?
   sentAt         DateTime?
   createdAt      DateTime    @default(now())
 
+  @@unique([campaignId, to])
   @@index([status, createdAt])
 }
 
@@ -841,4 +847,50 @@ model CouponRedemption {
 
   @@index([couponId, memberId])
   @@index([couponId, createdAt])
+}
+
+// ─────────────────────────────────────────────
+// 行銷：電子報
+// ─────────────────────────────────────────────
+
+enum CampaignStatus {
+  DRAFT
+  /// 已排程，時間到由排程開始寫入外寄匣
+  SCHEDULED
+  /// 正在分批寫入外寄匣（中斷後排程會接續，不會重複寄送）
+  SENDING
+  SENT
+}
+
+/// 電子報：只寄給同意接收行銷訊息、帳號正常的會員，依會員語系挑內容
+model Campaign {
+  id             String                @id @default(uuid(7)) @db.Uuid
+  /// 內部名稱
+  name           String
+  status         CampaignStatus        @default(DRAFT)
+  /// 收件對象的最低會員等級；null 表示所有訂閱的會員
+  minTier        MemberTier?
+  /// 預定寄送時間
+  scheduledAt    DateTime?
+  startedAt      DateTime?
+  sentAt         DateTime?
+  /// 寫入外寄匣的收件人數
+  recipientCount Int                   @default(0)
+  translations   CampaignTranslation[]
+  messages       EmailMessage[]
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([status, scheduledAt])
+}
+
+model CampaignTranslation {
+  campaignId String   @db.Uuid
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  locale     String
+  subject    String
+  /// 純文字，段落以空行分隔；{{name}} 會換成會員名稱
+  body       String
+
+  @@id([campaignId, locale])
 }

@@ -4,6 +4,7 @@ import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
 import type { EmailMessage } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { RedisService } from '../../infra/redis/redis.service.js';
+import { listUnsubscribeHeaders } from '../marketing/unsubscribe.js';
 
 export const MAX_EMAIL_ATTEMPTS = 5;
 
@@ -80,6 +81,10 @@ export class EmailOutboxService {
         to: [message.to],
         subject: message.subject,
         text: message.text,
+        // 行銷信件帶一鍵退訂標頭（Gmail、Yahoo 對大量寄件者的要求）
+        ...(message.unsubscribeUrl
+          ? { headers: listUnsubscribeHeaders(message.unsubscribeUrl) }
+          : {}),
       }),
       signal: AbortSignal.timeout(10_000),
     });
