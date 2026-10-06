@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import type { Locale } from '../../common/i18n/locale.js';
-import type { ShippingMethod } from '../../generated/prisma/client.js';
+import { ShippingMethod } from '../../generated/prisma/enums.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { Availability, computeAvailability, isPurchasable } from '../catalog/availability.js';
 import {
@@ -9,12 +9,9 @@ import {
   productSummaryInclude,
   type ProductWithSummary,
 } from '../catalog/catalog.service.js';
-import {
-  calculateShippingFee,
-  freeShippingThreshold,
-  SHIPPING_RATES,
-} from '../orders/order-rules.js';
+import { calculateShippingFee, freeShippingThreshold } from '../orders/order-rules.js';
 import { purchasedQuantities } from '../orders/purchase-history.js';
+import { SettingsService } from '../settings/settings.service.js';
 import {
   type CartDto,
   CartIssue,
@@ -41,6 +38,7 @@ export class CartService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly catalog: CatalogService,
+    private readonly settings: SettingsService,
   ) {}
 
   async getCart(memberId: string, locale: Locale): Promise<CartDto> {
@@ -82,13 +80,14 @@ export class CartService {
     items: { productId: string; quantity: number; product: ProductWithSummary }[],
     locale: Locale,
   ): Promise<CartDto> {
-    const [purchased, tier = 'ROOKIE'] = await Promise.all([
+    const [purchased, tier = 'ROOKIE', rates] = await Promise.all([
       purchasedQuantities(
         this.prisma,
         memberId,
         items.map((item) => item.productId),
       ),
       this.catalog.memberTier(memberId),
+      this.settings.shippingRates(),
     ]);
 
     const now = new Date();
@@ -113,10 +112,10 @@ export class CartService {
       subtotal,
       hasIssues: preorderMixed || lines.some((line) => line.issue !== null),
       preorderMixed,
-      shippingOptions: (Object.keys(SHIPPING_RATES) as ShippingMethod[]).map((method) => ({
+      shippingOptions: Object.values(ShippingMethod).map((method) => ({
         method,
-        fee: calculateShippingFee(method, subtotal, tier),
-        freeThreshold: freeShippingThreshold(method, tier),
+        fee: calculateShippingFee(method, subtotal, tier, rates),
+        freeThreshold: freeShippingThreshold(method, tier, rates),
       })),
     };
   }

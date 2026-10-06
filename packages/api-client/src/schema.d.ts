@@ -1427,6 +1427,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 前台顯示用的運費、免運門檻與付款期限 */
+        get: operations["Settings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminSettings_get"];
+        /** 修改運費與付款期限（購物車與結帳立即套用；已成立的訂單不受影響） */
+        put: operations["AdminSettings_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/health": {
         parameters: {
             query?: never;
@@ -3308,6 +3342,32 @@ export interface components {
             topProducts: components["schemas"]["ReportProductDto"][];
             /** @description 使用次數前 20 名 */
             coupons: components["schemas"]["ReportCouponDto"][];
+        };
+        StoreSettingsDto: {
+            /** @description 宅配運費 */
+            homeDeliveryFee: number;
+            /** @description 宅配免運門檻（商品小計；0 表示一律免運） */
+            homeFreeShippingThreshold: number;
+            /** @description 超商取貨運費（各家超商共用） */
+            cvsFee: number;
+            /** @description 超商取貨免運門檻 */
+            cvsFreeShippingThreshold: number;
+            /** @description 一般訂單的付款期限（分鐘） */
+            paymentTimeoutMinutes: number;
+            /** @description 含限量商品的訂單付款期限（分鐘） */
+            limitedPaymentTimeoutMinutes: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UpdateStoreSettingsDto: {
+            homeDeliveryFee: number;
+            homeFreeShippingThreshold: number;
+            cvsFee: number;
+            cvsFreeShippingThreshold: number;
+            /** @description 10 分鐘～3 天 */
+            paymentTimeoutMinutes: number;
+            /** @description 5～120 分鐘，且不可長於一般訂單 */
+            limitedPaymentTimeoutMinutes: number;
         };
         HealthDto: Record<string, never>;
         AdminRoleSummaryDto: {
@@ -5886,6 +5946,67 @@ export interface operations {
                 };
                 content: {
                     "text/csv": string;
+                };
+            };
+        };
+    };
+    Settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreSettingsDto"];
+                };
+            };
+        };
+    };
+    AdminSettings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreSettingsDto"];
+                };
+            };
+        };
+    };
+    AdminSettings_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateStoreSettingsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreSettingsDto"];
                 };
             };
         };

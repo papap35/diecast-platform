@@ -37,9 +37,6 @@ const envSchema = z.object({
     .default('true')
     .transform((value) => value === 'true'),
 
-  ORDER_PAYMENT_TIMEOUT_MINUTES: z.coerce.number().int().positive().default(30),
-  LIMITED_PAYMENT_TIMEOUT_MINUTES: z.coerce.number().int().positive().default(10),
-
   PAYMENT_PROVIDER: z.enum(['mock', 'ecpay']).default('mock'),
   ECPAY_ENV: z.enum(['stage', 'production']).default('stage'),
   ECPAY_MERCHANT_ID: z.string().default(''),

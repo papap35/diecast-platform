@@ -1,22 +1,43 @@
-import { calculateShippingFee, canTransition, releasesStock } from './order-rules.js';
+import {
+  calculateShippingFee,
+  canTransition,
+  releasesStock,
+  type ShippingRates,
+} from './order-rules.js';
+
+/** 與系統設定的預設值相同 */
+const RATES: ShippingRates = {
+  home: { fee: 120, freeThreshold: 1500 },
+  cvs: { fee: 60, freeThreshold: 1000 },
+};
 
 describe('calculateShippingFee', () => {
   it('宅配未滿 1,500 收 120 元，達門檻免運', () => {
-    expect(calculateShippingFee('HOME_DELIVERY', 1499)).toBe(120);
-    expect(calculateShippingFee('HOME_DELIVERY', 1500)).toBe(0);
+    expect(calculateShippingFee('HOME_DELIVERY', 1499, 'ROOKIE', RATES)).toBe(120);
+    expect(calculateShippingFee('HOME_DELIVERY', 1500, 'ROOKIE', RATES)).toBe(0);
   });
 
   it('超商取貨未滿 1,000 收 60 元，達門檻免運', () => {
-    expect(calculateShippingFee('CVS_711', 999)).toBe(60);
-    expect(calculateShippingFee('CVS_FAMILY', 1000)).toBe(0);
+    expect(calculateShippingFee('CVS_711', 999, 'ROOKIE', RATES)).toBe(60);
+    expect(calculateShippingFee('CVS_FAMILY', 1000, 'ROOKIE', RATES)).toBe(0);
   });
 
   it('冠軍車手免運門檻打六折，傳奇車手全站免運', () => {
-    expect(calculateShippingFee('CVS_711', 599, 'CHAMPION')).toBe(60);
-    expect(calculateShippingFee('CVS_711', 600, 'CHAMPION')).toBe(0);
-    expect(calculateShippingFee('HOME_DELIVERY', 899, 'CHAMPION')).toBe(120);
-    expect(calculateShippingFee('HOME_DELIVERY', 1, 'LEGEND')).toBe(0);
-    expect(calculateShippingFee('CVS_711', 999, 'DRIVER')).toBe(60);
+    expect(calculateShippingFee('CVS_711', 599, 'CHAMPION', RATES)).toBe(60);
+    expect(calculateShippingFee('CVS_711', 600, 'CHAMPION', RATES)).toBe(0);
+    expect(calculateShippingFee('HOME_DELIVERY', 899, 'CHAMPION', RATES)).toBe(120);
+    expect(calculateShippingFee('HOME_DELIVERY', 1, 'LEGEND', RATES)).toBe(0);
+    expect(calculateShippingFee('CVS_711', 999, 'DRIVER', RATES)).toBe(60);
+  });
+
+  it('依系統設定的運費計算；門檻 0 表示一律免運', () => {
+    const custom: ShippingRates = {
+      home: { fee: 150, freeThreshold: 2000 },
+      cvs: { fee: 0, freeThreshold: 0 },
+    };
+    expect(calculateShippingFee('HOME_DELIVERY', 1999, 'ROOKIE', custom)).toBe(150);
+    expect(calculateShippingFee('HOME_DELIVERY', 1200, 'CHAMPION', custom)).toBe(0);
+    expect(calculateShippingFee('CVS_OKMART', 1, 'ROOKIE', custom)).toBe(0);
   });
 });
 

@@ -896,3 +896,23 @@ model CampaignTranslation {
 
   @@id([campaignId, locale])
 }
+
+// ─────────────────────────────────────────────
+// 系統設定
+// ─────────────────────────────────────────────
+
+/// 系統設定：只有一列（id 固定為 1）。運費與付款期限在後台調整，不必重新部署
+model StoreSettings {
+  id                           Int      @id @default(1)
+  /// 宅配運費與免運門檻（商品小計，新台幣；門檻 0 表示一律免運）
+  homeDeliveryFee              Int      @default(120)
+  homeFreeShippingThreshold    Int      @default(1500)
+  /// 超商取貨運費與免運門檻（各家超商共用）
+  cvsFee                       Int      @default(60)
+  cvsFreeShippingThreshold     Int      @default(1000)
+  /// 未付款訂單的保留時間（分鐘），逾時由排程取消並釋放庫存
+  paymentTimeoutMinutes        Int      @default(30)
+  /// 含限量商品的訂單保留時間較短，避免名額被未付款的訂單卡住
+  limitedPaymentTimeoutMinutes Int      @default(10)
+  updatedAt                    DateTime @default(now()) @updatedAt
+}

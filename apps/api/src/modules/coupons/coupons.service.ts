@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import type { Coupon, MemberTier, Prisma, ShippingMethod } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
+import type { ShippingRates } from '../orders/order-rules.js';
+import { SettingsService } from '../settings/settings.service.js';
 import { type OrderPricing, type PricingLine, priceOrder } from './coupon-pricing.js';
 import type { CouponPreviewDto, CouponPreviewRequestDto } from './dto/coupon.dto.js';
 
@@ -21,7 +23,10 @@ export interface AppliedCoupon {
  */
 @Injectable()
 export class CouponsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly settings: SettingsService,
+  ) {}
 
   /** 驗證優惠券並計價（結帳與預覽共用；總使用次數的最終檢查在 redeem） */
   async apply(
@@ -30,11 +35,12 @@ export class CouponsService {
     member: { id: string; tier: MemberTier },
     lines: PricingLine[],
     method: ShippingMethod,
+    rates: ShippingRates,
     now = new Date(),
   ): Promise<AppliedCoupon> {
     const coupon = await db.coupon.findUnique({ where: { code: code.trim().toUpperCase() } });
     if (!coupon) throw AppException.notFound(ErrorCode.COUPON_NOT_FOUND, '找不到這個優惠碼');
-    const pricing = priceOrder(lines, method, member.tier, coupon, now);
+    const pricing = priceOrder(lines, method, member.tier, rates, coupon, now);
     const used = await db.couponRedemption.count({
       where: { couponId: coupon.id, memberId: member.id, releasedAt: null },
     });
@@ -116,6 +122,7 @@ export class CouponsService {
       member,
       lines,
       dto.shippingMethod,
+      await this.settings.shippingRates(),
     );
     return {
       code: coupon.code,

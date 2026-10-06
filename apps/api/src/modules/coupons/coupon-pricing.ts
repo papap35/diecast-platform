@@ -6,7 +6,7 @@ import type {
   ShippingMethod,
 } from '../../generated/prisma/client.js';
 import { meetsTier } from '../members/tiers.js';
-import { calculateShippingFee } from '../orders/order-rules.js';
+import { calculateShippingFee, type ShippingRates } from '../orders/order-rules.js';
 
 /** 計價需要的優惠券規則（使用次數另外由資料庫檢查） */
 export interface CouponRule {
@@ -46,12 +46,13 @@ export function priceOrder(
   lines: PricingLine[],
   method: ShippingMethod,
   tier: MemberTier,
+  rates: ShippingRates,
   coupon?: CouponRule,
   now = new Date(),
 ): OrderPricing {
   const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
   if (!coupon) {
-    const shippingFee = calculateShippingFee(method, subtotal, tier);
+    const shippingFee = calculateShippingFee(method, subtotal, tier, rates);
     return {
       subtotal,
       discount: 0,
@@ -93,7 +94,7 @@ export function priceOrder(
   }
 
   if (coupon.type === 'FREE_SHIPPING') {
-    const shippingDiscount = calculateShippingFee(method, subtotal, tier);
+    const shippingDiscount = calculateShippingFee(method, subtotal, tier, rates);
     if (shippingDiscount === 0) {
       throw AppException.badRequest(
         ErrorCode.COUPON_NOT_APPLICABLE,
@@ -113,7 +114,7 @@ export function priceOrder(
   const raw =
     coupon.type === 'FIXED' ? coupon.value : Math.floor((eligibleSubtotal * coupon.value) / 100);
   const discount = Math.min(raw, coupon.maxDiscount ?? Infinity, eligibleSubtotal);
-  const shippingFee = calculateShippingFee(method, subtotal - discount, tier);
+  const shippingFee = calculateShippingFee(method, subtotal - discount, tier, rates);
   return {
     subtotal,
     discount,

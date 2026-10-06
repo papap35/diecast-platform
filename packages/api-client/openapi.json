@@ -4461,6 +4461,89 @@
         ]
       }
     },
+    "/v1/settings": {
+      "get": {
+        "operationId": "Settings_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "前台顯示用的運費、免運門檻與付款期限",
+        "tags": [
+          "Settings"
+        ]
+      }
+    },
+    "/v1/admin/settings": {
+      "get": {
+        "operationId": "AdminSettings_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "tags": [
+          "Admin / Settings"
+        ]
+      },
+      "put": {
+        "operationId": "AdminSettings_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStoreSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "修改運費與付款期限（購物車與結帳立即套用；已成立的訂單不受影響）",
+        "tags": [
+          "Admin / Settings"
+        ]
+      }
+    },
     "/v1/health": {
       "get": {
         "operationId": "Health_check",
@@ -11375,6 +11458,93 @@
           "byTier",
           "topProducts",
           "coupons"
+        ]
+      },
+      "StoreSettingsDto": {
+        "type": "object",
+        "properties": {
+          "homeDeliveryFee": {
+            "type": "number",
+            "description": "宅配運費"
+          },
+          "homeFreeShippingThreshold": {
+            "type": "number",
+            "description": "宅配免運門檻（商品小計；0 表示一律免運）"
+          },
+          "cvsFee": {
+            "type": "number",
+            "description": "超商取貨運費（各家超商共用）"
+          },
+          "cvsFreeShippingThreshold": {
+            "type": "number",
+            "description": "超商取貨免運門檻"
+          },
+          "paymentTimeoutMinutes": {
+            "type": "number",
+            "description": "一般訂單的付款期限（分鐘）"
+          },
+          "limitedPaymentTimeoutMinutes": {
+            "type": "number",
+            "description": "含限量商品的訂單付款期限（分鐘）"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "homeDeliveryFee",
+          "homeFreeShippingThreshold",
+          "cvsFee",
+          "cvsFreeShippingThreshold",
+          "paymentTimeoutMinutes",
+          "limitedPaymentTimeoutMinutes",
+          "updatedAt"
+        ]
+      },
+      "UpdateStoreSettingsDto": {
+        "type": "object",
+        "properties": {
+          "homeDeliveryFee": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "homeFreeShippingThreshold": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "cvsFee": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "cvsFreeShippingThreshold": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "paymentTimeoutMinutes": {
+            "type": "number",
+            "description": "10 分鐘～3 天",
+            "minimum": 10,
+            "maximum": 4320
+          },
+          "limitedPaymentTimeoutMinutes": {
+            "type": "number",
+            "description": "5～120 分鐘，且不可長於一般訂單",
+            "minimum": 5,
+            "maximum": 120
+          }
+        },
+        "required": [
+          "homeDeliveryFee",
+          "homeFreeShippingThreshold",
+          "cvsFee",
+          "cvsFreeShippingThreshold",
+          "paymentTimeoutMinutes",
+          "limitedPaymentTimeoutMinutes"
         ]
       },
       "HealthDto": {

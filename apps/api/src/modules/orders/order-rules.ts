@@ -2,32 +2,40 @@ import type { MemberTier, OrderStatus, ShippingMethod } from '../../generated/pr
 
 export interface ShippingRate {
   fee: number;
-  /** 訂單小計達此金額免運 */
+  /** 訂單小計達此金額免運（0 表示一律免運） */
   freeThreshold: number;
 }
 
-/** 運費表：宅配 120 元滿 1,500 免運；超商取貨 60 元滿 1,000 免運 */
-export const SHIPPING_RATES: Record<ShippingMethod, ShippingRate> = {
-  HOME_DELIVERY: { fee: 120, freeThreshold: 1500 },
-  CVS_711: { fee: 60, freeThreshold: 1000 },
-  CVS_FAMILY: { fee: 60, freeThreshold: 1000 },
-  CVS_HILIFE: { fee: 60, freeThreshold: 1000 },
-  CVS_OKMART: { fee: 60, freeThreshold: 1000 },
-};
+/** 運費設定：宅配一組、各家超商共用一組（後台「系統設定」可調整，見 SettingsService） */
+export interface ShippingRates {
+  home: ShippingRate;
+  cvs: ShippingRate;
+}
+
+export function shippingRate(method: ShippingMethod, rates: ShippingRates): ShippingRate {
+  return method === 'HOME_DELIVERY' ? rates.home : rates.cvs;
+}
 
 /** 會員等級的免運優惠：冠軍車手門檻打六折，傳奇車手全站免運 */
-export function freeShippingThreshold(method: ShippingMethod, tier: MemberTier = 'ROOKIE'): number {
+export function freeShippingThreshold(
+  method: ShippingMethod,
+  tier: MemberTier,
+  rates: ShippingRates,
+): number {
   if (tier === 'LEGEND') return 0;
-  const base = SHIPPING_RATES[method].freeThreshold;
+  const base = shippingRate(method, rates).freeThreshold;
   return tier === 'CHAMPION' ? Math.round(base * 0.6) : base;
 }
 
 export function calculateShippingFee(
   method: ShippingMethod,
   subtotal: number,
-  tier: MemberTier = 'ROOKIE',
+  tier: MemberTier,
+  rates: ShippingRates,
 ): number {
-  return subtotal >= freeShippingThreshold(method, tier) ? 0 : SHIPPING_RATES[method].fee;
+  return subtotal >= freeShippingThreshold(method, tier, rates)
+    ? 0
+    : shippingRate(method, rates).fee;
 }
 
 export function isConvenienceStore(method: ShippingMethod): boolean {

@@ -30,6 +30,7 @@ import type { CheckoutDto, OrderDto, OrderListDto, OrderListQueryDto } from './d
 import { generateOrderNo } from './order-number.js';
 import { canTransition, isConvenienceStore, releasesStock, SPENT_STATUSES } from './order-rules.js';
 import { purchasedQuantities } from './purchase-history.js';
+import { SettingsService, toShippingRates } from '../settings/settings.service.js';
 
 export const orderDetailInclude = {
   items: { orderBy: { id: 'asc' }, include: { product: { select: { expectedShipAt: true } } } },
@@ -69,6 +70,7 @@ export class OrdersService {
     private readonly redis: RedisService,
     private readonly notifications: NotificationsService,
     private readonly coupons: CouponsService,
+    private readonly settings: SettingsService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
@@ -147,6 +149,9 @@ export class OrdersService {
     fromCart: boolean,
   ): Promise<OrderDto> {
     const { id: memberId, tier } = member;
+    // 運費與付款期限以下單當下的系統設定為準
+    const settings = await this.settings.get();
+    const rates = toShippingRates(settings);
     const order = await this.withOrderNoRetry(() =>
       this.prisma.$transaction(
         async (tx) => {
@@ -190,14 +195,16 @@ export class OrdersService {
                 { id: memberId, tier },
                 pricingLines,
                 dto.shippingMethod,
+                rates,
                 now,
               )
             : null;
-          const pricing = coupon?.pricing ?? priceOrder(pricingLines, dto.shippingMethod, tier);
+          const pricing =
+            coupon?.pricing ?? priceOrder(pricingLines, dto.shippingMethod, tier, rates);
           const hasLimited = lines.some((line) => line.product.saleType === 'LIMITED');
           const timeoutMinutes = hasLimited
-            ? this.config.LIMITED_PAYMENT_TIMEOUT_MINUTES
-            : this.config.ORDER_PAYMENT_TIMEOUT_MINUTES;
+            ? settings.limitedPaymentTimeoutMinutes
+            : settings.paymentTimeoutMinutes;
           const cvs = isConvenienceStore(dto.shippingMethod);
 
           const created = await tx.order.create({

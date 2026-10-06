@@ -9,12 +9,14 @@ import { TokenService } from '../auth/token.service.js';
 import type { ChangePasswordDto, UpdateProfileDto } from './dto/me.dto.js';
 import type { MembershipDto, MemberStateDto } from './dto/membership.dto.js';
 import { toMembership } from './membership.js';
+import { SettingsService } from '../settings/settings.service.js';
 
 @Injectable()
 export class MeService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tokens: TokenService,
+    private readonly settings: SettingsService,
   ) {}
 
   async profile(memberId: string): Promise<MemberProfileDto> {
@@ -46,11 +48,14 @@ export class MeService {
   }
 
   async membership(memberId: string): Promise<MembershipDto> {
-    const member = await this.prisma.member.findUniqueOrThrow({
-      where: { id: memberId },
-      select: { tier: true, totalSpent: true, tierUpdatedAt: true },
-    });
-    return toMembership(member);
+    const [member, rates] = await Promise.all([
+      this.prisma.member.findUniqueOrThrow({
+        where: { id: memberId },
+        select: { tier: true, totalSpent: true, tierUpdatedAt: true },
+      }),
+      this.settings.shippingRates(),
+    ]);
+    return toMembership(member, rates);
   }
 
   async update(memberId: string, dto: UpdateProfileDto): Promise<MemberProfileDto> {
