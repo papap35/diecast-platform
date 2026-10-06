@@ -54,7 +54,9 @@ export class EmailOutboxService {
             status: attempts >= MAX_EMAIL_ATTEMPTS ? 'FAILED' : 'PENDING',
           },
         });
-        this.logger.warn(`寄信失敗（${message.to}，第 ${attempts} 次）：${(error as Error).message}`);
+        this.logger.warn(
+          `寄信失敗（${message.to}，第 ${attempts} 次）：${(error as Error).message}`,
+        );
       }
     }
     return sent;

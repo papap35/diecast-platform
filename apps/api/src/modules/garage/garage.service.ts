@@ -174,7 +174,10 @@ export class GarageService {
   }
 
   private async findOwn(memberId: string, id: string) {
-    const item = await this.prisma.garageItem.findUnique({ where: { id }, select: { memberId: true } });
+    const item = await this.prisma.garageItem.findUnique({
+      where: { id },
+      select: { memberId: true },
+    });
     if (!item || item.memberId !== memberId) {
       throw AppException.notFound(ErrorCode.NOT_FOUND, '找不到這台收藏');
     }

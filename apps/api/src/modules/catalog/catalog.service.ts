@@ -144,7 +144,10 @@ export class CatalogService {
 
   async getProduct(slug: string, locale: Locale, memberId?: string): Promise<ProductDetailDto> {
     const [product, tier] = await Promise.all([
-      this.prisma.product.findFirst({ where: { slug, status: 'ACTIVE' }, include: productDetailInclude }),
+      this.prisma.product.findFirst({
+        where: { slug, status: 'ACTIVE' },
+        include: productDetailInclude,
+      }),
       this.memberTier(memberId),
     ]);
     if (!product) throw AppException.notFound(ErrorCode.PRODUCT_NOT_FOUND, '找不到這個商品');

@@ -23,7 +23,11 @@ interface Schedule {
 
 /** 這位會員可以開始購買的時間：符合優先購資格者為優先購開始，其餘為正式開賣 */
 export function startsFor(product: Schedule, tier: MemberTier | undefined): Date | null {
-  if (product.earlyAccessAt && product.earlyAccessTier && meetsTier(tier, product.earlyAccessTier)) {
+  if (
+    product.earlyAccessAt &&
+    product.earlyAccessTier &&
+    meetsTier(tier, product.earlyAccessTier)
+  ) {
     return product.earlyAccessAt;
   }
   return product.releaseAt;

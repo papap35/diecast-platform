@@ -1,4 +1,13 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Put } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Put,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiLocaleQuery, ReqLocale } from '../../common/i18n/locale.decorator.js';
 import type { Locale } from '../../common/i18n/locale.js';
@@ -16,7 +25,10 @@ export class WishlistController {
   /** 願望清單（新到舊）；售完的商品補貨時會通知 */
   @Get()
   @ApiLocaleQuery()
-  list(@CurrentMember() member: MemberPrincipal, @ReqLocale() locale: Locale): Promise<WishlistDto> {
+  list(
+    @CurrentMember() member: MemberPrincipal,
+    @ReqLocale() locale: Locale,
+  ): Promise<WishlistDto> {
     return this.wishlist.list(member.id, locale);
   }
 
