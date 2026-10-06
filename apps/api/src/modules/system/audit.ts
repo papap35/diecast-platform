@@ -16,7 +16,8 @@ export type AuditTarget =
   | 'Coupon'
   | 'Campaign'
   | 'Setting'
-  | 'EmailMessage';
+  | 'EmailMessage'
+  | 'Report';
 
 export interface AuditMeta {
   /** 動作代碼，例如 product.update */

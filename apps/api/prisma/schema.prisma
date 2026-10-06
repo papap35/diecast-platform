@@ -391,6 +391,8 @@ model Order {
   @@index([memberId, createdAt])
   @@index([status, paymentDeadline])
   @@index([createdAt])
+  /// 儀表板與報表依付款時間統計營收
+  @@index([paidAt])
 }
 
 model OrderItem {

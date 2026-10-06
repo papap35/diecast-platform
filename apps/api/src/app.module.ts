@@ -23,6 +23,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { OrdersModule } from './modules/orders/orders.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
 import { RemindersModule } from './modules/reminders/reminders.module.js';
+import { ReportsModule } from './modules/reports/reports.module.js';
 import { SystemModule } from './modules/system/system.module.js';
 import { WishlistModule } from './modules/wishlist/wishlist.module.js';
 
@@ -57,6 +58,7 @@ import { WishlistModule } from './modules/wishlist/wishlist.module.js';
     CouponsModule,
     MarketingModule,
     AdminModule,
+    ReportsModule,
     HealthModule,
     // 放最後：OpenAPI 文件依模組順序排列，系統管理排在其他後台 API 之後
     SystemModule,

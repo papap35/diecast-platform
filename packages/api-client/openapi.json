@@ -4294,6 +4294,173 @@
         ]
       }
     },
+    "/v1/admin/reports/sales": {
+      "get": {
+        "operationId": "Reports_sales",
+        "parameters": [
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "起日（含，台北時間 YYYY-MM-DD）；預設迄日往前 29 天",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "迄日（含，台北時間 YYYY-MM-DD）；預設今天",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "granularity",
+            "required": false,
+            "in": "query",
+            "description": "趨勢圖的時間單位；依日最長 366 天、依週 3 年、依月 5 年",
+            "schema": {
+              "default": "day",
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "銷售報表：營收趨勢與前期比較、品牌／分類／銷售型態／配送／會員等級分析、熱銷商品、優惠券成效",
+        "tags": [
+          "Admin / Reports"
+        ]
+      }
+    },
+    "/v1/admin/reports/products.csv": {
+      "get": {
+        "operationId": "Reports_productsCsv",
+        "parameters": [
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "起日（含，台北時間 YYYY-MM-DD）；預設迄日往前 29 天",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "迄日（含，台北時間 YYYY-MM-DD）；預設今天",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "商品銷售 CSV（依付款日，扣除已退款訂單）",
+        "tags": [
+          "Admin / Reports"
+        ]
+      }
+    },
+    "/v1/admin/reports/orders.csv": {
+      "get": {
+        "operationId": "Reports_ordersCsv",
+        "parameters": [
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "起日（含，台北時間 YYYY-MM-DD）；預設迄日往前 29 天",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "迄日（含，台北時間 YYYY-MM-DD）；預設今天",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "訂單明細 CSV（依下單日）。內容有會員與收件人資料，另外需要訂單檢視權限，匯出會記到操作紀錄",
+        "tags": [
+          "Admin / Reports"
+        ]
+      }
+    },
     "/v1/health": {
       "get": {
         "operationId": "Health_check",
@@ -4621,6 +4788,26 @@
             }
           },
           {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "起日（含，台北時間 YYYY-MM-DD）",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "迄日（含，台北時間 YYYY-MM-DD）",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
             "name": "adminId",
             "required": false,
             "in": "query",
@@ -4654,24 +4841,6 @@
             "in": "query",
             "schema": {
               "maxLength": 64,
-              "type": "string"
-            }
-          },
-          {
-            "name": "from",
-            "required": false,
-            "in": "query",
-            "description": "起日（含，台北時間 YYYY-MM-DD）",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "to",
-            "required": false,
-            "in": "query",
-            "description": "迄日（含，台北時間 YYYY-MM-DD）",
-            "schema": {
               "type": "string"
             }
           }
@@ -10864,6 +11033,348 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "ReportTotalsDto": {
+        "type": "object",
+        "properties": {
+          "revenue": {
+            "type": "number",
+            "description": "營收：期間內付款、目前仍有效（未退款）訂單的實付金額（含運費、已扣優惠）"
+          },
+          "orders": {
+            "type": "number"
+          },
+          "units": {
+            "type": "number",
+            "description": "售出件數"
+          },
+          "averageOrderValue": {
+            "type": "number"
+          },
+          "customers": {
+            "type": "number",
+            "description": "下單的不重複會員數"
+          },
+          "discount": {
+            "type": "number",
+            "description": "優惠券折抵總額（商品折扣＋免運券省下的運費）"
+          },
+          "shippingFee": {
+            "type": "number",
+            "description": "實收運費"
+          },
+          "refundOrders": {
+            "type": "number",
+            "description": "期間內退款的訂單（依退款日計算）"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "newMembers": {
+            "type": "number",
+            "description": "期間內註冊的會員"
+          }
+        },
+        "required": [
+          "revenue",
+          "orders",
+          "units",
+          "averageOrderValue",
+          "customers",
+          "discount",
+          "shippingFee",
+          "refundOrders",
+          "refundAmount",
+          "newMembers"
+        ]
+      },
+      "ReportPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "期間起始日（台北時間 YYYY-MM-DD；週為週一、月為 1 日）"
+          },
+          "revenue": {
+            "type": "number"
+          },
+          "orders": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "revenue",
+          "orders"
+        ]
+      },
+      "ReportBreakdownDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "品牌或分類 id"
+          },
+          "label": {
+            "type": "string",
+            "description": "顯示名稱"
+          },
+          "revenue": {
+            "type": "number",
+            "description": "商品實收（扣除優惠券分攤，不含運費）"
+          },
+          "units": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "revenue",
+          "units"
+        ]
+      },
+      "ReportSaleTypeDto": {
+        "type": "object",
+        "properties": {
+          "saleType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SaleType"
+              }
+            ]
+          },
+          "revenue": {
+            "type": "number"
+          },
+          "units": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "saleType",
+          "revenue",
+          "units"
+        ]
+      },
+      "ReportShippingDto": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShippingMethod"
+              }
+            ]
+          },
+          "orders": {
+            "type": "number"
+          },
+          "revenue": {
+            "type": "number",
+            "description": "訂單實付金額（含運費）"
+          }
+        },
+        "required": [
+          "method",
+          "orders",
+          "revenue"
+        ]
+      },
+      "ReportTierDto": {
+        "type": "object",
+        "properties": {
+          "tier": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberTier"
+              }
+            ]
+          },
+          "members": {
+            "type": "number",
+            "description": "目前在這個等級的會員數"
+          },
+          "customers": {
+            "type": "number",
+            "description": "期間內有下單的會員數（依目前等級歸類）"
+          },
+          "revenue": {
+            "type": "number",
+            "description": "這些會員在期間內的訂單實付金額"
+          }
+        },
+        "required": [
+          "tier",
+          "members",
+          "customers",
+          "revenue"
+        ]
+      },
+      "ReportProductDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "revenue": {
+            "type": "number",
+            "description": "商品實收（扣除優惠券分攤，不含運費）"
+          },
+          "units": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "productId",
+          "sku",
+          "name",
+          "revenue",
+          "units"
+        ]
+      },
+      "ReportCouponDto": {
+        "type": "object",
+        "properties": {
+          "couponId": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "orders": {
+            "type": "number"
+          },
+          "discount": {
+            "type": "number",
+            "description": "折抵總額（含免運券省下的運費）"
+          },
+          "revenue": {
+            "type": "number",
+            "description": "使用這張優惠券的訂單實付金額"
+          }
+        },
+        "required": [
+          "couponId",
+          "code",
+          "name",
+          "orders",
+          "discount",
+          "revenue"
+        ]
+      },
+      "SalesReportDto": {
+        "type": "object",
+        "properties": {
+          "granularity": {
+            "enum": [
+              "day",
+              "week",
+              "month"
+            ],
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/ReportTotalsDto"
+          },
+          "previous": {
+            "description": "前一段同樣長度的期間，用來計算成長率",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReportTotalsDto"
+              }
+            ]
+          },
+          "previousFrom": {
+            "type": "string"
+          },
+          "previousTo": {
+            "type": "string"
+          },
+          "trend": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportPointDto"
+            }
+          },
+          "byBrand": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportBreakdownDto"
+            }
+          },
+          "byCategory": {
+            "description": "依第一層分類加總",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportBreakdownDto"
+            }
+          },
+          "bySaleType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportSaleTypeDto"
+            }
+          },
+          "byShipping": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportShippingDto"
+            }
+          },
+          "byTier": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportTierDto"
+            }
+          },
+          "topProducts": {
+            "description": "商品實收前 10 名",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportProductDto"
+            }
+          },
+          "coupons": {
+            "description": "使用次數前 20 名",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportCouponDto"
+            }
+          }
+        },
+        "required": [
+          "granularity",
+          "from",
+          "to",
+          "totals",
+          "previous",
+          "previousFrom",
+          "previousTo",
+          "trend",
+          "byBrand",
+          "byCategory",
+          "bySaleType",
+          "byShipping",
+          "byTier",
+          "topProducts",
+          "coupons"
         ]
       },
       "HealthDto": {

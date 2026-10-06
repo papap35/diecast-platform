@@ -1376,6 +1376,57 @@ export interface paths {
         patch: operations["AdminMembers_updateStatus"];
         trace?: never;
     };
+    "/v1/admin/reports/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 銷售報表：營收趨勢與前期比較、品牌／分類／銷售型態／配送／會員等級分析、熱銷商品、優惠券成效 */
+        get: operations["Reports_sales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reports/products.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 商品銷售 CSV（依付款日，扣除已退款訂單） */
+        get: operations["Reports_productsCsv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/reports/orders.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 訂單明細 CSV（依下單日）。內容有會員與收件人資料，另外需要訂單檢視權限，匯出會記到操作紀錄 */
+        get: operations["Reports_ordersCsv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/health": {
         parameters: {
             query?: never;
@@ -3163,6 +3214,100 @@ export interface components {
              * @enum {string}
              */
             status: "ACTIVE" | "SUSPENDED";
+        };
+        ReportTotalsDto: {
+            /** @description 營收：期間內付款、目前仍有效（未退款）訂單的實付金額（含運費、已扣優惠） */
+            revenue: number;
+            orders: number;
+            /** @description 售出件數 */
+            units: number;
+            averageOrderValue: number;
+            /** @description 下單的不重複會員數 */
+            customers: number;
+            /** @description 優惠券折抵總額（商品折扣＋免運券省下的運費） */
+            discount: number;
+            /** @description 實收運費 */
+            shippingFee: number;
+            /** @description 期間內退款的訂單（依退款日計算） */
+            refundOrders: number;
+            refundAmount: number;
+            /** @description 期間內註冊的會員 */
+            newMembers: number;
+        };
+        ReportPointDto: {
+            /** @description 期間起始日（台北時間 YYYY-MM-DD；週為週一、月為 1 日） */
+            date: string;
+            revenue: number;
+            orders: number;
+        };
+        ReportBreakdownDto: {
+            /** @description 品牌或分類 id */
+            key: string;
+            /** @description 顯示名稱 */
+            label: string;
+            /** @description 商品實收（扣除優惠券分攤，不含運費） */
+            revenue: number;
+            units: number;
+        };
+        ReportSaleTypeDto: {
+            saleType: components["schemas"]["SaleType"];
+            revenue: number;
+            units: number;
+        };
+        ReportShippingDto: {
+            method: components["schemas"]["ShippingMethod"];
+            orders: number;
+            /** @description 訂單實付金額（含運費） */
+            revenue: number;
+        };
+        ReportTierDto: {
+            tier: components["schemas"]["MemberTier"];
+            /** @description 目前在這個等級的會員數 */
+            members: number;
+            /** @description 期間內有下單的會員數（依目前等級歸類） */
+            customers: number;
+            /** @description 這些會員在期間內的訂單實付金額 */
+            revenue: number;
+        };
+        ReportProductDto: {
+            productId: string;
+            sku: string;
+            name: string;
+            /** @description 商品實收（扣除優惠券分攤，不含運費） */
+            revenue: number;
+            units: number;
+        };
+        ReportCouponDto: {
+            couponId: string;
+            code: string;
+            name: string;
+            orders: number;
+            /** @description 折抵總額（含免運券省下的運費） */
+            discount: number;
+            /** @description 使用這張優惠券的訂單實付金額 */
+            revenue: number;
+        };
+        SalesReportDto: {
+            /** @enum {string} */
+            granularity: "day" | "week" | "month";
+            from: string;
+            to: string;
+            totals: components["schemas"]["ReportTotalsDto"];
+            /** @description 前一段同樣長度的期間，用來計算成長率 */
+            previous: components["schemas"]["ReportTotalsDto"];
+            previousFrom: string;
+            previousTo: string;
+            trend: components["schemas"]["ReportPointDto"][];
+            byBrand: components["schemas"]["ReportBreakdownDto"][];
+            /** @description 依第一層分類加總 */
+            byCategory: components["schemas"]["ReportBreakdownDto"][];
+            bySaleType: components["schemas"]["ReportSaleTypeDto"][];
+            byShipping: components["schemas"]["ReportShippingDto"][];
+            byTier: components["schemas"]["ReportTierDto"][];
+            /** @description 商品實收前 10 名 */
+            topProducts: components["schemas"]["ReportProductDto"][];
+            /** @description 使用次數前 20 名 */
+            coupons: components["schemas"]["ReportCouponDto"][];
         };
         HealthDto: Record<string, never>;
         AdminRoleSummaryDto: {
@@ -5670,6 +5815,81 @@ export interface operations {
             };
         };
     };
+    Reports_sales: {
+        parameters: {
+            query?: {
+                /** @description 起日（含，台北時間 YYYY-MM-DD）；預設迄日往前 29 天 */
+                from?: string;
+                /** @description 迄日（含，台北時間 YYYY-MM-DD）；預設今天 */
+                to?: string;
+                /** @description 趨勢圖的時間單位；依日最長 366 天、依週 3 年、依月 5 年 */
+                granularity?: "day" | "week" | "month";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesReportDto"];
+                };
+            };
+        };
+    };
+    Reports_productsCsv: {
+        parameters: {
+            query?: {
+                /** @description 起日（含，台北時間 YYYY-MM-DD）；預設迄日往前 29 天 */
+                from?: string;
+                /** @description 迄日（含，台北時間 YYYY-MM-DD）；預設今天 */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+        };
+    };
+    Reports_ordersCsv: {
+        parameters: {
+            query?: {
+                /** @description 起日（含，台北時間 YYYY-MM-DD）；預設迄日往前 29 天 */
+                from?: string;
+                /** @description 迄日（含，台北時間 YYYY-MM-DD）；預設今天 */
+                to?: string;
+                status?: components["schemas"]["OrderStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+        };
+    };
     Health_check: {
         parameters: {
             query?: never;
@@ -5870,15 +6090,15 @@ export interface operations {
             query?: {
                 page?: number;
                 pageSize?: number;
+                /** @description 起日（含，台北時間 YYYY-MM-DD） */
+                from?: string;
+                /** @description 迄日（含，台北時間 YYYY-MM-DD） */
+                to?: string;
                 adminId?: string;
                 /** @description 動作代碼或前綴，例如 order 或 order.status */
                 action?: string;
                 targetType?: string;
                 targetId?: string;
-                /** @description 起日（含，台北時間 YYYY-MM-DD） */
-                from?: string;
-                /** @description 迄日（含，台北時間 YYYY-MM-DD） */
-                to?: string;
             };
             header?: never;
             path?: never;

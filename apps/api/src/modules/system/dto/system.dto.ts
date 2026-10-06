@@ -13,9 +13,8 @@ import {
   MinLength,
 } from 'class-validator';
 import { PageMeta, PaginationQuery } from '../../../common/http/pagination.dto.js';
+import { IsCalendarDay } from '../../../common/validation/calendar-day.js';
 import { ALL_PERMISSIONS } from '../../auth/permissions.js';
-
-const DAY = /^\d{4}-\d{2}-\d{2}$/;
 
 export class AdminRoleSummaryDto {
   id!: string;
@@ -199,13 +198,15 @@ export class AuditLogQueryDto extends PaginationQuery {
   targetId?: string;
 
   /** 起日（含，台北時間 YYYY-MM-DD） */
+  @ApiPropertyOptional({ format: 'date' })
   @IsOptional()
-  @Matches(DAY)
+  @IsCalendarDay()
   from?: string;
 
   /** 迄日（含，台北時間 YYYY-MM-DD） */
+  @ApiPropertyOptional({ format: 'date' })
   @IsOptional()
-  @Matches(DAY)
+  @IsCalendarDay()
   to?: string;
 }
 
