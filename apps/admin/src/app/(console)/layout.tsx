@@ -74,6 +74,7 @@ export default async function ConsoleLayout({ children }: LayoutProps<'/'>) {
               { href: '/admins', label: t('admins'), icon: 'user' as const },
               { href: '/roles', label: t('roles'), icon: 'shield' as const },
               { href: '/audit-logs', label: t('auditLogs'), icon: 'clock' as const },
+              { href: '/emails', label: t('emails'), icon: 'send' as const },
             ]
           : []),
         ...(can(admin, 'settings:write')

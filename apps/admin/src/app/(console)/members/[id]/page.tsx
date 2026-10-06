@@ -7,6 +7,7 @@ import { MemberStatusControl } from '@/components/member-status-control';
 import { PageHeader } from '@/components/page-header';
 import { StatTile } from '@/components/stat-tile';
 import { MemberStatusBadge } from '@/components/status-badges';
+import { ButtonLink } from '@/components/ui/button';
 import { serverApi } from '@/lib/api';
 import { formatDateTime, formatPrice } from '@/lib/format';
 import { can, getAdmin } from '@/lib/permissions';
@@ -41,9 +42,19 @@ export default async function MemberPage({ params }: PageProps<'/members/[id]'>)
           </span>
         }
         actions={
-          can(admin, 'member:write') ? (
-            <MemberStatusControl memberId={member.id} status={member.status} />
-          ) : null
+          <>
+            {can(admin, 'admin:manage') ? (
+              <ButtonLink
+                href={`/emails?q=${encodeURIComponent(member.email)}`}
+                variant="secondary"
+              >
+                {t('emailLog')}
+              </ButtonLink>
+            ) : null}
+            {can(admin, 'member:write') ? (
+              <MemberStatusControl memberId={member.id} status={member.status} />
+            ) : null}
+          </>
         }
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

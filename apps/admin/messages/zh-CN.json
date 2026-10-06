@@ -29,7 +29,8 @@
     "campaigns": "电子报",
     "reports": "报表",
     "salesReport": "销售报表",
-    "settings": "系统设置"
+    "settings": "系统设置",
+    "emails": "寄信纪录"
   },
   "login": {
     "title": "营运后台登录",
@@ -383,7 +384,8 @@
       "DRIVER": "正式车手",
       "CHAMPION": "冠军车手",
       "LEGEND": "传奇车手"
-    }
+    },
+    "emailLog": "寄信纪录"
   },
   "errors": {
     "generic": "发生错误，请稍后再试",
@@ -409,7 +411,8 @@
     "COUPON_CODE_TAKEN": "优惠码已存在",
     "COUPON_IN_USE": "已有使用纪录的优惠券不能删除，请改为停用",
     "CAMPAIGN_NOT_EDITABLE": "电子报已调度或寄出，不能修改（调度中可先取消）",
-    "INTERNAL_ERROR": "系统暂时发生问题，请稍后再试"
+    "INTERNAL_ERROR": "系统暂时发生问题，请稍后再试",
+    "EMAIL_NOT_RETRYABLE": "只有寄送失败的信可以重新寄送"
   },
   "admins": {
     "title": "管理员",
@@ -499,7 +502,8 @@
       "coupon": "优惠券",
       "campaign": "电子报",
       "report": "报表导出",
-      "settings": "系统设置"
+      "settings": "系统设置",
+      "email": "寄信纪录"
     },
     "actions": {
       "auth": {
@@ -572,6 +576,10 @@
       },
       "settings": {
         "update": "修改系统设置"
+      },
+      "email": {
+        "retry": "重新寄送信件",
+        "retry_failed": "重新寄送全部失败的信"
       }
     }
   },
@@ -937,5 +945,50 @@
     "minutes": "分钟",
     "saved": "已保存，新设置会在 15 秒内套用到购物车与结帐",
     "appliesHint": "已成立的订单维持下单当时的运费与付款期限。"
+  },
+  "emails": {
+    "title": "寄信纪录",
+    "subtitle": "通知信与电子报的寄送状态。寄送失败会在 1、5、15、60 分钟后自动重试，仍失败的信可以在这里重新寄送。",
+    "detail": "信件内容",
+    "searchPlaceholder": "收件人或主旨",
+    "kind": "类型",
+    "kinds": {
+      "NOTIFICATION": "通知信",
+      "CAMPAIGN": "电子报",
+      "OTHER": "其他"
+    },
+    "statuses": {
+      "PENDING": "待寄出",
+      "SENT": "已寄出",
+      "FAILED": "寄送失败"
+    },
+    "to": "收件人",
+    "subject": "主旨",
+    "result": "寄送结果",
+    "waiting": "等待调度寄出",
+    "nextAttempt": "{time} 自动重试",
+    "attemptsFailed": "已尝试 {count} 次",
+    "attempts": "尝试次数",
+    "sentAt": "寄出时间",
+    "nextAttemptLabel": "下次重试",
+    "unsubscribe": "退订",
+    "unsubscribeHeader": "附一键退订标头（List-Unsubscribe）",
+    "lastError": "最后一次错误",
+    "content": "内容（纯文本）",
+    "retry": "重新寄送",
+    "queued": "已重新排入，约 30 秒内寄出",
+    "retryAll": "全部重新寄送（{count}）",
+    "retryAllConfirm": "要把 {count} 封寄送失败的信重新排入寄送吗？请先确认寄信服务已经恢复。",
+    "queuedCount": "已重新排入 {count} 封",
+    "notificationTypes": {
+      "ORDER_PAID": "付款成功",
+      "ORDER_SHIPPED": "订单出货",
+      "ORDER_ARRIVED": "包裹到店",
+      "ORDER_CANCELLED": "订单取消",
+      "ORDER_REFUNDED": "订单退款",
+      "RELEASE_REMINDER": "开卖提醒",
+      "WISHLIST_RESTOCK": "补货通知",
+      "TIER_UPGRADED": "等级升级"
+    }
   }
 }

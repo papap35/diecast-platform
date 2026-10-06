@@ -106,3 +106,15 @@ export function CampaignStatusBadge({ status }: { status: CampaignStatus }) {
   const t = useTranslations('campaigns.statuses');
   return <Badge tone={CAMPAIGN_TONE[status]}>{t(status)}</Badge>;
 }
+
+type EmailStatus = Schemas['AdminEmailListItemDto']['status'];
+const EMAIL_TONE: Record<EmailStatus, Tone> = {
+  PENDING: 'warn',
+  SENT: 'ok',
+  FAILED: 'accent',
+};
+
+export function EmailStatusBadge({ status }: { status: EmailStatus }) {
+  const t = useTranslations('emails.statuses');
+  return <Badge tone={EMAIL_TONE[status]}>{t(status)}</Badge>;
+}

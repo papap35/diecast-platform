@@ -13,6 +13,7 @@ import {
   MailIcon,
   MegaphoneIcon,
   ReceiptIcon,
+  SendIcon,
   SettingsIcon,
   ShieldIcon,
   TagIcon,
@@ -37,6 +38,7 @@ const ICONS = {
   mail: MailIcon,
   chart: ChartIcon,
   settings: SettingsIcon,
+  send: SendIcon,
 };
 
 export interface NavGroup {

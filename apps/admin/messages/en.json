@@ -29,7 +29,8 @@
     "campaigns": "Newsletters",
     "reports": "Reports",
     "salesReport": "Sales report",
-    "settings": "Settings"
+    "settings": "Settings",
+    "emails": "Email log"
   },
   "login": {
     "title": "Admin sign in",
@@ -383,7 +384,8 @@
       "DRIVER": "Driver",
       "CHAMPION": "Champion",
       "LEGEND": "Legend"
-    }
+    },
+    "emailLog": "Email log"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -409,7 +411,8 @@
     "COUPON_CODE_TAKEN": "This coupon code already exists",
     "COUPON_IN_USE": "Coupons that have been used can't be deleted. Disable it instead",
     "CAMPAIGN_NOT_EDITABLE": "Scheduled or sent newsletters can't be edited (cancel the schedule first)",
-    "INTERNAL_ERROR": "Something went wrong. Please try again later."
+    "INTERNAL_ERROR": "Something went wrong. Please try again later.",
+    "EMAIL_NOT_RETRYABLE": "Only failed emails can be resent"
   },
   "admins": {
     "title": "Admins",
@@ -499,7 +502,8 @@
       "coupon": "Coupons",
       "campaign": "Newsletters",
       "report": "Report exports",
-      "settings": "Settings"
+      "settings": "Settings",
+      "email": "Email log"
     },
     "actions": {
       "auth": {
@@ -572,6 +576,10 @@
       },
       "settings": {
         "update": "Updated settings"
+      },
+      "email": {
+        "retry": "Resent an email",
+        "retry_failed": "Resent all failed emails"
       }
     }
   },
@@ -937,5 +945,50 @@
     "minutes": "min",
     "saved": "Saved. Carts and checkout pick up the new settings within 15 seconds.",
     "appliesHint": "Existing orders keep the fees and deadlines from when they were placed."
+  },
+  "emails": {
+    "title": "Email log",
+    "subtitle": "Delivery status of notification emails and newsletters. Failed sends retry automatically after 1, 5, 15 and 60 minutes; anything still failing can be resent here.",
+    "detail": "Email",
+    "searchPlaceholder": "Recipient or subject",
+    "kind": "Type",
+    "kinds": {
+      "NOTIFICATION": "Notification",
+      "CAMPAIGN": "Newsletter",
+      "OTHER": "Other"
+    },
+    "statuses": {
+      "PENDING": "Pending",
+      "SENT": "Sent",
+      "FAILED": "Failed"
+    },
+    "to": "Recipient",
+    "subject": "Subject",
+    "result": "Delivery",
+    "waiting": "Waiting to be sent",
+    "nextAttempt": "Retrying at {time}",
+    "attemptsFailed": "{count, plural, one {# attempt} other {# attempts}}",
+    "attempts": "Attempts",
+    "sentAt": "Sent at",
+    "nextAttemptLabel": "Next retry",
+    "unsubscribe": "Unsubscribe",
+    "unsubscribeHeader": "Includes one-click unsubscribe headers (List-Unsubscribe)",
+    "lastError": "Last error",
+    "content": "Content (plain text)",
+    "retry": "Resend",
+    "queued": "Queued again; it will go out within about 30 seconds",
+    "retryAll": "Resend all failed ({count})",
+    "retryAllConfirm": "Queue {count} failed emails again? Make sure the email service has recovered first.",
+    "queuedCount": "Queued {count} emails again",
+    "notificationTypes": {
+      "ORDER_PAID": "Payment received",
+      "ORDER_SHIPPED": "Order shipped",
+      "ORDER_ARRIVED": "Ready for pickup",
+      "ORDER_CANCELLED": "Order cancelled",
+      "ORDER_REFUNDED": "Order refunded",
+      "RELEASE_REMINDER": "Release reminder",
+      "WISHLIST_RESTOCK": "Back in stock",
+      "TIER_UPGRADED": "Tier upgrade"
+    }
   }
 }

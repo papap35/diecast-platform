@@ -29,6 +29,7 @@ const ACTION_GROUPS = [
   'campaign',
   'report',
   'settings',
+  'email',
 ];
 
 /** 操作對象在後台的頁面 */
@@ -58,6 +59,8 @@ function targetHref(type: string, id: string | null): string | null {
       return `/coupons/${id}`;
     case 'Campaign':
       return `/campaigns/${id}`;
+    case 'EmailMessage':
+      return `/emails/${id}`;
     default:
       return null;
   }
