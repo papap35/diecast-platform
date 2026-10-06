@@ -4,7 +4,7 @@ import type { MemberPrincipal } from '../auth/auth.types.js';
 import { CurrentMember, MemberAuth } from '../auth/decorators.js';
 import { MemberProfileDto } from '../auth/dto/member-auth.dto.js';
 import { ChangePasswordDto, DeleteAccountDto, UpdateProfileDto } from './dto/me.dto.js';
-import { MembershipDto } from './dto/membership.dto.js';
+import { MembershipDto, MemberStateDto } from './dto/membership.dto.js';
 import { MeService } from './me.service.js';
 
 @ApiTags('Me')
@@ -17,6 +17,12 @@ export class MeController {
   @Get()
   profile(@CurrentMember() member: MemberPrincipal): Promise<MemberProfileDto> {
     return this.me.profile(member.id);
+  }
+
+  /** 版頭與全站共用的會員狀態：等級、購物車件數、未讀通知、願望清單與提醒 */
+  @Get('state')
+  state(@CurrentMember() member: MemberPrincipal): Promise<MemberStateDto> {
+    return this.me.state(member.id);
   }
 
   /** 會員等級、累計消費、距離下一級的差額與各等級權益 */

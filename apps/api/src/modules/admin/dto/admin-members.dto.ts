@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
 import { PageMeta, PaginationQuery } from '../../../common/http/pagination.dto.js';
-import { MemberStatus } from '../../../generated/prisma/enums.js';
+import { MemberStatus, MemberTier } from '../../../generated/prisma/enums.js';
 import { AdminOrderListItemDto } from './admin-orders.dto.js';
 
 export class AdminMemberQueryDto extends PaginationQuery {
@@ -15,6 +15,11 @@ export class AdminMemberQueryDto extends PaginationQuery {
   @IsOptional()
   @IsIn(Object.values(MemberStatus))
   status?: MemberStatus;
+
+  @ApiPropertyOptional({ enum: MemberTier, enumName: 'MemberTier' })
+  @IsOptional()
+  @IsIn(Object.values(MemberTier))
+  tier?: MemberTier;
 }
 
 export class AdminMemberListItemDto {
@@ -24,6 +29,8 @@ export class AdminMemberListItemDto {
   phone!: string | null;
   @ApiProperty({ enum: MemberStatus, enumName: 'MemberStatus' })
   status!: MemberStatus;
+  @ApiProperty({ enum: MemberTier, enumName: 'MemberTier' })
+  tier!: MemberTier;
   totalSpent!: number;
   orderCount!: number;
   lastLoginAt!: Date | null;

@@ -165,6 +165,70 @@ describe('收藏玩家功能 (e2e)', () => {
     });
   });
 
+  describe('會員狀態', () => {
+    it('一次回傳等級、購物車件數、未讀通知、願望清單與尚未開賣的提醒', async () => {
+      const regular = await createProduct(ctx.prisma);
+      const upcoming = await createProduct(ctx.prisma, {
+        saleType: 'LIMITED',
+        releaseAt: new Date(Date.now() + 60 * MINUTE),
+      });
+      const released = await createProduct(ctx.prisma, {
+        saleType: 'LIMITED',
+        releaseAt: new Date(Date.now() + 60 * MINUTE),
+      });
+      const member = await registerMember(ctx);
+      await setTier(member.id, 'CHAMPION', 8000);
+      await ctx
+        .http()
+        .put(`/v1/cart/items/${regular.id}`)
+        .set(member.auth)
+        .send({ quantity: 3 })
+        .expect(200);
+      await ctx.http().put(`/v1/me/wishlist/${regular.id}`).set(member.auth).expect(204);
+      for (const product of [upcoming, released]) {
+        await ctx.http().put(`/v1/me/reminders/${product.id}`).set(member.auth).expect(204);
+      }
+      // 已經開賣的商品不再列在提醒裡
+      await ctx.prisma.product.update({
+        where: { id: released.id },
+        data: { releaseAt: new Date(Date.now() - MINUTE) },
+      });
+      await ctx.prisma.notification.createMany({
+        data: [
+          { memberId: member.id, type: 'TIER_UPGRADED', title: '升級', body: '恭喜' },
+          {
+            memberId: member.id,
+            type: 'ORDER_PAID',
+            title: '付款',
+            body: '完成',
+            readAt: new Date(),
+          },
+        ],
+      });
+
+      const state = await ctx.http().get('/v1/me/state').set(member.auth).expect(200);
+      expect(state.body).toEqual({
+        tier: 'CHAMPION',
+        cartCount: 3,
+        unreadNotifications: 1,
+        wishlistIds: [regular.id],
+        reminderIds: [upcoming.id],
+      });
+      await ctx.http().get('/v1/me/state').expect(401);
+    });
+
+    it('後台會員列表可依等級篩選', async () => {
+      const admin = await createAdmin(ctx);
+      await registerMember(ctx);
+      const legend = await registerMember(ctx);
+      await setTier(legend.id, 'LEGEND', 20000);
+
+      const res = await ctx.http().get('/v1/admin/members?tier=LEGEND').set(admin.auth).expect(200);
+      expect(res.body.data).toEqual([expect.objectContaining({ id: legend.id, tier: 'LEGEND' })]);
+      await ctx.http().get('/v1/admin/members?tier=GOLD').set(admin.auth).expect(400);
+    });
+  });
+
   describe('限量發售與預購', () => {
     it('限量閘門：售完的請求直接拒絕；取消訂單釋出名額後可以再買', async () => {
       const product = await createProduct(ctx.prisma, {

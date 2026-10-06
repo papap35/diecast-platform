@@ -156,6 +156,23 @@ export interface paths {
         patch: operations["Me_update"];
         trace?: never;
     };
+    "/v1/me/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 版頭與全站共用的會員狀態：等級、購物車件數、未讀通知、願望清單與提醒 */
+        get: operations["Me_state"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/membership": {
         parameters: {
             query?: never;
@@ -1184,6 +1201,16 @@ export interface components {
         AdminAuthResultDto: {
             admin: components["schemas"]["AdminProfileDto"];
             tokens: components["schemas"]["TokenPairDto"];
+        };
+        MemberStateDto: {
+            tier: components["schemas"]["MemberTier"];
+            /** @description 購物車商品件數 */
+            cartCount: number;
+            unreadNotifications: number;
+            /** @description 願望清單中的商品 id */
+            wishlistIds: string[];
+            /** @description 已設定發售提醒、尚未開賣的商品 id */
+            reminderIds: string[];
         };
         NextTierDto: {
             tier: components["schemas"]["MemberTier"];
@@ -2289,6 +2316,7 @@ export interface components {
         MemberStatus: "ACTIVE" | "SUSPENDED" | "DELETED";
         AdminMemberListItemDto: {
             status: components["schemas"]["MemberStatus"];
+            tier: components["schemas"]["MemberTier"];
             id: string;
             email: string;
             name: string;
@@ -2306,6 +2334,7 @@ export interface components {
         };
         AdminMemberDto: {
             status: components["schemas"]["MemberStatus"];
+            tier: components["schemas"]["MemberTier"];
             id: string;
             email: string;
             name: string;
@@ -2572,6 +2601,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberProfileDto"];
+                };
+            };
+        };
+    };
+    Me_state: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberStateDto"];
                 };
             };
         };
@@ -4050,6 +4098,7 @@ export interface operations {
                 page?: number;
                 pageSize?: number;
                 status?: components["schemas"]["MemberStatus"];
+                tier?: components["schemas"]["MemberTier"];
                 /** @description Email、姓名或電話 */
                 q?: string;
             };

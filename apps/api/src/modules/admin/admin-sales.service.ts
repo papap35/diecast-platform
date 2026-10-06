@@ -156,6 +156,7 @@ export class AdminSalesService {
   async listMembers(query: AdminMemberQueryDto): Promise<AdminMemberListDto> {
     const and: Prisma.MemberWhereInput[] = [];
     if (query.status) and.push({ status: query.status });
+    if (query.tier) and.push({ tier: query.tier });
     if (query.q?.trim()) {
       const q = query.q.trim();
       and.push({
@@ -183,6 +184,7 @@ export class AdminSalesService {
         name: member.name,
         phone: member.phone,
         status: member.status,
+        tier: member.tier,
         totalSpent: member.totalSpent,
         orderCount: member._count.orders,
         lastLoginAt: member.lastLoginAt,
@@ -207,6 +209,7 @@ export class AdminSalesService {
       name: member.name,
       phone: member.phone,
       status: member.status,
+      tier: member.tier,
       totalSpent: member.totalSpent,
       orderCount: member._count.orders,
       lastLoginAt: member.lastLoginAt,

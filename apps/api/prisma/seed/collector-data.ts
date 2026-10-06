@@ -95,21 +95,21 @@ export const EVENTS: SeedEvent[] = [
     cover: 'vortex-gt3-liquid-chrome',
     product: 'vortex-gt3-liquid-chrome',
     title: {
-      'zh-TW': 'Vortex GT3 Liquid Chrome 發售之夜',
+      'zh-TW': 'Vortex GT3「液態鉻」發售之夜',
       en: 'Vortex GT3 Liquid Chrome Launch Night',
-      'zh-CN': 'Vortex GT3 Liquid Chrome 发售之夜',
+      'zh-CN': 'Vortex GT3「液态铬」发售之夜',
     },
     summary: {
-      'zh-TW': '限量 300 台液態鍍鉻車殼，正式車手以上開賣前 1 小時優先購。',
+      'zh-TW': '限量 300 台液態鉻車殼，正式車手以上開賣前 1 小時優先購。',
       en: '300 liquid-chrome shells. Driver members and above get one hour of early access.',
-      'zh-CN': '限量 300 台液态镀铬车壳，正式车手以上开卖前 1 小时优先购。',
+      'zh-CN': '限量 300 台液态铬车壳，正式车手以上开卖前 1 小时优先购。',
     },
     body: {
       'zh-TW':
-        'Torque Lab 年度限定 Vortex GT3「Liquid Chrome」將於當晚 20:00 開賣，全球限量 300 台、每人限購 1 台。\n\n正式車手以上會員可在開賣前 1 小時優先購買；在商品頁設定「發售提醒」，開始前 15 分鐘會通知你。\n\n發售當晚旗艦館同步直播開箱，現場另有實車鍍鉻展示。',
-      en: "Torque Lab's limited Vortex GT3 \"Liquid Chrome\" goes on sale at 8 pm: 300 pieces worldwide, one per customer.\n\nDriver members and above can buy one hour early. Set a release reminder on the product page and we'll notify you 15 minutes before your window opens.\n\nWe'll stream the unboxing live from the flagship store on launch night.",
+        'Apex Miniatures 年度限定 Vortex GT3「液態鉻」將於當晚 20:00 開賣，全球限量 300 台、每人限購 2 台。\n\n正式車手以上會員可在開賣前 1 小時優先購買；在商品頁設定「發售提醒」，開始前 15 分鐘會通知你。\n\n發售當晚旗艦館同步直播開箱，現場另有實車鍍鉻展示。',
+      en: "Apex Miniatures' limited Vortex GT3 \"Liquid Chrome\" goes on sale at 8 pm: 300 pieces worldwide, two per customer.\n\nDriver members and above can buy one hour early. Set a release reminder on the product page and we'll notify you 15 minutes before your window opens.\n\nWe'll stream the unboxing live from the flagship store on launch night.",
       'zh-CN':
-        'Torque Lab 年度限定 Vortex GT3「Liquid Chrome」将于当晚 20:00 开卖，全球限量 300 台、每人限购 1 台。\n\n正式车手以上会员可在开卖前 1 小时优先购买；在商品页设置「发售提醒」，开始前 15 分钟会通知你。\n\n发售当晚旗舰馆同步直播开箱，现场另有实车镀铬展示。',
+        'Apex Miniatures 年度限定 Vortex GT3「液态铬」将于当晚 20:00 开卖，全球限量 300 台、每人限购 2 台。\n\n正式车手以上会员可在开卖前 1 小时优先购买；在商品页设置「发售提醒」，开始前 15 分钟会通知你。\n\n发售当晚旗舰馆同步直播开箱，现场另有实车镀铬展示。',
     },
   },
   {
@@ -134,10 +134,10 @@ export const EVENTS: SeedEvent[] = [
     },
     body: {
       'zh-TW':
-        'Apex Miniatures 1:43 Comet LMP Hybrid #8 開賣前一天，我們會在直播中完整開箱：碳纖維紋路、可拆式車殼、展示底座與編號證書。\n\n冠軍車手以上會員可在開賣前 30 分鐘優先購買。',
-      en: "The day before the Apex Miniatures 1:43 Comet LMP Hybrid #8 goes on sale, we'll unbox it live: carbon weave, removable body, display base and numbered certificate.\n\nChampion members and above can buy 30 minutes before the public launch.",
+        'Pit Lane Collectibles 1:43 Comet LMP Hybrid #8 開賣前一天，我們會在直播中完整開箱：碳纖維紋路、可拆式車殼、展示底座與編號證書。\n\n冠軍車手以上會員可在開賣前 30 分鐘優先購買。',
+      en: "The day before the Pit Lane Collectibles 1:43 Comet LMP Hybrid #8 goes on sale, we'll unbox it live: carbon weave, removable body, display base and numbered certificate.\n\nChampion members and above can buy 30 minutes before the public launch.",
       'zh-CN':
-        'Apex Miniatures 1:43 Comet LMP Hybrid #8 开卖前一天，我们会在直播中完整开箱：碳纤维纹路、可拆式车壳、展示底座与编号证书。\n\n冠军车手以上会员可在开卖前 30 分钟优先购买。',
+        'Pit Lane Collectibles 1:43 Comet LMP Hybrid #8 开卖前一天，我们会在直播中完整开箱：碳纤维纹路、可拆式车壳、展示底座与编号证书。\n\n冠军车手以上会员可在开卖前 30 分钟优先购买。',
     },
   },
   {

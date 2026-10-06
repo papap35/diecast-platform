@@ -31,3 +31,16 @@ export class MembershipDto {
   next!: NextTierDto | null;
   tiers!: TierInfoDto[];
 }
+
+/** 前台版頭與全站共用的會員狀態（一次取得，減少每頁的 API 往返） */
+export class MemberStateDto {
+  @ApiProperty({ enum: MemberTier, enumName: 'MemberTier' })
+  tier!: MemberTier;
+  /** 購物車商品件數 */
+  cartCount!: number;
+  unreadNotifications!: number;
+  /** 願望清單中的商品 id */
+  wishlistIds!: string[];
+  /** 已設定發售提醒、尚未開賣的商品 id */
+  reminderIds!: string[];
+}

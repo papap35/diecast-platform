@@ -7,7 +7,7 @@ import type { MemberProfileDto } from '../auth/dto/member-auth.dto.js';
 import { toMemberProfile } from '../auth/member-auth.service.js';
 import { TokenService } from '../auth/token.service.js';
 import type { ChangePasswordDto, UpdateProfileDto } from './dto/me.dto.js';
-import type { MembershipDto } from './dto/membership.dto.js';
+import type { MembershipDto, MemberStateDto } from './dto/membership.dto.js';
 import { toMembership } from './membership.js';
 
 @Injectable()
@@ -23,6 +23,26 @@ export class MeService {
       throw AppException.unauthorized(ErrorCode.ACCOUNT_DISABLED, '帳號已停用或不存在');
     }
     return toMemberProfile(member);
+  }
+
+  async state(memberId: string): Promise<MemberStateDto> {
+    const [member, cart, unread, wishlist, reminders] = await Promise.all([
+      this.prisma.member.findUniqueOrThrow({ where: { id: memberId }, select: { tier: true } }),
+      this.prisma.cartItem.aggregate({ where: { cart: { memberId } }, _sum: { quantity: true } }),
+      this.prisma.notification.count({ where: { memberId, readAt: null } }),
+      this.prisma.wishlistItem.findMany({ where: { memberId }, select: { productId: true } }),
+      this.prisma.releaseReminder.findMany({
+        where: { memberId, product: { releaseAt: { gt: new Date() } } },
+        select: { productId: true },
+      }),
+    ]);
+    return {
+      tier: member.tier,
+      cartCount: cart._sum.quantity ?? 0,
+      unreadNotifications: unread,
+      wishlistIds: wishlist.map((item) => item.productId),
+      reminderIds: reminders.map((item) => item.productId),
+    };
   }
 
   async membership(memberId: string): Promise<MembershipDto> {
