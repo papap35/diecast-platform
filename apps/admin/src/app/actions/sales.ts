@@ -89,3 +89,15 @@ export async function retryInvoiceAction(id: string): Promise<ActionResult> {
   refresh();
   return { ok: true, data: undefined };
 }
+
+/** 把會員的公開車庫設為不公開 */
+export async function hideGarageAction(memberId: string): Promise<ActionResult> {
+  if (!(await ensureAccessToken())) return { ok: false, error: UNAUTHORIZED };
+  const api = await actionApi();
+  const { error, response } = await api.POST('/v1/admin/members/{id}/garage/hide', {
+    params: { path: { id: memberId } },
+  });
+  if (!response.ok) return { ok: false, error: toActionError(error, response.status) };
+  refresh();
+  return { ok: true, data: undefined };
+}

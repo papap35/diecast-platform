@@ -385,7 +385,31 @@
       "CHAMPION": "Champion",
       "LEGEND": "Legend"
     },
-    "emailLog": "Email log"
+    "emailLog": "Email log",
+    "garage": {
+      "title": "Garage",
+      "summary": "{models, plural, one {# model} other {# models}} · {cars, plural, one {# car} other {# cars}}",
+      "privacyHint": "Purchase prices and notes are visible only to the member and aren't shown here.",
+      "public": "Public garage",
+      "publicShort": "Public garage",
+      "private": "Private",
+      "hide": "Make private",
+      "hideConfirm": "Make this member's garage private? The public page stops working right away; the member can edit it and publish it again.",
+      "model": "Model",
+      "condition": "Condition",
+      "quantity": "Qty",
+      "source": "Source",
+      "added": "Added",
+      "empty": "No models yet",
+      "favorite": "Favorite",
+      "manual": "Logged by member",
+      "conditions": {
+        "SEALED": "Sealed",
+        "OPENED": "Opened",
+        "DISPLAYED": "On display",
+        "PLAYWORN": "Play-worn"
+      }
+    }
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -545,7 +569,8 @@
         "invoice_retry": "Retried invoice"
       },
       "member": {
-        "status": "Changed member status"
+        "status": "Changed member status",
+        "garage_hide": "Made a garage private"
       },
       "event": {
         "create": "Created event",

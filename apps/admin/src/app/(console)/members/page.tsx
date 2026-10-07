@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { PageHeader } from '@/components/page-header';
 import { Pagination } from '@/components/pagination';
 import { MemberStatusBadge } from '@/components/status-badges';
+import { Badge } from '@/components/ui/badge';
 import { buttonClass } from '@/components/ui/button';
 import { Input, Select } from '@/components/ui/field';
 import { serverApi } from '@/lib/api';
@@ -31,6 +32,7 @@ export default async function MembersPage({ searchParams }: PageProps<'/members'
     q: params.q || undefined,
     status: (params.status || undefined) as Query['status'],
     tier: (params.tier || undefined) as Query['tier'],
+    garage: params.garage === 'public' ? 'public' : undefined,
   };
   const api = await serverApi();
   const { data } = await api.GET('/v1/admin/members', { params: { query } });
@@ -75,6 +77,17 @@ export default async function MembersPage({ searchParams }: PageProps<'/members'
             </option>
           ))}
         </Select>
+        <Select
+          name="garage"
+          defaultValue={params.garage ?? ''}
+          className="w-40"
+          aria-label={t('garage.title')}
+        >
+          <option value="">
+            {t('garage.title')}：{tc('all')}
+          </option>
+          <option value="public">{t('garage.public')}</option>
+        </Select>
         <button type="submit" className={buttonClass('primary', 'md')}>
           {tc('search')}
         </button>
@@ -105,6 +118,11 @@ export default async function MembersPage({ searchParams }: PageProps<'/members'
                     <Link href={`/members/${member.id}`} className="font-semibold hover:underline">
                       {member.name}
                     </Link>
+                    {member.garagePublic ? (
+                      <Badge tone="info" className="ml-2">
+                        {t('garage.publicShort')}
+                      </Badge>
+                    ) : null}
                   </td>
                   <td className="text-ink-2">{member.email}</td>
                   <td className="text-ink-2 tabular">{member.phone ?? '—'}</td>

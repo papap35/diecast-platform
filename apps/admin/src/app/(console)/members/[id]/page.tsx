@@ -3,12 +3,14 @@ import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { AdminOrderTable } from '@/components/admin-order-table';
+import { MemberGarage } from '@/components/member-garage';
 import { MemberStatusControl } from '@/components/member-status-control';
 import { PageHeader } from '@/components/page-header';
 import { StatTile } from '@/components/stat-tile';
 import { MemberStatusBadge } from '@/components/status-badges';
 import { ButtonLink } from '@/components/ui/button';
 import { serverApi } from '@/lib/api';
+import { STOREFRONT_URL } from '@/lib/env';
 import { formatDateTime, formatPrice } from '@/lib/format';
 import { can, getAdmin } from '@/lib/permissions';
 
@@ -23,8 +25,9 @@ export default async function MemberPage({ params }: PageProps<'/members/[id]'>)
   const tc = await getTranslations('common');
   const locale = await getLocale();
   const api = await serverApi();
-  const [{ data: member }, admin] = await Promise.all([
+  const [{ data: member }, { data: garage }, admin] = await Promise.all([
     api.GET('/v1/admin/members/{id}', { params: { path: { id } } }),
+    api.GET('/v1/admin/members/{id}/garage', { params: { path: { id } } }),
     getAdmin(),
   ]);
   if (!member) notFound();
@@ -78,6 +81,15 @@ export default async function MemberPage({ params }: PageProps<'/members/[id]'>)
         <h2 className="p-5 pb-2 text-sm font-semibold">{t('recentOrders')}</h2>
         <AdminOrderTable orders={member.recentOrders} showMember={false} />
       </div>
+      {garage ? (
+        <MemberGarage
+          garage={garage}
+          memberId={member.id}
+          canWrite={can(admin, 'member:write')}
+          storefrontUrl={STOREFRONT_URL}
+          locale={locale}
+        />
+      ) : null}
     </>
   );
 }

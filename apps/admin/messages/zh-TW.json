@@ -385,7 +385,31 @@
       "CHAMPION": "冠軍車手",
       "LEGEND": "傳奇車手"
     },
-    "emailLog": "寄信紀錄"
+    "emailLog": "寄信紀錄",
+    "garage": {
+      "title": "收藏車庫",
+      "summary": "{models} 款、{cars} 台",
+      "privacyHint": "購入價與備註只有會員本人看得到，這裡不顯示。",
+      "public": "公開車庫",
+      "publicShort": "公開車庫",
+      "private": "未公開",
+      "hide": "設為不公開",
+      "hideConfirm": "要把這位會員的公開車庫設為不公開嗎？公開頁面會立即無法瀏覽，會員之後可以修改內容再自行公開。",
+      "model": "車款",
+      "condition": "狀態",
+      "quantity": "數量",
+      "source": "來源",
+      "added": "加入時間",
+      "empty": "這位會員還沒有收藏",
+      "favorite": "最愛",
+      "manual": "會員自行登錄",
+      "conditions": {
+        "SEALED": "未拆封",
+        "OPENED": "已拆封",
+        "DISPLAYED": "展示中",
+        "PLAYWORN": "有使用痕跡"
+      }
+    }
   },
   "errors": {
     "generic": "發生錯誤，請稍後再試",
@@ -545,7 +569,8 @@
         "invoice_retry": "重新開立發票"
       },
       "member": {
-        "status": "變更會員狀態"
+        "status": "變更會員狀態",
+        "garage_hide": "將公開車庫設為不公開"
       },
       "event": {
         "create": "新增活動",
