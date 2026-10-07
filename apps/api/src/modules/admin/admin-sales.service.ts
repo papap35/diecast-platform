@@ -151,6 +151,7 @@ export class AdminSalesService {
     const and: Prisma.MemberWhereInput[] = [];
     if (query.status) and.push({ status: query.status });
     if (query.tier) and.push({ tier: query.tier });
+    if (query.garage === 'public') and.push({ garagePublic: true });
     if (query.q?.trim()) {
       const q = query.q.trim();
       and.push({
@@ -181,6 +182,7 @@ export class AdminSalesService {
         tier: member.tier,
         totalSpent: member.totalSpent,
         orderCount: member._count.orders,
+        garagePublic: member.garagePublic,
         lastLoginAt: member.lastLoginAt,
         createdAt: member.createdAt,
       })),
@@ -206,6 +208,7 @@ export class AdminSalesService {
       tier: member.tier,
       totalSpent: member.totalSpent,
       orderCount: member._count.orders,
+      garagePublic: member.garagePublic,
       lastLoginAt: member.lastLoginAt,
       createdAt: member.createdAt,
       locale: member.locale,

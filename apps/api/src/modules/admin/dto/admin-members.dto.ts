@@ -20,6 +20,12 @@ export class AdminMemberQueryDto extends PaginationQuery {
   @IsOptional()
   @IsIn(Object.values(MemberTier))
   tier?: MemberTier;
+
+  /** public：只列出公開車庫的會員（後台巡查公開內容用） */
+  @ApiPropertyOptional({ enum: ['public'] })
+  @IsOptional()
+  @IsIn(['public'])
+  garage?: 'public';
 }
 
 export class AdminMemberListItemDto {
@@ -33,6 +39,8 @@ export class AdminMemberListItemDto {
   tier!: MemberTier;
   totalSpent!: number;
   orderCount!: number;
+  /** 是否公開車庫 */
+  garagePublic!: boolean;
   lastLoginAt!: Date | null;
   createdAt!: Date;
 }

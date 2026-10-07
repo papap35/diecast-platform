@@ -181,3 +181,34 @@ export class UpdateGarageSettingsDto {
   })
   handle?: string;
 }
+
+export class GarageOrderRefDto {
+  id!: string;
+  orderNo!: string;
+}
+
+/** 後台檢視的收藏：與公開車庫相同，不含購入價與備註（只有會員本人看得到） */
+export class AdminGarageItemDto {
+  id!: string;
+  productId!: string | null;
+  name!: string;
+  brandName!: string | null;
+  scale!: string | null;
+  imageUrl!: string | null;
+  @ApiProperty({ enum: GarageCondition, enumName: 'GarageCondition' })
+  condition!: GarageCondition;
+  quantity!: number;
+  isFavorite!: boolean;
+  @ApiProperty({ enum: ['ORDER', 'MANUAL'] })
+  source!: 'ORDER' | 'MANUAL';
+  /** 由訂單自動入庫時的來源訂單 */
+  order!: GarageOrderRefDto | null;
+  acquiredAt!: Date | null;
+  createdAt!: Date;
+}
+
+export class AdminGarageDto {
+  settings!: GarageSettingsDto;
+  stats!: GarageStatsDto;
+  items!: AdminGarageItemDto[];
+}

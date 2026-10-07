@@ -3062,6 +3062,78 @@
         ]
       }
     },
+    "/v1/admin/members/{id}/garage": {
+      "get": {
+        "operationId": "AdminGarage_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminGarageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "會員的收藏車庫（不含購入價與備註）",
+        "tags": [
+          "Admin / Members"
+        ]
+      }
+    },
+    "/v1/admin/members/{id}/garage/hide": {
+      "post": {
+        "operationId": "AdminGarage_hide",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GarageSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin": []
+          }
+        ],
+        "summary": "把公開車庫設為不公開（內容不當時使用）",
+        "tags": [
+          "Admin / Members"
+        ]
+      }
+    },
     "/v1/events": {
       "get": {
         "operationId": "Events_list",
@@ -4351,6 +4423,18 @@
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/MemberTier"
+            }
+          },
+          {
+            "name": "garage",
+            "required": false,
+            "in": "query",
+            "description": "public：只列出公開車庫的會員（後台巡查公開內容用）",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "public"
+              ]
             }
           },
           {
@@ -9345,6 +9429,124 @@
           "stats"
         ]
       },
+      "GarageOrderRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "orderNo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "orderNo"
+        ]
+      },
+      "AdminGarageItemDto": {
+        "type": "object",
+        "properties": {
+          "condition": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GarageCondition"
+              }
+            ]
+          },
+          "source": {
+            "enum": [
+              "ORDER",
+              "MANUAL"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "brandName": {
+            "type": "string",
+            "nullable": true
+          },
+          "scale": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "isFavorite": {
+            "type": "boolean"
+          },
+          "order": {
+            "nullable": true,
+            "description": "由訂單自動入庫時的來源訂單",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GarageOrderRefDto"
+              }
+            ]
+          },
+          "acquiredAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "condition",
+          "source",
+          "id",
+          "productId",
+          "name",
+          "brandName",
+          "scale",
+          "imageUrl",
+          "quantity",
+          "isFavorite",
+          "order",
+          "acquiredAt",
+          "createdAt"
+        ]
+      },
+      "AdminGarageDto": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "$ref": "#/components/schemas/GarageSettingsDto"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/GarageStatsDto"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminGarageItemDto"
+            }
+          }
+        },
+        "required": [
+          "settings",
+          "stats",
+          "items"
+        ]
+      },
       "EventType": {
         "type": "string",
         "enum": [
@@ -11408,6 +11610,10 @@
           "orderCount": {
             "type": "number"
           },
+          "garagePublic": {
+            "type": "boolean",
+            "description": "是否公開車庫"
+          },
           "lastLoginAt": {
             "format": "date-time",
             "type": "string",
@@ -11427,6 +11633,7 @@
           "phone",
           "totalSpent",
           "orderCount",
+          "garagePublic",
           "lastLoginAt",
           "createdAt"
         ]
@@ -11485,6 +11692,10 @@
           "orderCount": {
             "type": "number"
           },
+          "garagePublic": {
+            "type": "boolean",
+            "description": "是否公開車庫"
+          },
           "lastLoginAt": {
             "format": "date-time",
             "type": "string",
@@ -11516,6 +11727,7 @@
           "phone",
           "totalSpent",
           "orderCount",
+          "garagePublic",
           "lastLoginAt",
           "createdAt",
           "locale",

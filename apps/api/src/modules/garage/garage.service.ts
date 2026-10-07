@@ -6,6 +6,7 @@ import { type Locale, pickTranslation } from '../../common/i18n/locale.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import type {
+  AdminGarageDto,
   CreateGarageItemDto,
   GarageDto,
   GarageItemDto,
@@ -85,6 +86,52 @@ export class GarageService {
       note: null,
     }));
     return { handle: handle.toLowerCase(), tier: member.tier, items, stats: stats(items) };
+  }
+
+  /** 後台會員頁：會員的收藏與公開設定（不含購入價與備註） */
+  async adminGet(memberId: string): Promise<AdminGarageDto> {
+    const member = await this.prisma.member.findUnique({
+      where: { id: memberId },
+      select: { garagePublic: true, garageHandle: true },
+    });
+    if (!member) throw AppException.notFound(ErrorCode.NOT_FOUND, '找不到這位會員');
+    const rows = await this.prisma.garageItem.findMany({
+      where: { memberId },
+      include: {
+        ...garageInclude,
+        orderItem: { select: { order: { select: { id: true, orderNo: true } } } },
+      },
+      orderBy: [{ isFavorite: 'desc' }, { createdAt: 'desc' }],
+    });
+    const items = rows.map((row) => {
+      const {
+        pricePaid: _price,
+        note: _note,
+        productSlug: _slug,
+        ...item
+      } = this.toDto(row, 'zh-TW');
+      return { ...item, order: row.orderItem?.order ?? null };
+    });
+    return {
+      settings: { public: member.garagePublic, handle: member.garageHandle },
+      stats: stats(items),
+      items,
+    };
+  }
+
+  /** 後台把公開車庫設為不公開（例如名稱有不當內容）；網址代稱保留，會員可修改後再公開 */
+  async adminHide(memberId: string): Promise<GarageSettingsDto> {
+    const member = await this.prisma.member.findUnique({
+      where: { id: memberId },
+      select: { id: true },
+    });
+    if (!member) throw AppException.notFound(ErrorCode.NOT_FOUND, '找不到這位會員');
+    const updated = await this.prisma.member.update({
+      where: { id: memberId },
+      data: { garagePublic: false },
+      select: { garagePublic: true, garageHandle: true },
+    });
+    return { public: updated.garagePublic, handle: updated.garageHandle };
   }
 
   async create(memberId: string, dto: CreateGarageItemDto, locale: Locale): Promise<GarageItemDto> {
@@ -207,7 +254,9 @@ export class GarageService {
   }
 }
 
-function countBy(items: GarageItemDto[], key: (item: GarageItemDto) => string | null) {
+type CountableItem = Pick<GarageItemDto, 'brandName' | 'scale' | 'quantity'>;
+
+function countBy(items: CountableItem[], key: (item: CountableItem) => string | null) {
   const counts = new Map<string, number>();
   for (const item of items) {
     const label = key(item);
@@ -218,7 +267,7 @@ function countBy(items: GarageItemDto[], key: (item: GarageItemDto) => string | 
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }
 
-function stats(items: GarageItemDto[]): GarageStatsDto {
+function stats(items: CountableItem[]): GarageStatsDto {
   return {
     models: items.length,
     cars: items.reduce((sum, item) => sum + item.quantity, 0),

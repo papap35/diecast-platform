@@ -1028,6 +1028,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/members/{id}/garage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 會員的收藏車庫（不含購入價與備註） */
+        get: operations["AdminGarage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/members/{id}/garage/hide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 把公開車庫設為不公開（內容不當時使用） */
+        post: operations["AdminGarage_hide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/events": {
         parameters: {
             query?: never;
@@ -2801,6 +2835,34 @@ export interface components {
             items: components["schemas"]["GarageItemDto"][];
             stats: components["schemas"]["GarageStatsDto"];
         };
+        GarageOrderRefDto: {
+            id: string;
+            orderNo: string;
+        };
+        AdminGarageItemDto: {
+            condition: components["schemas"]["GarageCondition"];
+            /** @enum {string} */
+            source: "ORDER" | "MANUAL";
+            id: string;
+            productId: string | null;
+            name: string;
+            brandName: string | null;
+            scale: string | null;
+            imageUrl: string | null;
+            quantity: number;
+            isFavorite: boolean;
+            /** @description 由訂單自動入庫時的來源訂單 */
+            order: components["schemas"]["GarageOrderRefDto"] | null;
+            /** Format: date-time */
+            acquiredAt: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AdminGarageDto: {
+            settings: components["schemas"]["GarageSettingsDto"];
+            stats: components["schemas"]["GarageStatsDto"];
+            items: components["schemas"]["AdminGarageItemDto"][];
+        };
         /** @enum {string} */
         EventType: "EXHIBITION" | "MEETUP" | "LAUNCH" | "ONLINE";
         EventSummaryDto: {
@@ -3349,6 +3411,8 @@ export interface components {
             phone: string | null;
             totalSpent: number;
             orderCount: number;
+            /** @description 是否公開車庫 */
+            garagePublic: boolean;
             /** Format: date-time */
             lastLoginAt: string | null;
             /** Format: date-time */
@@ -3367,6 +3431,8 @@ export interface components {
             phone: string | null;
             totalSpent: number;
             orderCount: number;
+            /** @description 是否公開車庫 */
+            garagePublic: boolean;
             /** Format: date-time */
             lastLoginAt: string | null;
             /** Format: date-time */
@@ -5342,6 +5408,48 @@ export interface operations {
             };
         };
     };
+    AdminGarage_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminGarageDto"];
+                };
+            };
+        };
+    };
+    AdminGarage_hide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GarageSettingsDto"];
+                };
+            };
+        };
+    };
     Events_list: {
         parameters: {
             query?: {
@@ -6030,6 +6138,8 @@ export interface operations {
                 pageSize?: number;
                 status?: components["schemas"]["MemberStatus"];
                 tier?: components["schemas"]["MemberTier"];
+                /** @description public：只列出公開車庫的會員（後台巡查公開內容用） */
+                garage?: "public";
                 /** @description Email、姓名或電話 */
                 q?: string;
             };

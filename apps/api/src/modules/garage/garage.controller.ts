@@ -15,8 +15,11 @@ import { ApiTags } from '@nestjs/swagger';
 import { ApiLocaleQuery, ReqLocale } from '../../common/i18n/locale.decorator.js';
 import type { Locale } from '../../common/i18n/locale.js';
 import type { MemberPrincipal } from '../auth/auth.types.js';
-import { CurrentMember, MemberAuth } from '../auth/decorators.js';
+import { AdminAuth, CurrentMember, MemberAuth, RequirePermissions } from '../auth/decorators.js';
+import { Permission } from '../auth/permissions.js';
+import { Audit } from '../system/audit.js';
 import {
+  AdminGarageDto,
   CreateGarageItemDto,
   GarageDto,
   GarageItemDto,
@@ -91,5 +94,27 @@ export class PublicGarageController {
   @ApiLocaleQuery()
   get(@Param('handle') handle: string, @ReqLocale() locale: Locale): Promise<PublicGarageDto> {
     return this.garage.getPublic(handle, locale);
+  }
+}
+
+@ApiTags('Admin / Members')
+@AdminAuth(Permission.MemberRead)
+@Controller('admin/members/:id/garage')
+export class AdminGarageController {
+  constructor(private readonly garage: GarageService) {}
+
+  /** 會員的收藏車庫（不含購入價與備註） */
+  @Get()
+  get(@Param('id', ParseUUIDPipe) id: string): Promise<AdminGarageDto> {
+    return this.garage.adminGet(id);
+  }
+
+  /** 把公開車庫設為不公開（內容不當時使用） */
+  @Post('hide')
+  @HttpCode(HttpStatus.OK)
+  @Audit('member.garage_hide', 'Member')
+  @RequirePermissions(Permission.MemberWrite)
+  hide(@Param('id', ParseUUIDPipe) id: string): Promise<GarageSettingsDto> {
+    return this.garage.adminHide(id);
   }
 }
