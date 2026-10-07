@@ -7,7 +7,7 @@ import { LocaleSelect } from '@/components/locale-select';
 import { Logo } from '@/components/logo';
 import { SidebarNav, type NavGroup } from '@/components/sidebar-nav';
 import { Badge } from '@/components/ui/badge';
-import { API_BASE_URL, STOREFRONT_URL } from '@/lib/env';
+import { API_DOCS_URL, STOREFRONT_URL } from '@/lib/env';
 import { can, getAdmin } from '@/lib/permissions';
 
 export default async function ConsoleLayout({ children }: LayoutProps<'/'>) {
@@ -114,7 +114,7 @@ export default async function ConsoleLayout({ children }: LayoutProps<'/'>) {
             {t('storefront')}
           </a>
           <a
-            href={`${API_BASE_URL}/docs`}
+            href={API_DOCS_URL}
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-white/60 hover:bg-white/10 hover:text-white"

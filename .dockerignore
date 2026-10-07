@@ -1,0 +1,24 @@
+# 版本控制與編輯器
+.git
+.github
+**/.DS_Store
+
+# 依賴與建置產物（映像內重新安裝、重新編譯）
+**/node_modules
+**/dist
+**/.next
+**/*.tsbuildinfo
+apps/api/src/generated
+
+# 環境變數與機密
+**/.env
+**/.env.*
+!**/.env.example
+
+# 與 API 映像無關的內容
+apps/web
+apps/admin
+docs
+apps/api/loadtest
+apps/api/test
+**/*.log
