@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # 依賴每週一次、合併成少數幾個 PR，避免淹沒在小版本更新裡
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      nest:
+        patterns: ['@nestjs/*']
+      prisma:
+        patterns: ['prisma', '@prisma/*']
+      next:
+        patterns: ['next', 'react', 'react-dom', 'next-intl', 'eslint-config-next']
+      dev-tools:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+
+  - package-ecosystem: docker
+    directory: /apps/api
+    schedule:
+      interval: monthly
