@@ -16,6 +16,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:migrate": "pnpm --filter @paddock64/api db:migrate",
+    "db:deploy": "pnpm --filter @paddock64/api db:deploy",
     "db:seed": "pnpm --filter @paddock64/api db:seed",
     "openapi": "pnpm --filter @paddock64/api openapi && pnpm --filter @paddock64/api-client generate"
   },
