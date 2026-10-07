@@ -47,9 +47,6 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
     metadataBase: new URL(SITE_URL),
     title: { default: t('title'), template: `%s｜Paddock 64` },
     description: t('description'),
-    alternates: {
-      languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
-    },
     openGraph: { siteName: 'Paddock 64', type: 'website', locale },
   };
 }

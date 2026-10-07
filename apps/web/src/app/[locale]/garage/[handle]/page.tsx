@@ -6,6 +6,7 @@ import { GarageStats } from '@/components/garage/garage-stats';
 import { TrophyIcon } from '@/components/icons';
 import { pageLocale } from '@/i18n/page-locale';
 import { serverApi } from '@/lib/api';
+import { localeAlternates } from '@/lib/seo';
 
 async function loadGarage(handle: string, locale: string) {
   const api = await serverApi(locale);
@@ -24,6 +25,7 @@ export async function generateMetadata({
   const garage = await loadGarage(handle, locale);
   return {
     title: t('publicTitle', { handle: garage.handle }),
+    alternates: localeAlternates(locale, `/garage/${garage.handle}`),
     description: t('publicSubtitle', { models: garage.stats.models, cars: garage.stats.cars }),
   };
 }

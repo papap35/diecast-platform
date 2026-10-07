@@ -19,6 +19,7 @@ import { requestTime } from '@/lib/time';
 import { countryName, flagEmoji, formatDate, formatDateTime } from '@/lib/format';
 import { memberState } from '@/lib/member-state';
 import { storeSettings } from '@/lib/store-settings';
+import { localeAlternates } from '@/lib/seo';
 
 type Product = Schemas['ProductDetailDto'];
 
@@ -40,6 +41,7 @@ export async function generateMetadata({
   const product = await loadProduct(slug, locale as AppLocale);
   return {
     title: product.name,
+    alternates: localeAlternates(locale, `/products/${slug}`),
     description: product.subtitle ?? product.description.slice(0, 120),
     openGraph: { images: product.imageUrl ? [product.imageUrl] : [] },
   };

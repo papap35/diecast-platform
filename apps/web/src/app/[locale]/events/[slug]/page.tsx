@@ -11,6 +11,7 @@ import { pageLocale } from '@/i18n/page-locale';
 import type { AppLocale } from '@/i18n/routing';
 import { serverApi } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
+import { localeAlternates } from '@/lib/seo';
 
 async function loadEvent(slug: string, locale: AppLocale) {
   const api = await serverApi(locale);
@@ -28,6 +29,7 @@ export async function generateMetadata({
   const event = await loadEvent(slug, locale as AppLocale);
   return {
     title: event.title,
+    alternates: localeAlternates(locale, `/events/${slug}`),
     description: event.summary,
     openGraph: { images: event.coverImageUrl ? [event.coverImageUrl] : [] },
   };

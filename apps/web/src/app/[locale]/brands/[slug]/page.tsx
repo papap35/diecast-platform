@@ -7,6 +7,7 @@ import { pageLocale } from '@/i18n/page-locale';
 import type { AppLocale } from '@/i18n/routing';
 import { serverApi } from '@/lib/api';
 import { countryName, flagEmoji } from '@/lib/format';
+import { localeAlternates } from '@/lib/seo';
 
 async function loadBrand(slug: string, locale: AppLocale) {
   const api = await serverApi(locale);
@@ -22,7 +23,11 @@ export async function generateMetadata({
 }: PageProps<'/[locale]/brands/[slug]'>): Promise<Metadata> {
   const { locale, slug } = await params;
   const brand = await loadBrand(slug, locale as AppLocale);
-  return { title: brand.name, description: brand.description ?? undefined };
+  return {
+    title: brand.name,
+    description: brand.description ?? undefined,
+    alternates: localeAlternates(locale, `/brands/${slug}`),
+  };
 }
 
 export default async function BrandPage({ params }: PageProps<'/[locale]/brands/[slug]'>) {

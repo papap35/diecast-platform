@@ -2,13 +2,14 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { ProductListing } from '@/components/product-listing';
 import { pageLocale } from '@/i18n/page-locale';
+import { localeAlternates } from '@/lib/seo';
 
 export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/products'>): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'listing' });
-  return { title: t('title') };
+  return { title: t('title'), alternates: localeAlternates(locale, '/products') };
 }
 
 export default async function ProductsPage({

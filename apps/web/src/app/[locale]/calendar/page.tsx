@@ -14,13 +14,18 @@ import { pageLocale } from '@/i18n/page-locale';
 import { serverApi } from '@/lib/api';
 import { requestTime } from '@/lib/time';
 import { formatReleaseParts } from '@/lib/format';
+import { localeAlternates } from '@/lib/seo';
 
 export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/calendar'>): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'calendar' });
-  return { title: t('title'), description: t('subtitle') };
+  return {
+    title: t('title'),
+    description: t('subtitle'),
+    alternates: localeAlternates(locale, '/calendar'),
+  };
 }
 
 export default async function CalendarPage({ params }: PageProps<'/[locale]/calendar'>) {

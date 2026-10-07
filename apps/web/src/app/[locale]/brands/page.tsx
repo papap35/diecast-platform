@@ -5,13 +5,18 @@ import { Link } from '@/i18n/navigation';
 import { pageLocale } from '@/i18n/page-locale';
 import { serverApi } from '@/lib/api';
 import { countryName, flagEmoji } from '@/lib/format';
+import { localeAlternates } from '@/lib/seo';
 
 export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/brands'>): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'brands' });
-  return { title: t('title'), description: t('subtitle') };
+  return {
+    title: t('title'),
+    description: t('subtitle'),
+    alternates: localeAlternates(locale, '/brands'),
+  };
 }
 
 export default async function BrandsPage({ params }: PageProps<'/[locale]/brands'>) {

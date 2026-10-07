@@ -6,6 +6,7 @@ import { Link } from '@/i18n/navigation';
 import { pageLocale } from '@/i18n/page-locale';
 import { serverApi } from '@/lib/api';
 import { cn } from '@/lib/cn';
+import { localeAlternates } from '@/lib/seo';
 
 type EventType = Schemas['EventType'];
 const TYPES: EventType[] = ['EXHIBITION', 'MEETUP', 'LAUNCH', 'ONLINE'];
@@ -15,7 +16,11 @@ export async function generateMetadata({
 }: PageProps<'/[locale]/events'>): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'events' });
-  return { title: t('title'), description: t('subtitle') };
+  return {
+    title: t('title'),
+    description: t('subtitle'),
+    alternates: localeAlternates(locale, '/events'),
+  };
 }
 
 export default async function EventsPage({ params, searchParams }: PageProps<'/[locale]/events'>) {

@@ -1,4 +1,5 @@
 import type { paths, Schemas } from '@paddock64/api-client';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { AvailabilityBadge } from '@/components/availability-badge';
@@ -14,6 +15,7 @@ import { pageLocale } from '@/i18n/page-locale';
 import { serverApi } from '@/lib/api';
 import { requestTime } from '@/lib/time';
 import { flagEmoji } from '@/lib/format';
+import { localeAlternates } from '@/lib/seo';
 
 type Product = Schemas['ProductSummaryDto'];
 type ProductQuery = NonNullable<paths['/v1/products']['get']['parameters']['query']>;
@@ -24,6 +26,11 @@ function pickHero(drops: Product[], now: number): Product | undefined {
     (p) => p.releaseAt && new Date(p.releaseAt).getTime() <= now && p.availability !== 'SOLD_OUT',
   );
   return live ?? drops.find((p) => p.availability === 'COMING_SOON');
+}
+
+export async function generateMetadata({ params }: PageProps<'/[locale]'>): Promise<Metadata> {
+  const { locale } = await params;
+  return { alternates: localeAlternates(locale) };
 }
 
 export default async function HomePage({ params }: PageProps<'/[locale]'>) {
