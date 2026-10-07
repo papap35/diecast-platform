@@ -436,7 +436,8 @@
     "COUPON_IN_USE": "Coupons that have been used can't be deleted. Disable it instead",
     "CAMPAIGN_NOT_EDITABLE": "Scheduled or sent newsletters can't be edited (cancel the schedule first)",
     "INTERNAL_ERROR": "Something went wrong. Please try again later.",
-    "EMAIL_NOT_RETRYABLE": "Only failed emails can be resent"
+    "EMAIL_NOT_RETRYABLE": "Only failed emails can be resent",
+    "DEMO_ACCOUNT_LOCKED": "Demo accounts can't have their password changed or be deactivated or deleted (they're shared on this demo site)"
   },
   "admins": {
     "title": "Admins",

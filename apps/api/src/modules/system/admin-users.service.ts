@@ -1,4 +1,6 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { assertNotDemoAccount } from '../../common/demo/demo-accounts.js';
+import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import { hashPassword } from '../../common/security/password.js';
 import type { AdminUser, Prisma, Role } from '../../generated/prisma/client.js';
@@ -34,6 +36,7 @@ export class AdminUsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tokens: TokenService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   async list(): Promise<AdminUserListDto> {
@@ -72,6 +75,7 @@ export class AdminUsersService {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('admin-users'))`;
       const admin = await tx.adminUser.findUnique({ where: { id }, include: { role: true } });
       if (!admin) throw AppException.notFound(ErrorCode.NOT_FOUND, '找不到這位管理員');
+      assertNotDemoAccount(this.config, admin.email);
       const roleChanged = dto.roleId !== undefined && dto.roleId !== admin.roleId;
       if (id === actorId && (roleChanged || dto.isActive === false)) {
         throw this.selfError('不能停用自己或變更自己的角色');
@@ -94,8 +98,12 @@ export class AdminUsersService {
   /** 重設其他管理員的密碼，並登出對方所有裝置（自己的密碼請用「修改密碼」） */
   async resetPassword(id: string, password: string, actorId: string): Promise<void> {
     if (id === actorId) throw this.selfError('請從「修改密碼」變更自己的密碼');
-    const admin = await this.prisma.adminUser.findUnique({ where: { id }, select: { id: true } });
+    const admin = await this.prisma.adminUser.findUnique({
+      where: { id },
+      select: { id: true, email: true },
+    });
     if (!admin) throw AppException.notFound(ErrorCode.NOT_FOUND, '找不到這位管理員');
+    assertNotDemoAccount(this.config, admin.email);
     await this.prisma.adminUser.update({
       where: { id },
       data: { passwordHash: await hashPassword(password), tokensValidAfter: new Date() },

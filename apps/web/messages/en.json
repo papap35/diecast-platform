@@ -384,7 +384,8 @@
     "COUPON_NOT_APPLICABLE": "Nothing in your cart qualifies (limited drops are excluded), or shipping is already free",
     "COUPON_ALREADY_USED": "You've already used this coupon",
     "COUPON_USED_UP": "This coupon has been fully redeemed",
-    "UNSUBSCRIBE_INVALID": "This unsubscribe link isn't valid. Please open it again from the newsletter"
+    "UNSUBSCRIBE_INVALID": "This unsubscribe link isn't valid. Please open it again from the newsletter",
+    "DEMO_ACCOUNT_LOCKED": "The demo account's password can't be changed and the account can't be deleted. Register your own account to try everything."
   },
   "footer": {
     "tagline": "An online garage built for diecast collectors.",

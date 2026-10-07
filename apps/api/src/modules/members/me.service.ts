@@ -1,4 +1,6 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { assertNotDemoAccount } from '../../common/demo/demo-accounts.js';
+import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import { generateOpaqueToken } from '../../common/security/random.js';
 import { hashPassword, verifyPassword } from '../../common/security/password.js';
@@ -17,6 +19,7 @@ export class MeService {
     private readonly prisma: PrismaService,
     private readonly tokens: TokenService,
     private readonly settings: SettingsService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   async profile(memberId: string): Promise<MemberProfileDto> {
@@ -69,6 +72,7 @@ export class MeService {
   /** 變更密碼後作廢所有既有登入，其他裝置需重新登入 */
   async changePassword(memberId: string, dto: ChangePasswordDto): Promise<void> {
     const member = await this.prisma.member.findUniqueOrThrow({ where: { id: memberId } });
+    assertNotDemoAccount(this.config, member.email);
     if (!(await verifyPassword(dto.currentPassword, member.passwordHash))) {
       throw new AppException(
         ErrorCode.INVALID_CREDENTIALS,
@@ -89,6 +93,7 @@ export class MeService {
    */
   async deleteAccount(memberId: string, password: string): Promise<void> {
     const member = await this.prisma.member.findUniqueOrThrow({ where: { id: memberId } });
+    assertNotDemoAccount(this.config, member.email);
     if (!(await verifyPassword(password, member.passwordHash))) {
       throw new AppException(ErrorCode.INVALID_CREDENTIALS, '密碼不正確', HttpStatus.BAD_REQUEST);
     }

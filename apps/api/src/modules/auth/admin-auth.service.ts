@@ -1,4 +1,6 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { assertNotDemoAccount } from '../../common/demo/demo-accounts.js';
+import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import { verifyPassword, hashPassword } from '../../common/security/password.js';
 import type { AdminUser, Role } from '../../generated/prisma/client.js';
@@ -32,6 +34,7 @@ export class AdminAuthService {
     private readonly prisma: PrismaService,
     private readonly tokens: TokenService,
     private readonly audit: AuditService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   async login(dto: AdminLoginDto, client: ClientInfo): Promise<AdminAuthResultDto> {
@@ -90,6 +93,7 @@ export class AdminAuthService {
     client: ClientInfo,
   ): Promise<void> {
     const admin = await this.prisma.adminUser.findUniqueOrThrow({ where: { id: adminId } });
+    assertNotDemoAccount(this.config, admin.email);
     if (!(await verifyPassword(dto.currentPassword, admin.passwordHash))) {
       throw AppException.badRequest(ErrorCode.INVALID_CREDENTIALS, '目前的密碼不正確');
     }

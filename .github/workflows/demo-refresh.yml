@@ -1,0 +1,38 @@
+name: 示範環境每日重整
+
+# 公開示範站每天凌晨重新執行種子：還原示範帳號密碼、系統設定與橫幅，
+# 讓限量發售的倒數與發售行事曆永遠在未來，賣完的商品補貨，並移除訪客新增的公開內容。
+# 需要在 repository 設定：
+#   - Variables：DEMO_REFRESH_ENABLED = true（fork 或尚未部署時不會執行）
+#   - Secrets：DEMO_DATABASE_URL（示範環境資料庫）
+# 資料庫遷移只在部署時執行（Railway preDeployCommand），這裡不跑，避免 main 比線上版本新時先改到正式資料庫。
+on:
+  schedule:
+    - cron: '7 19 * * *' # 台灣時間每天 03:07
+  workflow_dispatch:
+
+concurrency:
+  group: demo-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    if: vars.DEMO_REFRESH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter @paddock64/api
+      - name: 重整示範資料
+        run: pnpm --filter @paddock64/api db:seed
+        env:
+          DATABASE_URL: ${{ secrets.DEMO_DATABASE_URL }}
+          DEMO_RESET: 'true'

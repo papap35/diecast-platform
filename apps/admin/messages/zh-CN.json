@@ -436,13 +436,14 @@
     "COUPON_IN_USE": "已有使用纪录的优惠券不能删除，请改为停用",
     "CAMPAIGN_NOT_EDITABLE": "电子报已调度或寄出，不能修改（调度中可先取消）",
     "INTERNAL_ERROR": "系统暂时发生问题，请稍后再试",
-    "EMAIL_NOT_RETRYABLE": "只有寄送失败的信可以重新寄送"
+    "EMAIL_NOT_RETRYABLE": "只有寄送失败的信可以重新寄送",
+    "DEMO_ACCOUNT_LOCKED": "示范账号不能修改密码、停用或删除（示范网站的公开账号）"
   },
   "admins": {
     "title": "管理员",
-    "subtitle": "后台帐号与角色。停用或重设密码会立即注销对方所有设备。",
+    "subtitle": "后台账号与角色。停用或重设密码会立即注销对方所有设备。",
     "new": "添加管理员",
-    "create": "创建帐号",
+    "create": "创建账号",
     "email": "Email",
     "name": "名称",
     "role": "角色",
@@ -511,7 +512,7 @@
     "from": "起日",
     "to": "迄日",
     "showDetails": "查看送出的内容",
-    "deletedAdmin": "（已删除的帐号）",
+    "deletedAdmin": "（已删除的账号）",
     "groups": {
       "auth": "登录与密码",
       "admin": "管理员",
@@ -855,7 +856,7 @@
       "name": "名称",
       "nameHint": "内部辨识用，会员看不到",
       "audience": "收件对象",
-      "audienceHint": "只会寄给同意接收行销消息、帐号正常的会员",
+      "audienceHint": "只会寄给同意接收行销消息、账号正常的会员",
       "subject": "主旨",
       "body": "内容",
       "bodyHint": "纯文本，段落之间空一行；'{{name}}' 会换成会员名称。信件最后会自动加上退订说明。",

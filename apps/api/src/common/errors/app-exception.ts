@@ -81,6 +81,9 @@ export const ErrorCode = {
 
   /** 只有寄送失敗的信可以重新排入寄送 */
   EMAIL_NOT_RETRYABLE: 'EMAIL_NOT_RETRYABLE',
+
+  /** 公開示範環境的示範帳號不能改密碼、停用或刪除 */
+  DEMO_ACCOUNT_LOCKED: 'DEMO_ACCOUNT_LOCKED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

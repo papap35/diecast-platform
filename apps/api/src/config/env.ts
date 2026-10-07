@@ -65,6 +65,25 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().default(''),
   EMAIL_FROM: z.string().default('Paddock 64 <noreply@paddock64.dev>'),
 
+  /**
+   * 公開示範環境：示範帳號（帳密公開在 README）不能改密碼、停用或刪除，
+   * 避免訪客把其他人鎖在外面。示範資料每天由排程重整（見 docs/deployment.md）
+   */
+  DEMO_MODE: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
+  /** DEMO_MODE 時受保護的帳號 Email，以逗號分隔 */
+  DEMO_ACCOUNTS: z
+    .string()
+    .default('admin@paddock64.dev,ops@paddock64.dev,cs@paddock64.dev,demo@paddock64.dev')
+    .transform((value) =>
+      value
+        .split(',')
+        .map((item) => item.trim().toLowerCase())
+        .filter(Boolean),
+    ),
+
   SWAGGER_ENABLED: z
     .enum(['true', 'false'])
     .default('true')

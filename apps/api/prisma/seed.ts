@@ -1,7 +1,10 @@
 /**
- * 示範資料種子（可重複執行）。
- * - 角色、管理員、示範會員、品牌、分類、商品皆以唯一鍵 upsert
- * - 既有商品「不覆寫庫存」，只更新內容與發售時間（重新執行即可刷新限量發售的倒數）
+ * 示範資料種子（可重複執行；公開示範環境每天由 GitHub Actions 執行一次，見 docs/deployment.md）。
+ * - 角色、管理員、示範會員、品牌、分類、商品皆以唯一鍵 upsert，示範帳號的密碼一併還原
+ * - 商品內容與發售時間以執行當下重新計算：限量發售的倒數、發售行事曆永遠不會過期
+ * - 既有商品原則上不覆寫庫存；即將開賣的商品恢復完整名額、賣完的現貨補回初始庫存
+ * - 系統設定恢復預設值
+ * - DEMO_RESET=true 時另外移除訪客新增的橫幅、活動，下架訪客新增的商品
  */
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -9,7 +12,7 @@ import { PrismaClient } from '../src/generated/prisma/client.js';
 import { hashPassword } from '../src/common/security/password.js';
 import { Permission } from '../src/modules/auth/permissions.js';
 import { BRANDS, CATEGORIES, PRODUCTS, type SeedProduct } from './seed/catalog-data.js';
-import { seedDemoMemberExtras, seedEvents } from './seed/collector-data.js';
+import { EVENTS, seedDemoMemberExtras, seedEvents } from './seed/collector-data.js';
 import { seedBanners } from './seed/content-data.js';
 import { seedCampaigns, seedCoupons } from './seed/marketing-data.js';
 import {
@@ -108,7 +111,13 @@ async function seedAdmins(roleIds: Map<string, string>) {
         passwordHash: await hashPassword(admin.password),
         roleId: roleIds.get(admin.role)!,
       },
-      update: { roleId: roleIds.get(admin.role)!, isActive: true },
+      // 每次執行都還原名稱、角色與密碼（公開示範環境的帳密寫在 README）
+      update: {
+        name: admin.name,
+        roleId: roleIds.get(admin.role)!,
+        isActive: true,
+        passwordHash: await hashPassword(admin.password),
+      },
     });
   }
 }
@@ -124,7 +133,79 @@ async function seedMember() {
       passwordHash: await hashPassword(password),
       marketingOptIn: true,
     },
-    update: { status: 'ACTIVE' },
+    update: {
+      name,
+      phone: '0912345678',
+      status: 'ACTIVE',
+      marketingOptIn: true,
+      deletedAt: null,
+      passwordHash: await hashPassword(password),
+    },
+  });
+}
+
+/** 系統設定恢復預設值（與資料表預設值相同） */
+async function seedSettings() {
+  const defaults = {
+    homeDeliveryFee: 120,
+    homeFreeShippingThreshold: 1500,
+    cvsFee: 60,
+    cvsFreeShippingThreshold: 1000,
+    paymentTimeoutMinutes: 30,
+    limitedPaymentTimeoutMinutes: 10,
+  };
+  await prisma.storeSettings.upsert({
+    where: { id: 1 },
+    create: { id: 1, ...defaults },
+    update: defaults,
+  });
+}
+
+/**
+ * 示範環境每日重整（DEMO_RESET=true）：移除訪客新增的公開內容。
+ * 橫幅全部重建、非示範的活動刪除、非示範的商品下架（有訂單關聯，不能刪除），
+ * 訪客新增的品牌與分類停用。訂單、會員與優惠券保留，讓報表有資料可看。
+ */
+async function pruneVisitorContent() {
+  if (process.env.DEMO_RESET !== 'true') return;
+  await prisma.banner.deleteMany({});
+  await prisma.event.deleteMany({ where: { slug: { notIn: EVENTS.map((event) => event.slug) } } });
+  const products = await prisma.product.updateMany({
+    where: {
+      slug: { notIn: PRODUCTS.map((product) => product.slug) },
+      status: { not: 'ARCHIVED' },
+    },
+    data: { status: 'ARCHIVED' },
+  });
+  await prisma.brand.updateMany({
+    where: { slug: { notIn: BRANDS.map((brand) => brand.slug) } },
+    data: { isActive: false },
+  });
+  await prisma.category.updateMany({
+    where: { slug: { notIn: CATEGORIES.map((category) => category.slug) } },
+    data: { isActive: false },
+  });
+  console.log(`  示範環境重整：清除訪客新增的內容（下架 ${products.count} 項商品）`);
+}
+
+/**
+ * 把庫存調整成目標數量並記錄異動。以目前庫存為條件更新：
+ * 執行期間剛好有人下單，這次就跳過（下次重整再處理），不會蓋掉訂單扣的庫存。
+ */
+async function resetStock(productId: string, current: number, target: number, note: string) {
+  const delta = target - current;
+  if (delta === 0) return;
+  const { count } = await prisma.product.updateMany({
+    where: { id: productId, stock: current },
+    data: {
+      stock: target,
+      // 從售完補回有貨：願望清單會通知會員
+      ...(current <= 0 && target > 0 ? { restockedAt: new Date() } : {}),
+    },
+  });
+  if (count === 0) return;
+  await prisma.stockMovement.create({
+    data: { productId, delta, balance: target, reason: 'ADMIN_ADJUSTMENT', note },
   });
 }
 
@@ -191,6 +272,21 @@ async function seedProducts(brandIds: Map<string, string>, categoryIds: Map<stri
   for (const [index, product] of PRODUCTS.entries()) {
     const data = productData(product, now, brandIds, categoryIds);
     const existing = await prisma.product.findUnique({ where: { slug: product.slug } });
+
+    if (existing) {
+      // 即將開賣的限量／預購每次都恢復完整名額，搶購隨時可以體驗；
+      // 賣完的現貨補回初始庫存（庫存偏低但還沒賣完的保留，後台低庫存提醒才有內容）
+      const upcoming = product.releaseInHours !== undefined && product.releaseInHours > 0;
+      const soldOut = (product.saleType ?? 'REGULAR') === 'REGULAR' && existing.stock <= 0;
+      if (upcoming || soldOut) {
+        await resetStock(
+          existing.id,
+          existing.stock,
+          product.stock,
+          upcoming ? '示範資料：重設發售名額' : '示範資料：補回初始庫存',
+        );
+      }
+    }
 
     const saved = existing
       ? await prisma.product.update({ where: { id: existing.id }, data })
@@ -280,6 +376,7 @@ function productData(
 }
 
 async function main() {
+  await pruneVisitorContent();
   const roleIds = await seedRoles();
   await seedAdmins(roleIds);
   await seedMember();
@@ -295,6 +392,7 @@ async function main() {
   await seedCoupons(prisma);
   await seedCampaigns(prisma);
   await seedDemoMemberExtras(prisma, DEMO_ACCOUNTS.member.email);
+  await seedSettings();
 
   console.log(`✔ 示範資料建立完成${orders ? `（新增 ${orders} 筆示範訂單）` : ''}`);
   console.log(`  後台：${DEMO_ACCOUNTS.superAdmin.email} / ${DEMO_ACCOUNTS.superAdmin.password}`);

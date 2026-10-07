@@ -384,7 +384,8 @@
     "COUPON_NOT_APPLICABLE": "购物车中没有适用的商品（限量商品不适用），或这笔订单已经免运",
     "COUPON_ALREADY_USED": "你已经使用过这张优惠券",
     "COUPON_USED_UP": "这张优惠券已经被领完了",
-    "UNSUBSCRIBE_INVALID": "退订链接无效，请从电子报中的链接重新打开"
+    "UNSUBSCRIBE_INVALID": "退订链接无效，请从电子报中的链接重新打开",
+    "DEMO_ACCOUNT_LOCKED": "示范账号不能修改密码或删除；想完整体验可以另外注册一个账号"
   },
   "footer": {
     "tagline": "为模型车收藏家打造的线上车库。",

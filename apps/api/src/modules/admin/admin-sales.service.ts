@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { assertNotDemoAccount } from '../../common/demo/demo-accounts.js';
+import { APP_CONFIG, type AppConfig } from '../../config/config.module.js';
 import { AppException, ErrorCode } from '../../common/errors/app-exception.js';
 import { pageMeta, skipTake } from '../../common/http/pagination.dto.js';
 import { pickTranslation } from '../../common/i18n/locale.js';
@@ -37,6 +39,7 @@ export class AdminSalesService {
     private readonly prisma: PrismaService,
     private readonly orders: OrdersService,
     private readonly tokens: TokenService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   // ── 訂單 ──
@@ -220,8 +223,12 @@ export class AdminSalesService {
   }
 
   async updateMemberStatus(id: string, status: 'ACTIVE' | 'SUSPENDED'): Promise<AdminMemberDto> {
-    const member = await this.prisma.member.findUnique({ where: { id }, select: { status: true } });
+    const member = await this.prisma.member.findUnique({
+      where: { id },
+      select: { status: true, email: true },
+    });
     if (!member) throw AppException.notFound(ErrorCode.NOT_FOUND, '找不到這位會員');
+    if (status === 'SUSPENDED') assertNotDemoAccount(this.config, member.email);
     if (member.status === 'DELETED') {
       throw AppException.conflict(ErrorCode.CONFLICT, '已刪除的帳號無法變更狀態');
     }
